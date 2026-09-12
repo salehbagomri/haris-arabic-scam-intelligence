@@ -14,6 +14,8 @@ export interface ScamDnaIndicator {
   detected: boolean;
   severity: 'low' | 'medium' | 'high';
   detail: string;
+  evidence?: string[];
+  explanations?: string[];
   provenance?: 'deterministic' | 'ai' | 'both';
 }
 

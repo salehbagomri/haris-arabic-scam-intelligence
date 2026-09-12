@@ -10,6 +10,15 @@ import { AnalyzeRequest, AnalyzeResponse, analyzeResponseSchema } from '../api/s
 import { AnalysisResult, InputMode } from '../types/analysis';
 import { VISION_CONFIG, isAllowedImageMimeType } from '../config/vision';
 
+export const SAFE_CLIENT_ERROR_MESSAGES = {
+  BAD_REQUEST: 'تعذر التحقق من صحة المدخلات المرسلة. يرجى مراجعة النص أو الرابط أو ملف لقطة الشاشة والمحاولة مجدداً.',
+  PAYLOAD_TOO_LARGE: 'حجم لقطة الشاشة المرفوعة يتجاوز الحد الأقصى المسموح به (10 ميجابايت).',
+  SERVER_ERROR: 'حدث خطأ غير متوقع في خادم التحليل أثناء معالجة المحتوى. يرجى المحاولة مرة أخرى لاحقاً.',
+  NETWORK_ERROR: 'تعذر الاتصال بخادم الفحص. يرجى التحقق من اتصال الإنترنت لديك والمحاولة مجدداً.',
+  MALFORMED_RESPONSE: 'استجابة خادم الفحص غير صالحة أو غير متوقعة. يرجى إعادة المحاولة لاحقاً.',
+  FILE_READ_ERROR: 'تعذر قراءة بيانات ملف الصورة بصيغة صالحة في المتصفح.',
+} as const;
+
 export interface ExecuteAnalysisParams {
   mode: InputMode;
   text?: string;
@@ -29,43 +38,65 @@ export class AnalysisError extends Error {
 }
 
 /**
- * Safely convert a browser/runtime File to a Data URL (data:<mime>;base64,...)
- * Supports standard File.arrayBuffer() across modern browsers and Node runtimes.
+ * Browser-compatible conversion of ArrayBuffer to Base64 using standard Web primitives
+ * (Uint8Array, String.fromCharCode, window.btoa / globalThis.btoa).
+ * Does NOT require or use Node's `Buffer` object.
+ * Operates in 32KB chunks to prevent maximum call stack size exceeded errors on large files.
  */
-export async function fileToDataUrl(file: File): Promise<string> {
-  try {
-    if (typeof file.arrayBuffer === 'function') {
-      const arrayBuffer = await file.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString('base64');
-      return `data:${file.type};base64,${base64}`;
-    }
-
-    if (typeof FileReader !== 'undefined') {
-      return await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new AnalysisError('تعذر قراءة بيانات ملف الصورة بصيغة صالحة.'));
-          }
-        };
-        reader.onerror = () => {
-          reject(new AnalysisError('حدث خطأ أثناء قراءة ملف لقطة الشاشة في المتصفح.'));
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    throw new Error('Environment does not support file reading.');
-  } catch (err: unknown) {
-    if (err instanceof AnalysisError) throw err;
-    throw new AnalysisError('تعذر قراءة بيانات ملف الصورة بصيغة صالحة.');
+export function arrayBufferToBase64Web(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const len = bytes.byteLength;
+  const chunkSize = 0x8000; // 32,768 bytes per chunk
+  for (let i = 0; i < len; i += chunkSize) {
+    const chunk = bytes.subarray(i, Math.min(i + chunkSize, len));
+    binary += String.fromCharCode.apply(null, chunk as unknown as number[]);
   }
+  return btoa(binary);
 }
 
 /**
- * Map raw server AnalyzeResponse to the UI-compatible AnalysisResult
+ * Safely convert a browser/runtime File to a Data URL (data:<mime>;base64,...)
+ * Uses standard Web APIs (FileReader or File.arrayBuffer() + arrayBufferToBase64Web).
+ * Completely free of Node.js Buffer dependencies for 100% browser compatibility.
+ */
+export async function fileToDataUrl(file: File): Promise<string> {
+  // Strategy A: Native browser FileReader (standard in all modern browsers)
+  if (typeof FileReader !== 'undefined') {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result);
+        } else {
+          reject(new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.FILE_READ_ERROR));
+        }
+      };
+      reader.onerror = () => {
+        reject(new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.FILE_READ_ERROR));
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Strategy B: Standard Web API File.arrayBuffer() + pure Web Base64 conversion (btoa)
+  if (typeof file.arrayBuffer === 'function') {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const base64 = arrayBufferToBase64Web(arrayBuffer);
+      const mime = file.type || 'image/png';
+      return `data:${mime};base64,${base64}`;
+    } catch {
+      throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.FILE_READ_ERROR);
+    }
+  }
+
+  throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.FILE_READ_ERROR);
+}
+
+/**
+ * Map raw server AnalyzeResponse to the UI-compatible AnalysisResult.
+ * Preserves all intelligence indicators, complete Scam DNA evidence, and explanations.
  */
 export function mapApiResponseToResult(
   response: AnalyzeResponse,
@@ -88,9 +119,11 @@ export function mapApiResponseToResult(
       detected: d.detected,
       severity: d.severity,
       provenance: d.provenance,
+      evidence: d.evidence ? [...d.evidence] : [],
+      explanations: d.explanations ? [...d.explanations] : [],
       detail:
-        d.explanations.length > 0
-          ? d.explanations[0]
+        d.explanations && d.explanations.length > 0
+          ? d.explanations.join(' • ')
           : d.detected
           ? 'تم رصد هذا المؤشر كجزء من نمط التهديد'
           : 'لم يتم رصد هذا المؤشر في المحتوى المفحوص',
@@ -192,45 +225,25 @@ export async function executeRealAnalysis(
       body: JSON.stringify(requestBody),
     });
   } catch {
-    throw new AnalysisError(
-      'تعذر الاتصال بخادم الفحص. يرجى التحقق من اتصال الإنترنت لديك والمحاولة مجدداً.'
-    );
+    throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.NETWORK_ERROR);
   }
 
-  // 3. Handle non-200 HTTP statuses
+  // 3. Handle non-200 HTTP statuses (Strictly Sanitized: NEVER exposes errorJson.error or server details)
   if (!res.ok) {
-    let errorMessage = 'حدث خطأ أثناء معالجة الطلب.';
-    try {
-      const errorJson = (await res.json()) as { error?: string };
-      if (errorJson && typeof errorJson.error === 'string') {
-        errorMessage = errorJson.error;
-      }
-    } catch {
-      // fallback to status-based message
-    }
-
     if (res.status === 400) {
-      throw new AnalysisError(
-        `خطأ في التحقق من صحة المدخلات: ${errorMessage}`,
-        400
-      );
+      throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.BAD_REQUEST, 400);
     }
 
     if (res.status === 413) {
-      throw new AnalysisError(
-        'حجم الصورة المرفوعة يتجاوز الحد الأقصى المسموح به (10 ميجابايت).',
-        413
-      );
+      throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.PAYLOAD_TOO_LARGE, 413);
     }
 
     if (res.status === 500) {
-      throw new AnalysisError(
-        'حدث خطأ غير متوقع في خادم التحليل. يرجى المحاولة مرة أخرى لاحقاً.',
-        500
-      );
+      throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.SERVER_ERROR, 500);
     }
 
-    throw new AnalysisError(errorMessage, res.status);
+    // Generic fallback for any other unexpected HTTP status
+    throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.SERVER_ERROR, res.status);
   }
 
   // 4. Parse and validate 200 response
@@ -238,12 +251,12 @@ export async function executeRealAnalysis(
   try {
     rawJson = await res.json();
   } catch {
-    throw new AnalysisError('استجابة خادم الفحص غير صالحة أو تعذر قراءتها.');
+    throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.MALFORMED_RESPONSE);
   }
 
   const parseResult = analyzeResponseSchema.safeParse(rawJson);
   if (!parseResult.success) {
-    throw new AnalysisError('بنية نتائج التحليل المستلمة من الخادم غير مطابقة للمواصفات.');
+    throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.MALFORMED_RESPONSE);
   }
 
   // 5. Map to presentation model

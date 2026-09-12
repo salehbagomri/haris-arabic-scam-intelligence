@@ -37,15 +37,72 @@ export function ScamDnaGrid({ indicators }: ScamDnaGridProps) {
               <span className="haris-dna-card-en font-mono">{item.nameEn}</span>
             </div>
 
-            <p className="haris-dna-detail">{item.detail}</p>
+            {item.explanations && item.explanations.length > 1 ? (
+              <ul
+                className="haris-dna-detail"
+                style={{
+                  margin: 0,
+                  paddingRight: 'var(--space-4)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                }}
+              >
+                {item.explanations.map((exp, expIdx) => (
+                  <li key={expIdx}>{exp}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="haris-dna-detail">{item.detail}</p>
+            )}
 
-            <div style={{ marginTop: 'auto', paddingTop: 'var(--space-1)', display: 'flex', justifyContent: 'flex-end' }}>
+            {item.evidence && item.evidence.length > 0 && (
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: 'var(--space-1)' }}>
+                <span>الدليل المستخرج: </span>
+                <span className="font-mono" style={{ color: 'var(--text-secondary)' }}>
+                  {item.evidence.map((ev) => `«${ev}»`).join('، ')}
+                </span>
+              </div>
+            )}
+
+            <div
+              style={{
+                marginTop: 'auto',
+                paddingTop: 'var(--space-2)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              {item.provenance && (
+                <span
+                  className="haris-badge"
+                  style={{ background: 'var(--bg-surface-elevated)', color: 'var(--text-muted)', fontSize: '10px' }}
+                >
+                  <span>
+                    {item.provenance === 'both'
+                      ? 'رصد متعدد المصادر'
+                      : item.provenance === 'ai'
+                      ? 'استدلال ذكي'
+                      : 'فحص حتمي'}
+                  </span>
+                </span>
+              )}
+
               {item.detected ? (
-                <span className="haris-badge danger">
+                <span className="haris-badge danger" style={{ marginLeft: item.provenance ? undefined : 'auto' }}>
                   <span>تم الرصد</span>
                 </span>
               ) : (
-                <span className="haris-badge" style={{ background: 'var(--bg-surface-subtle)', color: 'var(--text-muted)' }}>
+                <span
+                  className="haris-badge"
+                  style={{
+                    background: 'var(--bg-surface-subtle)',
+                    color: 'var(--text-muted)',
+                    marginLeft: item.provenance ? undefined : 'auto',
+                  }}
+                >
                   <CheckCircle2 size={12} />
                   <span>غير مرصود</span>
                 </span>
