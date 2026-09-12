@@ -12,19 +12,30 @@ import { VISION_CONFIG, isAllowedImageMimeType } from '../config/vision';
 // 1. Request Contract
 // ============================================================================
 
-export const screenshotPayloadSchema = z.object({
-  mimeType: z
-    .string()
-    .trim()
-    .min(1, 'Screenshot mimeType cannot be empty')
-    .refine((val) => isAllowedImageMimeType(val), {
-      message: `Unsupported screenshot MIME type. Allowed formats: ${VISION_CONFIG.allowedMimeTypes.join(', ')}`,
-    }),
-  data: z
-    .string()
-    .trim()
-    .min(1, 'Screenshot data cannot be empty'),
-});
+/**
+ * Supported image MIME types per VISION_CONFIG:
+ * - image/png
+ * - image/jpeg
+ * - image/webp
+ * - image/heic
+ * - image/gif
+ * (Note: image/heif is not supported)
+ */
+export const screenshotPayloadSchema = z
+  .object({
+    mimeType: z
+      .string()
+      .trim()
+      .min(1, 'Screenshot mimeType cannot be empty')
+      .refine((val) => isAllowedImageMimeType(val), {
+        message: `Unsupported screenshot MIME type. Allowed formats: ${VISION_CONFIG.allowedMimeTypes.join(', ')}`,
+      }),
+    data: z
+      .string()
+      .trim()
+      .min(1, 'Screenshot data cannot be empty'),
+  })
+  .strict();
 
 export type ScreenshotPayload = z.infer<typeof screenshotPayloadSchema>;
 
@@ -42,6 +53,7 @@ export const analyzeRequestSchema = z
       .optional(),
     screenshot: screenshotPayloadSchema.optional(),
   })
+  .strict()
   .refine(
     (data) => {
       const hasText = typeof data.text === 'string' && data.text.length > 0;

@@ -19,7 +19,7 @@
 
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
-import { POST } from '../app/api/analyze/route';
+import { POST, setAnalyzePipelineForTesting } from '../app/api/analyze/route';
 import { setGeminiClientForTesting, resetGeminiClientCache } from '../lib/ai/client';
 import { AnalyzeResponse, analyzeResponseSchema } from '../lib/api/schema';
 import { VISION_CONFIG } from '../lib/config/vision';
@@ -27,10 +27,12 @@ import { VISION_CONFIG } from '../lib/config/vision';
 describe('HARIS Phase 5A: Unified Analysis API (POST /api/analyze)', () => {
   beforeEach(() => {
     resetGeminiClientCache();
+    setAnalyzePipelineForTesting(null);
   });
 
   afterEach(() => {
     resetGeminiClientCache();
+    setAnalyzePipelineForTesting(null);
   });
 
   // Helper to create Request object
@@ -370,6 +372,193 @@ describe('HARIS Phase 5A: Unified Analysis API (POST /api/analyze)', () => {
       console.warn = origWarn;
       console.error = origError;
       console.info = origInfo;
+    }
+  });
+
+  // =========================================================================
+  // Phase 5A.1 Precision Patch Tests
+  // =========================================================================
+
+  // 1. Base64 & Data URL Validation (Finding 1)
+  it('14. malformed Base64 payload returns 400 Bad Request', async () => {
+    const req = createApiRequest({
+      screenshot: {
+        mimeType: 'image/png',
+        data: 'not_valid_base64!!!@#$',
+      },
+    });
+
+    const res = await POST(req);
+    assert.strictEqual(res.status, 400);
+
+    const body = (await res.json()) as { error: string };
+    assert.ok(body.error && body.error.includes('Base64'));
+  });
+
+  it('15. non-canonical Base64 payload with invalid padding returns 400', async () => {
+    const req = createApiRequest({
+      screenshot: {
+        mimeType: 'image/png',
+        data: 'AAAA===', // invalid padding (3 equals)
+      },
+    });
+
+    const res = await POST(req);
+    assert.strictEqual(res.status, 400);
+
+    const body = (await res.json()) as { error: string };
+    assert.ok(body.error && body.error.includes('Base64'));
+  });
+
+  it('16. valid canonical Base64 payload is accepted with 200', async () => {
+    const validBase64 = Buffer.from('HARIS-valid-test-image-bytes').toString('base64');
+    const req = createApiRequest({
+      screenshot: {
+        mimeType: 'image/png',
+        data: validBase64,
+      },
+    });
+
+    const res = await POST(req);
+    assert.strictEqual(res.status, 200);
+  });
+
+  it('17. valid Data URL with matching MIME is accepted with 200', async () => {
+    const validBase64 = Buffer.from('HARIS-test-png-data').toString('base64');
+    const req = createApiRequest({
+      screenshot: {
+        mimeType: 'image/png',
+        data: `data:image/png;base64,${validBase64}`,
+      },
+    });
+
+    const res = await POST(req);
+    assert.strictEqual(res.status, 200);
+  });
+
+  it('18. Data URL MIME mismatch with screenshot.mimeType returns 400', async () => {
+    const validBase64 = Buffer.from('HARIS-test-png-data').toString('base64');
+    const req = createApiRequest({
+      screenshot: {
+        mimeType: 'image/png',
+        data: `data:image/jpeg;base64,${validBase64}`,
+      },
+    });
+
+    const res = await POST(req);
+    assert.strictEqual(res.status, 400);
+
+    const body = (await res.json()) as { error: string };
+    assert.ok(body.error && body.error.includes('Data URL MIME type'));
+  });
+
+  // 2. Strict Zod Schemas (Finding 2)
+  it('19. unexpected top-level request field is rejected with 400 (strict validation)', async () => {
+    const req = createApiRequest({
+      text: 'السلام عليكم ورحمة الله',
+      unexpectedField: 'malicious-injection',
+    });
+
+    const res = await POST(req);
+    assert.strictEqual(res.status, 400);
+
+    const body = (await res.json()) as { error: string };
+    assert.ok(
+      body.error &&
+        (body.error.includes('unexpectedField') ||
+          body.error.includes('Unrecognized') ||
+          body.error.includes('unrecognized_keys'))
+    );
+  });
+
+  it('20. unexpected screenshot property is rejected with 400 (strict validation)', async () => {
+    const validBase64 = Buffer.from('HARIS-test-png-data').toString('base64');
+    const req = createApiRequest({
+      screenshot: {
+        mimeType: 'image/png',
+        data: validBase64,
+        extraUnauthorizedProperty: true,
+      },
+    });
+
+    const res = await POST(req);
+    assert.strictEqual(res.status, 400);
+
+    const body = (await res.json()) as { error: string };
+    assert.ok(
+      body.error &&
+        (body.error.includes('extraUnauthorizedProperty') ||
+          body.error.includes('Unrecognized') ||
+          body.error.includes('unrecognized_keys'))
+    );
+  });
+
+  // 3. Exact MIME Allowlist (Finding 3)
+  it('21. accepts all approved MIME types in VISION_CONFIG allowlist', async () => {
+    const validBase64 = Buffer.from('HARIS-test-image-content').toString('base64');
+    const approvedMimes = ['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/gif'] as const;
+
+    for (const mime of approvedMimes) {
+      const req = createApiRequest({
+        screenshot: {
+          mimeType: mime,
+          data: validBase64,
+        },
+      });
+
+      const res = await POST(req);
+      assert.strictEqual(res.status, 200, `Expected approved MIME ${mime} to return 200`);
+    }
+  });
+
+  it('22. rejects unsupported MIME types including image/heif, image/svg+xml, and text/plain with 400', async () => {
+    const validBase64 = Buffer.from('HARIS-test-image-content').toString('base64');
+    const disallowedMimes = ['image/heif', 'image/svg+xml', 'image/bmp', 'text/plain'];
+
+    for (const mime of disallowedMimes) {
+      const req = createApiRequest({
+        screenshot: {
+          mimeType: mime,
+          data: validBase64,
+        },
+      });
+
+      const res = await POST(req);
+      assert.strictEqual(res.status, 400, `Expected disallowed MIME ${mime} to return 400`);
+
+      const body = (await res.json()) as { error: string };
+      assert.ok(body.error && body.error.includes('Unsupported screenshot MIME type'));
+    }
+  });
+
+  // 4. Complete HTTP 500 Error Coverage (Finding 4)
+  it('23. unexpected server exception returns HTTP 500 without leaking stack traces, keys, or internals', async () => {
+    const secretApiKey = 'AIzaSySecretApiKeyThatMustNeverLeak12345';
+    const internalTrace = 'Error: Kernel Panic at /internal/secrets/vault.ts:42:15';
+
+    setAnalyzePipelineForTesting(async () => {
+      throw new Error(`${internalTrace} with key ${secretApiKey}`);
+    });
+
+    try {
+      const req = createApiRequest({ text: 'تحقق من حسابك فوراً' });
+      const res = await POST(req);
+      assert.strictEqual(res.status, 500);
+
+      const body = (await res.json()) as Record<string, unknown>;
+      // Must be a stable JSON error shape with only 'error'
+      assert.deepStrictEqual(Object.keys(body), ['error']);
+      assert.strictEqual(typeof body.error, 'string');
+      assert.strictEqual(body.error, 'An unexpected internal error occurred during analysis.');
+
+      // Verification: zero leak of keys, stack traces, or internal paths
+      const errorStr = body.error as string;
+      assert.strictEqual(errorStr.includes(secretApiKey), false, 'API key leaked in 500 response!');
+      assert.strictEqual(errorStr.includes('Kernel Panic'), false, 'Stack trace leaked in 500 response!');
+      assert.strictEqual(errorStr.includes('/internal/'), false, 'Internal path leaked in 500 response!');
+      assert.strictEqual(errorStr.includes('vault.ts'), false, 'Internal filename leaked in 500 response!');
+    } finally {
+      setAnalyzePipelineForTesting(null);
     }
   });
 });
