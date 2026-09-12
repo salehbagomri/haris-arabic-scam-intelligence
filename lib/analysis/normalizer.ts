@@ -10,6 +10,8 @@
  * the original verbatim content.
  */
 
+import { parse as parseDomain } from 'tldts';
+
 export interface NormalizedTextResult {
   /** The untouched original input string */
   originalText: string;
@@ -133,21 +135,44 @@ export function normalizeArabizi(text: string): { cleaned: string; detected: boo
 }
 
 /**
- * Extract all URLs from the text
+ * Extract all URLs and bare domains from text with strict lexical validation
  */
 export function extractUrlsFromText(text: string): string[] {
-  // Match full URLs with protocols or common www / bare domain patterns
-  const urlRegex = /(?:https?:\/\/|www\.)[^\s/$.?#].[^\s]*|https?:\/\/[^\s]+/gi;
-  const matches = text.match(urlRegex) || [];
+  if (!text) return [];
 
-  return Array.from(
-    new Set(
-      matches.map((url) => {
-        // Clean trailing punctuation attached from sentence ending
-        return url.replace(/[),.;!؟]+$/, '').trim();
-      })
-    )
-  ).filter((u) => u.length > 4);
+  // Match full URLs with protocols or www, and candidate bare domains
+  const candidateRegex = /(?:https?:\/\/|www\.)[^\s/$.?#].[^\s]*|\b[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?:\/[^\s]*)?/gi;
+  const rawMatches = text.match(candidateRegex) || [];
+
+  const validUrls: string[] = [];
+
+  for (const item of rawMatches) {
+    // Clean trailing punctuation attached from sentence ending
+    const cleaned = item.replace(/[),.;!؟]+$/, '').trim();
+    if (cleaned.length < 4) continue;
+
+    // If explicit scheme or www, accept
+    if (/^(?:https?:\/\/|www\.)/i.test(cleaned)) {
+      validUrls.push(cleaned);
+      continue;
+    }
+
+    // For bare domains, check against ICANN root TLD database via tldts
+    // Exclude simple decimal numbers like 3.14 or versions like 1.2
+    if (/^\d+\.\d+$/.test(cleaned)) continue;
+
+    const parsed = parseDomain(cleaned);
+    const hostOnly = cleaned.split('/')[0].toLowerCase();
+
+    // Check if valid ICANN domain or IP address, and not a document/image file extension
+    const isExcludedFileExtension = /\.(?:png|jpg|jpeg|gif|webp|svg|pdf|docx?|xlsx?|txt|zip|tar|gz|exe|apk)$/i.test(hostOnly);
+
+    if ((parsed.isIcann || parsed.isIp) && parsed.domain && !isExcludedFileExtension) {
+      validUrls.push(cleaned);
+    }
+  }
+
+  return Array.from(new Set(validUrls));
 }
 
 /**

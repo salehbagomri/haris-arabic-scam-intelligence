@@ -70,9 +70,8 @@ export function analyzeDeterministic(input: {
     urlResults
   );
 
-  // 4. Calculate Risk Assessment
-  const primaryUrl = urlResults.length > 0 ? urlResults[0] : undefined;
-  const assessment = calculateRiskScore(signalResult.signals, primaryUrl);
+  // 4. Calculate Risk Assessment across all extracted and analyzed URLs
+  const assessment = calculateRiskScore(signalResult.signals, urlResults);
 
   return {
     normalizedText,

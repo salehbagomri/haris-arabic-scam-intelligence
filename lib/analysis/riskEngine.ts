@@ -38,6 +38,9 @@ export interface RiskAssessmentResult {
   /** All detected threat feature keys */
   detectedFeatures: FeatureKey[];
 
+  /** Feature-level evidence mapping (Scam DNA evidence grounding) */
+  featureEvidence: Record<FeatureKey, ExtractedSignal[]>;
+
   /** Concise executive security summary */
   summary: string;
 
@@ -46,31 +49,53 @@ export interface RiskAssessmentResult {
 
   /** Transparent uncertainties and analytical limitations */
   uncertainties: string[];
+
+  /** Aggregated URL findings across all analyzed URLs */
+  urlFindings?: {
+    totalUrls: number;
+    suspiciousUrlsCount: number;
+    urls: Array<{
+      url: string;
+      hostname: string;
+      isSuspicious: boolean;
+      anomalies: string[];
+      signals: ExtractedSignal[];
+    }>;
+  };
 }
 
 /**
- * Classify the most probable Scam Type from the set of detected signals
+ * Classify the most probable Scam Type from the set of detected signals and all analyzed URLs
  */
 export function classifyScamType(
   detectedFeatures: FeatureKey[],
   evidenceTexts: string[],
-  urlAnalysis?: UrlAnalysisResult
+  urlAnalyses?: UrlAnalysisResult | UrlAnalysisResult[]
 ): ScamType {
-  if (detectedFeatures.length === 0 && (!urlAnalysis || urlAnalysis.anomalies.length === 0)) {
+  const urlsList: UrlAnalysisResult[] = Array.isArray(urlAnalyses)
+    ? urlAnalyses
+    : urlAnalyses
+    ? [urlAnalyses]
+    : [];
+
+  const hasAnyAnomalies = urlsList.some((u) => u.anomalies.length > 0);
+  if (detectedFeatures.length === 0 && !hasAnyAnomalies) {
     return 'UNKNOWN';
   }
 
-  // Use URL brand spoofing signals if present
-  if (urlAnalysis?.brandSpoofing.detected) {
-    const brand = urlAnalysis.brandSpoofing.brandName || '';
-    if (brand.includes('البريد') || brand.includes('أرامكس') || brand.includes('DHL')) {
-      return 'DELIVERY_SCAM';
-    }
-    if (brand.includes('الراجحي') || brand.includes('الأهلي') || brand.includes('الرياض') || brand.includes('الإنماء')) {
-      return 'BANK_IMPERSONATION';
-    }
-    if (brand.includes('أبشر') || brand.includes('الزكاة')) {
-      return 'GOVERNMENT_IMPERSONATION';
+  // Use URL brand spoofing signals if present from ANY analyzed URL
+  for (const u of urlsList) {
+    if (u.brandSpoofing.detected) {
+      const brand = u.brandSpoofing.brandName || '';
+      if (brand.includes('البريد') || brand.includes('أرامكس') || brand.includes('DHL')) {
+        return 'DELIVERY_SCAM';
+      }
+      if (brand.includes('الراجحي') || brand.includes('الأهلي') || brand.includes('الرياض') || brand.includes('الإنماء')) {
+        return 'BANK_IMPERSONATION';
+      }
+      if (brand.includes('أبشر') || brand.includes('الزكاة')) {
+        return 'GOVERNMENT_IMPERSONATION';
+      }
     }
   }
 
@@ -174,11 +199,15 @@ export function classifyScamType(
 function generateActionableAdvice(
   detectedFeatures: FeatureKey[],
   scamType: ScamType,
-  urlAnalysis?: UrlAnalysisResult
+  urlsList: UrlAnalysisResult[]
 ): string[] {
   const advice: string[] = [];
 
-  if (detectedFeatures.includes('suspicious_url') || urlAnalysis?.isSuspiciousTld || urlAnalysis?.isIpHost) {
+  const hasSuspiciousUrl =
+    detectedFeatures.includes('suspicious_url') ||
+    urlsList.some((u) => u.isSuspiciousTld || u.isIpHost || u.brandSpoofing.detected || u.isPunycode || u.isUrlShortener);
+
+  if (hasSuspiciousUrl) {
     advice.push('لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.');
   }
 
@@ -217,11 +246,34 @@ function generateActionableAdvice(
  */
 export function calculateRiskScore(
   signals: ExtractedSignal[],
-  urlAnalysis?: UrlAnalysisResult,
+  urlAnalyses?: UrlAnalysisResult | UrlAnalysisResult[],
   config: WeightsConfig = DEFAULT_RISK_WEIGHTS
 ): RiskAssessmentResult {
+  const urlsList: UrlAnalysisResult[] = Array.isArray(urlAnalyses)
+    ? urlAnalyses
+    : urlAnalyses
+    ? [urlAnalyses]
+    : [];
+
+  const hasAnyAnomalies = urlsList.some((u) => u.anomalies.length > 0);
+
+  // Initialize featureEvidence container
+  const featureEvidence: Record<FeatureKey, ExtractedSignal[]> = {
+    urgency: [],
+    credential_request: [],
+    otp_request: [],
+    impersonation: [],
+    financial_lure: [],
+    suspicious_url: [],
+    threat_language: [],
+    unexpected_contact: [],
+    secrecy_pressure: [],
+    suspicious_payment_request: [],
+    action_pressure: [],
+  };
+
   // 1. If no signals at all, return safe baseline
-  if (signals.length === 0 && (!urlAnalysis || urlAnalysis.anomalies.length === 0)) {
+  if (signals.length === 0 && !hasAnyAnomalies) {
     return {
       score: 0,
       level: 'low',
@@ -229,10 +281,29 @@ export function calculateRiskScore(
       scamTypeNameAr: 'محتوى اعتيادي / غير مصنف كاحتيال',
       evidence: [],
       detectedFeatures: [],
+      featureEvidence,
       summary: 'لم يتم رصد مؤشرات احتيال أو روابط مشبوهة في المحتوى المفحوص.',
       actionableAdvice: ['المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة.'],
       uncertainties: ['الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.'],
+      urlFindings: urlsList.length > 0 ? {
+        totalUrls: urlsList.length,
+        suspiciousUrlsCount: 0,
+        urls: urlsList.map((u) => ({
+          url: u.rawUrl,
+          hostname: u.hostname,
+          isSuspicious: false,
+          anomalies: u.anomalies,
+          signals: u.signals,
+        })),
+      } : undefined,
     };
+  }
+
+  // Populate featureEvidence with detected signals
+  for (const sig of signals) {
+    if (sig.detected && featureEvidence[sig.featureId]) {
+      featureEvidence[sig.featureId].push(sig);
+    }
   }
 
   // 2. Aggregate signals by feature to avoid duplicate weighting
@@ -322,7 +393,7 @@ export function calculateRiskScore(
   }
 
   // 7. Classify Scam Type
-  const scamType = classifyScamType(detectedFeatures, evidenceTexts, urlAnalysis);
+  const scamType = classifyScamType(detectedFeatures, evidenceTexts, urlsList);
   const scamTypeMeta = SCAM_TYPES_METADATA[scamType];
 
   // 8. Generate Summary
@@ -336,13 +407,26 @@ export function calculateRiskScore(
   }
 
   // 9. Actionable Advice & Uncertainties
-  const actionableAdvice = generateActionableAdvice(detectedFeatures, scamType, urlAnalysis);
+  const actionableAdvice = generateActionableAdvice(detectedFeatures, scamType, urlsList);
 
   const uncertainties: string[] = [
     'التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.',
     'حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.',
     'هذه النتيجة تعبر عن "درجة الاشتباه" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.',
   ];
+
+  // 10. URL findings
+  const urlFindings = urlsList.length > 0 ? {
+    totalUrls: urlsList.length,
+    suspiciousUrlsCount: urlsList.filter((u) => u.signals.length > 0 || u.brandSpoofing.detected).length,
+    urls: urlsList.map((u) => ({
+      url: u.rawUrl,
+      hostname: u.hostname,
+      isSuspicious: u.signals.length > 0 || u.brandSpoofing.detected,
+      anomalies: u.anomalies,
+      signals: u.signals,
+    })),
+  } : undefined;
 
   return {
     score,
@@ -351,8 +435,10 @@ export function calculateRiskScore(
     scamTypeNameAr: scamTypeMeta.nameAr,
     evidence: evidenceItems,
     detectedFeatures,
+    featureEvidence,
     summary,
     actionableAdvice,
     uncertainties,
+    urlFindings,
   };
 }

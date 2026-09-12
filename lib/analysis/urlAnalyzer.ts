@@ -334,22 +334,52 @@ export function analyzeUrl(rawInput: string): UrlAnalysisResult {
     });
   }
 
-  // 5. Insecure HTTP check
+  // 5. Insecure HTTP check (Low-severity evidence signal)
   const isHttpOnly = protocol === 'http:';
   if (isHttpOnly) {
     anomalies.push('الرابط غير مشفر (HTTP بدلاً من HTTPS)');
+    signals.push({
+      id: `url-http-${Date.now()}`,
+      featureId: 'suspicious_url',
+      detected: true,
+      severity: 'low',
+      confidence: 'low',
+      source: 'url',
+      evidenceText: 'http://',
+      explanation: 'الرابط يستخدم بروتوكول HTTP غير المشفر، وهو مؤشر أمني ضعيف بمفرده ولكن يستدعي الحيطة.',
+    });
   }
 
   // 6. Non-standard port check (e.g. :8080, :8443, :8888)
   const isNonStandardPort = port !== null && port !== '80' && port !== '443';
   if (isNonStandardPort) {
     anomalies.push(`استخدام منفذ اتصال غير قياسي (${port})`);
+    signals.push({
+      id: `url-port-${Date.now()}`,
+      featureId: 'suspicious_url',
+      detected: true,
+      severity: 'low',
+      confidence: 'medium',
+      source: 'url',
+      evidenceText: `:${port}`,
+      explanation: `استخدام منفذ شبكي غير قياسي (${port}) في الرابط، وهو أمر غير معتاد في الروابط الرسمية.`,
+    });
   }
 
   // 7. Deep Subdomain depth check (> 2 subdomains)
   const hasDeepSubdomains = subdomainCount >= 3;
   if (hasDeepSubdomains) {
     anomalies.push(`تعدد مفرط في النطاقات الفرعية (عمق ${subdomainCount})`);
+    signals.push({
+      id: `url-deep-subdomain-${Date.now()}`,
+      featureId: 'suspicious_url',
+      detected: true,
+      severity: 'low',
+      confidence: 'low',
+      source: 'url',
+      evidenceText: subdomain || hostname,
+      explanation: `تعدد النطاقات الفرعية (عمق ${subdomainCount}) قد يُستخدم للتمويه وتشتيت الانتباه عن النطاق الفعلي.`,
+    });
   }
 
   // 8. Brand Impersonation Analysis (Subdomain vs Registrable Domain vs Path)
@@ -431,26 +461,16 @@ export function analyzeUrl(rawInput: string): UrlAnalysisResult {
       });
       break;
     } else if (brandInPath) {
-      // Brand in path of an arbitrary domain
-      const detail = `وجود اسم ${brand.canonicalNameAr} في مسار رابط يعود لنطاق خارجي (${registrableDomain})`;
+      // Brand in path of an arbitrary domain: Metadata only, NOT domain impersonation
+      const detail = `مسار الرابط يتضمن اسم (${brand.canonicalNameAr}) ولكن النطاق الفعلي (${registrableDomain}) مستقل`;
       brandSpoofing = {
-        detected: true,
+        detected: false,
         brandName: brand.canonicalNameAr,
         isOfficialDomain: false,
         location: 'path',
         detail,
       };
-      anomalies.push(detail);
-      signals.push({
-        id: `url-spoof-path-${Date.now()}`,
-        featureId: 'impersonation',
-        detected: true,
-        severity: 'medium',
-        confidence: 'medium',
-        source: 'url',
-        evidenceText: `${registrableDomain}${path}`,
-        explanation: `الرابط يضع اسم ${brand.canonicalNameAr} في المسار ولكن النطاق الفعلي (${registrableDomain}) لا يتبع لهذه الجهة.`,
-      });
+      anomalies.push(`[بيانات سياقية] ${detail}`);
       break;
     }
   }

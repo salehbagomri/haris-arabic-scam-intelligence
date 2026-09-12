@@ -1,12 +1,12 @@
 /**
- * HARIS (حارس) — Deterministic Signal Extractor
+ * HARIS (حارس) — Deterministic Signal Extractor (Precision Hardened)
  *
- * Implements intent-aware rule extraction for Scam DNA features without an LLM.
+ * Implements intent-aware, clause-level rule extraction for Scam DNA features.
  *
- * CRITICAL RULE:
- * Avoid naive keyword matching! We rigorously inspect context to differentiate
- * between legitimate security warnings (e.g. "لا تشارك رمز التحقق") and actual
- * malicious requests (e.g. "أدخل رمز التحقق لتأكيد طلبك").
+ * PRECISION PRINCIPLES:
+ * 1. Brand mention alone ≠ Impersonation (requires explicit identity claims, account threats, or paired threat actions).
+ * 2. Clause-level local negation (negation in one clause does NOT suppress malicious requests in other clauses).
+ * 3. Strict credential requests (generic language like "يمكنك تحديث حسابك من التطبيق" is NOT a credential request).
  */
 
 import { FeatureKey, ExtractedSignal, Severity } from './taxonomy';
@@ -32,17 +32,27 @@ interface PatternRule {
 }
 
 /**
+ * Split text into semantic clauses using sentence punctuation and contrastive conjunctions
+ */
+export function splitIntoClauses(text: string): string[] {
+  return text
+    .split(/(?:[.,;:\n!?؟،؛]|\b(?:لكن|ولكن|بس|بل|however|but)\b)/i)
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0);
+}
+
+/**
  * Deterministic Signal Pattern Rules Matrix
  */
 const DETERMINISTIC_RULES: PatternRule[] = [
-  // 1. OTP Request (Intent-aware)
+  // 1. OTP Request (Intent-aware & Clause-contextual)
   {
     id: 'rule-otp-request',
     featureId: 'otp_request',
     severity: 'high',
     positivePatterns: [
       /(?:و)?(?:ادخل|ادخال|ارسل|ارسال|شارك|مشاركه|زودنا|اكتب|اعطني|ضع)\s+(?:بـ)?(?:رمز|كود|الرمز|الكود)\s+(?:التحقق|التاكيد|السري|المؤقت|otp|code)/i,
-      /(?:رمز|كود)\s+(?:التحقق|التاكيد|otp)\s+(?:المرسل|الخاص بك|المطلوب|لتفعيل|لتاكيد|لتحديث)/i,
+      /(?:رمز|كود)\s+(?:التحقق|التاكيد|otp)\s+(?:المرسل|الخاص\s+بك|المطلوب|لتفعيل|لتاكيد|لتحديث)/i,
       /(?:enter|send|share|provide)\s+(?:your\s+)?(?:otp|verification\s+code|security\s+code)/i,
     ],
     negativePatterns: [
@@ -51,19 +61,19 @@ const DETERMINISTIC_RULES: PatternRule[] = [
     explanation: 'طلب صريح لإدخال أو مشاركة رمز التحقق لمرة واحدة (OTP) المخصص للمصادقة وتأكيد العمليات.',
   },
 
-  // 2. Credential Request (Intent-aware)
+  // 2. Credential Request (Strictly requiring sensitive credentials or explicit credential entry with links)
   {
     id: 'rule-credential-request',
     featureId: 'credential_request',
     severity: 'high',
     positivePatterns: [
-      /(?:ادخل|حدث|اكتب|تسجيل|تاكيد)\s+(?:بيانات|معلومات)?\s*(?:كلمه\s+المرور|الرقم\s+السري|password|cvv|رقم\s+البطاقه|بيانات\s+الدخول)/i,
-      /(?:يرجى\s+)?(?:تحديث|تاكيد|تنشيط)\s+(?:بياناتك|بيانات|معلوماتك|حسابك|بطاقتك)/i,
-      /(?:enter|update|verify|confirm)\s+(?:your\s+)?(?:password|card\s+number|cvv|pin|credentials)/i,
-      /(?:update|verify)\s+(?:your\s+)?account\s+details/i,
+      /(?:ادخل|ادخال|حدث|تحديث|اكتب|تسجيل|تاكيد|ارسل|ارسال|زودنا|تزويدنا|اعطني|ضع)\s+(?:بيانات|معلومات)?\s*(?:كلمه\s+المرور|الرقم\s+السري|كلمه\s+السر|رمز\s+الامان|رمز\s+الحمايه|password|pin|cvv|رقم\s+البطاقه|بيانات\s+الدخول|بيانات\s+البطاقه)/i,
+      /(?:ادخل|ادخال|ارسل|ارسال|شارك|مشاركه|زودنا|اكتب|ضع)\s+(?:رقم\s+البطاقه|رمز\s+الامان|رمز\s+الحمايه|cvv|pin)/i,
+      /(?:تحديث|تاكيد|تنشيط)\s+(?:بياناتك|حسابك|بطاقتك).*(?:وادخال|بادخال|مع|ثم\s+ادخل)\s*(?:كلمه\s+المرور|الرقم\s+السري|رمز\s+الامان|بيانات\s+الدخول|بيانات\s+البطاقه)/i,
+      /(?:enter|update|verify|confirm|provide|send)\s+(?:your\s+)?(?:password|card\s+number|cvv|pin|login\s+credentials)/i,
     ],
     negativePatterns: [
-      /(?:غير\s+كلمه\s+المرور|للحفاظ\s+على\s+امان|تغيير\s+دوري|نصيحه\s+امنيه|لا\s+تدخل\s+بياناتك)/i,
+      /(?:لن\s+يطلب|لا\s+تشارك|احذر|لا\s+تعط|لا\s+ترسل|لا\s+تدخل|غير\s+كلمه\s+المرور|تغيير\s+دوري|نصيحه\s+امنيه|تنبيه\s+امني|never\s+share|do\s+not\s+share)/i,
     ],
     explanation: 'محاولة استدراج كلمات المرور أو أرقام البطاقة البنكية ورمز الحماية CVV.',
   },
@@ -150,18 +160,30 @@ const DETERMINISTIC_RULES: PatternRule[] = [
 ];
 
 /**
- * Entity Keywords for Impersonation Detection in Text
+ * Known Target Entities for Text Impersonation Contextual Evaluation
  */
-const IMPERSONATION_KEYWORDS = [
+const IMPERSONATION_TARGET_ENTITIES = [
   { name: 'مصرف الراجحي', pattern: /(?:مصرف|بنك)?\s*الراجحي/i },
   { name: 'البنك الأهلي', pattern: /(?:البنك\s+الاهلي|snb|الاهلي\s+اونلاين)/i },
   { name: 'بنك الرياض', pattern: /بنك\s+الرياض/i },
+  { name: 'مصرف الإنماء', pattern: /(?:مصرف|بنك)?\s*الانماء/i },
   { name: 'أبشر', pattern: /(?:منصه|بوابه)?\s*ابشر/i },
   { name: 'البريد السعودي (سبل)', pattern: /(?:البريد\s+السعودي|سبل|شحنتك\s+رقم)/i },
   { name: 'أرامكس', pattern: /(?:ارامكس|aramex)/i },
   { name: 'دي إتش إل', pattern: /(?:دي\s+ايتش\s+ال|dhl)/i },
-  { name: 'وزارة التجارة', pattern: /وزاره\s+التجاره/i },
+  { name: 'شركة الاتصالات (stc)', pattern: /(?:stc|الاتصالات\s+السعوديه)/i },
   { name: 'الزكاة والضريبة', pattern: /(?:هيئه\s+الزكاه|زكاه\s+ودخل|zatca)/i },
+];
+
+/**
+ * Contextual Impersonation Patterns (Entity claim / Pretending to represent entity)
+ */
+const EXPLICIT_IDENTITY_CLAIM_PATTERNS = [
+  /(?:نحن\s+(?:من|فريق)?|معك|انا|فريق|خدمه\s+العملاء|خدمه\s+عملاء|دعم|موظف|اداره)\s+(?:من\s+)?(?:مصرف|بنك|منصه|شركه|بوابه)?\s*(?:الراجحي|الاهلي|الرياض|الانماء|ابشر|البريد|سبل|ارامكس|dhl|smsa|stc)/i,
+  /(?:من\s+)(?:مصرف|بنك|منصه|شركه|بوابه)\s*(?:الراجحي|الاهلي|الرياض|الانماء|ابشر|البريد|سبل|ارامكس|dhl|smsa|stc)/i,
+  /(?:موظف|ممثل|اداره)\s+(?:البنك|المصرف|خدمه\s+العملاء)/i,
+  /(?:حسابك|بطاقتك|شحنتك)\s+(?:في|لدى|مع)\s*(?:الراجحي|الاهلي|الرياض|الانماء|ابشر|البريد|سبل|ارامكس|dhl|smsa|stc)/i,
+  /(?:تم|سيتم)\s+(?:ايقاف|تجميد|حظر|قفل)\s+(?:حسابك|بطاقتك)\s+(?:في|لدى)?\s*(?:الراجحي|الاهلي|الرياض|الانماء|ابشر|البريد|سبل)/i,
 ];
 
 /**
@@ -175,64 +197,123 @@ export function extractDeterministicSignals(
   const linguisticAnomalies: string[] = [];
 
   const textToScan = normalized.normalizedText;
+  const clauses = splitIntoClauses(textToScan);
 
-  // 1. Scan against Deterministic Rules Matrix
+  // 1. Scan against Deterministic Rules Matrix at the Clause Level
   for (const rule of DETERMINISTIC_RULES) {
-    let matchesPositive = false;
-    let matchingSnippet = '';
+    let ruleMatched = false;
 
-    for (const posRegex of rule.positivePatterns) {
-      const match = textToScan.match(posRegex);
-      if (match) {
-        matchesPositive = true;
-        matchingSnippet = match[0];
-        break;
+    for (const clause of clauses) {
+      if (ruleMatched) break;
+
+      let clausePositiveMatch: string | null = null;
+      for (const posRegex of rule.positivePatterns) {
+        const match = clause.match(posRegex);
+        if (match) {
+          clausePositiveMatch = match[0];
+          break;
+        }
+      }
+
+      if (clausePositiveMatch) {
+        // Check if this specific clause has local negation
+        let clauseNegated = false;
+        if (rule.negativePatterns) {
+          for (const negRegex of rule.negativePatterns) {
+            if (negRegex.test(clause)) {
+              clauseNegated = true;
+              break;
+            }
+          }
+        }
+
+        // If not negated locally, emit signal
+        if (!clauseNegated) {
+          signals.push({
+            id: `${rule.id}-${Date.now()}-${signals.length}`,
+            featureId: rule.featureId,
+            detected: true,
+            severity: rule.severity,
+            confidence: 'high',
+            source: 'text',
+            evidenceText: clausePositiveMatch,
+            explanation: rule.explanation,
+          });
+          ruleMatched = true;
+          break;
+        }
       }
     }
 
-    if (matchesPositive) {
-      // Check negative intent patterns (hard negatives / security alerts)
-      let matchesNegative = false;
-      if (rule.negativePatterns) {
-        for (const negRegex of rule.negativePatterns) {
-          if (negRegex.test(textToScan)) {
-            matchesNegative = true;
+    // Special Anaphora check for OTP (e.g. "لا تشارك الرمز مع أحد، لكن أرسله لي فوراً")
+    if (!ruleMatched && rule.featureId === 'otp_request') {
+      const mentionsOtp = /(?:رمز|كود|الرمز|الكود|otp)/i.test(textToScan);
+      if (mentionsOtp) {
+        for (const clause of clauses) {
+          const sendDirective = clause.match(/(?:ارسل|ادخل|شارك|اعطني|زودني)(?:ه)?\s+(?:لي|لنا|هنا)?\s*(?:فورا|الان)?/i);
+          const hasLocalNegation = /(?:لا\s+تشارك|احذر|لن\s+يطلب|لا\s+ترسل|لا\s+تعط)/i.test(clause);
+
+          if (sendDirective && !hasLocalNegation) {
+            signals.push({
+              id: `${rule.id}-anaphora-${Date.now()}-${signals.length}`,
+              featureId: 'otp_request',
+              detected: true,
+              severity: 'high',
+              confidence: 'high',
+              source: 'text',
+              evidenceText: sendDirective[0],
+              explanation: 'طلب صريح لإرسال أو مشاركة رمز التحقق فوراً رغم الإشارة لسرية الرمز.',
+            });
             break;
           }
         }
       }
-
-      // Only fire signal if it is NOT a negative/legitimate context
-      if (!matchesNegative) {
-        signals.push({
-          id: `${rule.id}-${Date.now()}-${signals.length}`,
-          featureId: rule.featureId,
-          detected: true,
-          severity: rule.severity,
-          confidence: 'high',
-          source: 'text',
-          evidenceText: matchingSnippet,
-          explanation: rule.explanation,
-        });
-      }
     }
   }
 
-  // 2. Text Impersonation check (claiming to be a known entity)
-  for (const entity of IMPERSONATION_KEYWORDS) {
+  // 2. Intent-Aware Impersonation Evaluation in Text
+  // RULE: A brand mention alone does NOT trigger an impersonation signal!
+  // It requires an explicit identity claim OR being paired with credential/threat/payment/OTP/suspicious URL.
+  let hasExplicitIdentityClaim = false;
+  let identityEvidence = '';
+
+  for (const claimPattern of EXPLICIT_IDENTITY_CLAIM_PATTERNS) {
+    const claimMatch = textToScan.match(claimPattern);
+    if (claimMatch) {
+      hasExplicitIdentityClaim = true;
+      identityEvidence = claimMatch[0];
+      break;
+    }
+  }
+
+  // Check if any brand is mentioned in text
+  let mentionedEntity: { name: string; match: string } | null = null;
+  for (const entity of IMPERSONATION_TARGET_ENTITIES) {
     const match = textToScan.match(entity.pattern);
     if (match) {
+      mentionedEntity = { name: entity.name, match: match[0] };
+      break;
+    }
+  }
+
+  if (mentionedEntity) {
+    // Determine if there is supporting threat context
+    const hasSupportingThreatContext =
+      hasExplicitIdentityClaim ||
+      signals.some((s) => ['otp_request', 'credential_request', 'threat_language', 'suspicious_payment_request'].includes(s.featureId)) ||
+      urlResults.some((u) => u.signals.some((us) => us.featureId === 'suspicious_url' || us.featureId === 'impersonation'));
+
+    if (hasSupportingThreatContext) {
       signals.push({
         id: `text-impersonation-${Date.now()}-${signals.length}`,
         featureId: 'impersonation',
         detected: true,
         severity: 'high',
-        confidence: 'medium',
+        confidence: hasExplicitIdentityClaim ? 'high' : 'medium',
         source: 'text',
-        evidenceText: match[0],
-        explanation: `الرسالة تذكر اسماً أو صفة لجهة اعتبارية (${entity.name})، ويجب التأكد من مصداقية القناة والمصدر.`,
+        evidenceText: identityEvidence || mentionedEntity.match,
+        explanation: `انتحال صفة (${mentionedEntity.name}) مقترناً بطلب إجراء أو تهديد أو رابط غير رسمي.`,
       });
-      break;
     }
   }
 
