@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { RotateCcw, AlertOctagon, AlertTriangle, ShieldCheck, Sparkles } from 'lucide-react';
+import { RotateCcw, AlertOctagon, AlertTriangle, ShieldCheck, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { AnalysisResult } from '../lib/types/analysis';
 import { ScamDnaGrid } from './ScamDnaGrid';
 import { EvidenceList } from './EvidenceList';
@@ -15,6 +15,15 @@ interface ResultsViewProps {
 
 export function ResultsView({ result, onReset }: ResultsViewProps) {
   const getRiskDetails = () => {
+    if (result.isExtractionFailure) {
+      return {
+        label: 'تعذر التحليل: قراءة لقطة الشاشة غير مكتملة',
+        badgeClass: 'warning',
+        icon: <AlertTriangle size={16} />,
+        boxClass: 'warning',
+      };
+    }
+
     switch (result.riskLevel) {
       case 'high':
         return {
@@ -64,13 +73,45 @@ export function ResultsView({ result, onReset }: ResultsViewProps) {
         </div>
       )}
 
+      {result.isExtractionFailure && (
+        <div
+          className="haris-mock-banner"
+          style={{
+            borderColor: 'var(--warning-border)',
+            background: 'var(--warning-subtle)',
+            color: 'var(--warning-text)',
+          }}
+          role="alert"
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <AlertTriangle size={18} />
+            <span>
+              <strong>تنبيه: تعذر استخراج أو قراءة محتوى لقطة الشاشة.</strong> نتيجة الفحص غير محددة ولا تعني أن المحتوى آمن. يرجى رفع لقطة شاشة أكثر وضوحاً أو نسخ نص الرسالة ولصقه مباشرة.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Main Verdict Card */}
       <div className="haris-results-header-card">
         <div className={`haris-score-box ${risk.boxClass}`}>
-          <div className="haris-score-num">{result.riskScore}</div>
-          <span className="haris-score-max">من 100</span>
-          <span className="haris-score-label">درجة الاشتباه</span>
-          <span className="haris-score-disclaimer">مؤشر دلائل أمنية</span>
+          {result.isExtractionFailure ? (
+            <>
+              <div className="haris-score-num" style={{ fontSize: 'var(--font-xl)', color: 'var(--warning-text)' }}>
+                غير محدد
+              </div>
+              <span className="haris-score-max">فشل قراءة الصورة</span>
+              <span className="haris-score-label">حالة الفحص</span>
+              <span className="haris-score-disclaimer">لا تعني بأي حال أن المحتوى آمن</span>
+            </>
+          ) : (
+            <>
+              <div className="haris-score-num">{result.riskScore}</div>
+              <span className="haris-score-max">من 100</span>
+              <span className="haris-score-label">درجة الاشتباه</span>
+              <span className="haris-score-disclaimer">مؤشر دلائل أمنية</span>
+            </>
+          )}
         </div>
 
         <div className="haris-verdict-details">
@@ -81,15 +122,37 @@ export function ResultsView({ result, onReset }: ResultsViewProps) {
             </span>
 
             <span className="haris-badge" style={{ background: 'var(--bg-surface-elevated)', color: 'var(--text-secondary)' }}>
-              <span>النمط المكتشف: {result.scamType}</span>
+              <span>النمط: {result.scamTypeNameAr || result.scamType}</span>
             </span>
+
+            {result.aiConfidence !== null && result.aiConfidence !== undefined && (
+              <span
+                className="haris-badge"
+                style={{ background: 'var(--bg-surface-elevated)', color: 'var(--text-secondary)' }}
+                title="ثقة النموذج الدلالي في فهم سياق الرسالة (منفصلة تماماً عن درجة اشتباه الاحتيال)"
+              >
+                <Sparkles size={12} />
+                <span>ثقة النموذج الدلالي: {Math.round(result.aiConfidence * 100)}%</span>
+              </span>
+            )}
+
+            {result.extractionConfidence !== null && result.extractionConfidence !== undefined && (
+              <span
+                className="haris-badge"
+                style={{ background: 'var(--bg-surface-elevated)', color: 'var(--text-secondary)' }}
+                title="مستوى دقة قراءة واستخراج النصوص والروابط من لقطة الشاشة"
+              >
+                <ImageIcon size={12} />
+                <span>دقة الاستخراج: {Math.round(result.extractionConfidence * 100)}%</span>
+              </span>
+            )}
 
             <span className="haris-badge" style={{ background: 'var(--bg-surface-subtle)', color: 'var(--text-muted)' }}>
               <span>{result.analyzedAt}</span>
             </span>
           </div>
 
-          <h2 className="haris-scam-type-title">{result.scamType}</h2>
+          <h2 className="haris-scam-type-title">{result.scamTypeNameAr || result.scamType}</h2>
           <p className="haris-summary-text">{result.summary}</p>
         </div>
       </div>

@@ -23,9 +23,9 @@ export function ScreenshotInputMode({
 
   const validateAndSetFile = (file: File) => {
     setErrorMessage(null);
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      setErrorMessage('يرجى اختيار صورة بصيغة صالحة (PNG, JPG, أو WEBP).');
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/gif'];
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      setErrorMessage('يرجى اختيار صورة بصيغة صالحة (PNG, JPG, WEBP, HEIC, أو GIF).');
       return;
     }
 
@@ -89,7 +89,7 @@ export function ScreenshotInputMode({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/png, image/jpeg, image/webp"
+        accept="image/png, image/jpeg, image/webp, image/heic, image/gif"
         style={{ display: 'none' }}
         onChange={handleFileChange}
         disabled={isLoading}

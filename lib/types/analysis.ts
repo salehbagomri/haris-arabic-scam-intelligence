@@ -14,6 +14,7 @@ export interface ScamDnaIndicator {
   detected: boolean;
   severity: 'low' | 'medium' | 'high';
   detail: string;
+  provenance?: 'deterministic' | 'ai' | 'both';
 }
 
 export interface EvidenceItem {
@@ -21,7 +22,8 @@ export interface EvidenceItem {
   title: string;
   description: string;
   severity: 'low' | 'medium' | 'high';
-  source: 'linguistic' | 'technical' | 'behavioral';
+  source: 'linguistic' | 'technical' | 'behavioral' | 'ai' | 'visual';
+  provenance?: 'deterministic' | 'ai' | 'ocr' | 'both';
 }
 
 export interface AnalysisResult {
@@ -31,11 +33,15 @@ export interface AnalysisResult {
   riskScore: number; // 0 - 100 (درجة الاشتباه)
   riskLevel: RiskLevel;
   scamType: string;
+  scamTypeNameAr?: string;
   summary: string;
   scamDna: ScamDnaIndicator[];
   evidence: EvidenceItem[];
   actionableAdvice: string[];
   uncertainties: string[];
+  aiConfidence?: number | null;
+  extractionConfidence?: number | null;
+  isExtractionFailure?: boolean;
   analyzedAt: string;
 }
 

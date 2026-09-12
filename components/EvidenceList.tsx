@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ShieldAlert, Cpu, MessageSquareWarning } from 'lucide-react';
+import { Search, ShieldAlert, Cpu, MessageSquareWarning, Eye, Sparkles } from 'lucide-react';
 import { EvidenceItem } from '../lib/types/analysis';
 
 interface EvidenceListProps {
@@ -15,6 +15,12 @@ export function EvidenceList({ evidence }: EvidenceListProps) {
         return { label: 'تحليل لغوي وسياقي', icon: <MessageSquareWarning size={14} /> };
       case 'behavioral':
         return { label: 'نمط سلوكي', icon: <ShieldAlert size={14} /> };
+      case 'visual':
+        return { label: 'دليل بصري من الصورة', icon: <Eye size={14} /> };
+      case 'ai':
+        return { label: 'استدلال ذكاء اصطناعي', icon: <Sparkles size={14} /> };
+      default:
+        return { label: 'مؤشر استدلالي', icon: <ShieldAlert size={14} /> };
     }
   };
 
