@@ -99,6 +99,9 @@ export interface FusedAnalysisResult {
   /** Observable visual signals from screenshot */
   visualSignals?: VisualSignal[];
 
+  /** Machine-readable flag indicating whether screenshot extraction failed without fallback */
+  isExtractionFailure?: boolean;
+
   /** Actionable, context-tailored safety advice */
   actionableAdvice: string[];
 
@@ -118,6 +121,10 @@ export interface FusionOptions {
   maxAiScoreContribution?: number;
   maxVisualScoreContribution?: number;
   visualData?: ScreenshotExtractionData | null;
+  isExtractionFailure?: boolean;
+  overrideInterpretation?: string;
+  additionalAdvice?: string[];
+  additionalUncertainties?: string[];
 }
 
 /**
@@ -336,7 +343,9 @@ export function fuseEvidenceAndAssess(
 
   // 6. Synthesize Interpretation
   let interpretation = '';
-  if (aiSemanticResult && aiSemanticResult.interpretation) {
+  if (options.overrideInterpretation) {
+    interpretation = options.overrideInterpretation;
+  } else if (aiSemanticResult && aiSemanticResult.interpretation) {
     interpretation = aiSemanticResult.interpretation;
   } else {
     interpretation = deterministic.assessment.summary;
@@ -353,6 +362,11 @@ export function fuseEvidenceAndAssess(
       if (lower.includes('استعجال') || lower.includes('إلحاح') || lower.includes('urgency')) {
         adviceSet.add('الاحتيال يعتمد على الضغط الزمني لحرمانك من التفكير؛ تمهل ولا تستجب لطلب العجلة.');
       }
+    }
+  }
+  if (options.additionalAdvice) {
+    for (const adv of options.additionalAdvice) {
+      adviceSet.add(adv);
     }
   }
   const actionableAdvice = Array.from(adviceSet);
@@ -372,11 +386,17 @@ export function fuseEvidenceAndAssess(
       uncertaintiesSet.add(`محدودية بصرية: ${unc}`);
     }
   }
+  if (options.additionalUncertainties) {
+    for (const unc of options.additionalUncertainties) {
+      uncertaintiesSet.add(unc);
+    }
+  }
   const uncertainties = Array.from(uncertaintiesSet);
 
   return {
     aiAvailable: isAiAvailable,
     aiFallbackReason: options.fallbackReason,
+    isExtractionFailure: options.isExtractionFailure ?? false,
     modelUsed: options.modelUsed,
     aiConfidence: aiSemanticResult ? aiSemanticResult.aiConfidence : null,
     interpretation,

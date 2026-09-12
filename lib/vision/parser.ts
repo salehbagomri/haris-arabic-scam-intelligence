@@ -100,7 +100,11 @@ export function parseAndValidateVisionOutput(rawResponseText: string): VisionPar
   for (const signal of rawData.visualSignals) {
     // If evidence contains a direct quotation (e.g. "نص الدليل" or quotes)
     const quoteMatch = signal.evidence.match(/["'«]([^"'»]+)["'»]/);
-    if (quoteMatch && originalOcrText.trim().length > 0) {
+    if (quoteMatch) {
+      // If a verbatim quotation is claimed but OCR text is empty, reject as ungrounded
+      if (!originalOcrText || originalOcrText.trim().length === 0) {
+        continue;
+      }
       const quotedText = quoteMatch[1].trim();
       const isQuoteGrounded = isEvidenceGrounded(quotedText, originalOcrText, normalizedOcrText);
       if (!isQuoteGrounded) {

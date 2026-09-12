@@ -531,7 +531,12 @@ describe('HARIS Phase 4B: Screenshot Intelligence Tests', () => {
       assert.strictEqual(result.riskLevel, 'low');
       assert.strictEqual(result.riskScore, 0);
       assert.strictEqual(result.aiAvailable, false);
+      assert.strictEqual(result.isExtractionFailure, true);
+      assert.ok(result.interpretation.includes('تعذر استخراج أو قراءة محتوى لقطة الشاشة'));
+      assert.ok(!result.interpretation.includes('لم يتم رصد أي مؤشرات احتيال واضحة'));
       assert.ok(result.aiFallbackReason && result.aiFallbackReason.includes('0 bytes'));
+      assert.ok(result.uncertainties.some((u) => u.includes('0 bytes')));
+      assert.ok(result.actionableAdvice.some((a) => a.includes('لقطة شاشة') || a.includes('نسخ نص')));
     });
   });
 
@@ -578,6 +583,188 @@ describe('HARIS Phase 4B: Screenshot Intelligence Tests', () => {
       const res = parseAndValidateVisionOutput(JSON.stringify(payload));
       assert.strictEqual(res.success, false);
       assert.ok(res.error && res.error.includes('character limit'));
+    });
+  });
+
+  // =========================================================================
+  // Phase 4B Audit Precision Fixes Regression Tests
+  // =========================================================================
+  describe('Phase 4B Audit Precision Fixes Regression Tests', () => {
+    // 1. Screenshot-only extraction failure does not produce a misleading clean/low-risk interpretation
+    it('1. screenshot-only extraction failure does not produce a misleading clean/low-risk interpretation', async () => {
+      const failingClient = {
+        models: {
+          generateContent: async () => {
+            throw new Error('Vision gateway timeout after 15000ms');
+          },
+        },
+      };
+
+      const result = await analyzeUnified(
+        {
+          screenshot: {
+            buffer: dummyBuffer,
+            mimeType: 'image/png',
+          },
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { client: failingClient as any }
+      );
+
+      assert.strictEqual(result.isExtractionFailure, true);
+      assert.ok(result.interpretation.includes('تعذر استخراج أو قراءة محتوى لقطة الشاشة'));
+      assert.ok(!result.interpretation.includes('لم يتم رصد أي مؤشرات احتيال واضحة'));
+      assert.ok(result.interpretation.includes('لا يعتبر ذلك مؤشراً على أمان الرسالة'));
+    });
+
+    // 2. Failure reason appears in uncertainties
+    it('2. failure reason appears in uncertainties', async () => {
+      const failingClient = {
+        models: {
+          generateContent: async () => {
+            throw new Error('Connection refused by vision service');
+          },
+        },
+      };
+
+      const result = await analyzeUnified(
+        {
+          screenshot: {
+            buffer: dummyBuffer,
+            mimeType: 'image/png',
+          },
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { client: failingClient as any }
+      );
+
+      assert.ok(result.uncertainties.some((u) => u.includes('Connection refused by vision service')));
+      assert.ok(result.uncertainties.some((u) => u.includes('ولا تعني بأي حال من الأحوال أن الرسالة آمنة')));
+    });
+
+    // 3. Failure advice asks for clearer screenshot / pasted text
+    it('3. failure advice asks for clearer screenshot/pasted text', async () => {
+      const failingClient = {
+        models: {
+          generateContent: async () => {
+            throw new Error('Network reset');
+          },
+        },
+      };
+
+      const result = await analyzeUnified(
+        {
+          screenshot: {
+            buffer: dummyBuffer,
+            mimeType: 'image/png',
+          },
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { client: failingClient as any }
+      );
+
+      assert.ok(result.actionableAdvice.some((a) => a.includes('لقطة شاشة بدقة أعلى')));
+      assert.ok(result.actionableAdvice.some((a) => a.includes('نسخ نص الرسالة')));
+    });
+
+    // 4. Text/URL fallback still works
+    it('4. text/URL fallback still works when screenshot extraction fails', async () => {
+      const failingClient = {
+        models: {
+          generateContent: async () => {
+            throw new Error('Vision service offline');
+          },
+        },
+      };
+
+      const result = await analyzeUnified(
+        {
+          text: 'عزيزي العميل، تم إيقاف حسابك، أرسل رمز التحقق OTP فوراً.',
+          screenshot: {
+            buffer: dummyBuffer,
+            mimeType: 'image/png',
+          },
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { client: failingClient as any }
+      );
+
+      // Deterministic and semantic text fallback completed successfully
+      assert.strictEqual(result.isExtractionFailure, false);
+      assert.ok(result.detectedFeatures.includes('otp_request'));
+      assert.ok(result.riskScore > 0);
+      assert.ok(result.uncertainties.some((u) => u.includes('فشل استخراج لقطة الشاشة')));
+    });
+
+    // 5. Quoted visual signal with empty extracted text is rejected
+    it('5. quoted visual signal with empty extracted text is rejected as ungrounded', () => {
+      const payload = {
+        extractedText: '',
+        extractedUrls: [],
+        visibleEntities: [],
+        visualSignals: [
+          {
+            type: 'urgency_visual',
+            description: 'استعجال فوري',
+            evidence: 'عبارة مقتبسة "سدد الحساب فوراً لتجنب الإيقاف"',
+            severity: 'high',
+          },
+        ],
+        uncertainties: [],
+        extractionConfidence: 0.8,
+      };
+
+      const res = parseAndValidateVisionOutput(JSON.stringify(payload));
+      assert.strictEqual(res.success, true);
+      assert.strictEqual(res.data?.visualSignals.length, 0); // Pruned as ungrounded quote!
+    });
+
+    // 6. Non-quoted visual observation with empty extracted text remains allowed
+    it('6. non-quoted visual observation with empty extracted text remains allowed', () => {
+      const payload = {
+        extractedText: '',
+        extractedUrls: [],
+        visibleEntities: [],
+        visualSignals: [
+          {
+            type: 'impersonation_visual',
+            description: 'The screenshot visually resembles Saudi Post (SPL) branding and color scheme',
+            evidence: 'شعار البريد السعودي ودرجات اللون الأزرق والأخضر',
+            severity: 'medium',
+          },
+        ],
+        uncertainties: [],
+        extractionConfidence: 0.85,
+      };
+
+      const res = parseAndValidateVisionOutput(JSON.stringify(payload));
+      assert.strictEqual(res.success, true);
+      assert.strictEqual(res.data?.visualSignals.length, 1);
+      assert.strictEqual(res.data?.visualSignals[0].type, 'impersonation_visual');
+    });
+
+    // 7. Valid quoted signal grounded in extracted text still passes
+    it('7. valid quoted signal grounded in extracted text still passes', () => {
+      const payload = {
+        extractedText: 'تنبيه: تم تعليق بطاقتك المصرفية، يرجى التفعيل الآن عبر الرابط.',
+        extractedUrls: [],
+        visibleEntities: [],
+        visualSignals: [
+          {
+            type: 'fake_security_warning',
+            description: 'تحذير تعليق البطاقة لإثارة القلق',
+            evidence: 'يظهر نص "تم تعليق بطاقتك المصرفية"',
+            severity: 'high',
+          },
+        ],
+        uncertainties: [],
+        extractionConfidence: 0.95,
+      };
+
+      const res = parseAndValidateVisionOutput(JSON.stringify(payload));
+      assert.strictEqual(res.success, true);
+      assert.strictEqual(res.data?.visualSignals.length, 1);
+      assert.strictEqual(res.data?.visualSignals[0].type, 'fake_security_warning');
     });
   });
 });

@@ -67,10 +67,21 @@ export async function analyzeUnified(
 
   // 3. Early structured fallback if ONLY a screenshot was provided and extraction failed
   if (!aggregatedText && !input.url && input.screenshot && !visualData) {
+    const reason = visualFallbackReason || 'تعذر استخراج أو قراءة محتوى لقطة الشاشة المرفقة.';
     const emptyDeterministic = analyzeDeterministic({});
     return fuseEvidenceAndAssess(emptyDeterministic, null, {
-      fallbackReason: visualFallbackReason || 'Screenshot could not be extracted or read.',
+      fallbackReason: reason,
       visualData: null,
+      isExtractionFailure: true,
+      overrideInterpretation: `تعذر استخراج أو قراءة محتوى لقطة الشاشة المرفقة (${reason}). لم يتم التحقق من سلامة المحتوى ولا يعتبر ذلك مؤشراً على أمان الرسالة.`,
+      additionalAdvice: [
+        'يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.',
+        'يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر.',
+      ],
+      additionalUncertainties: [
+        `فشل استخراج محتوى لقطة الشاشة: ${reason}`,
+        'نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة.',
+      ],
     });
   }
 
@@ -132,6 +143,9 @@ export async function analyzeUnified(
       visualData,
       maxAiScoreContribution: options.maxAiScoreContribution,
       maxVisualScoreContribution: options.maxVisualScoreContribution,
+      additionalUncertainties: visualFallbackReason
+        ? [`فشل استخراج لقطة الشاشة (${visualFallbackReason})، واعتمد التحليل على النص/الرابط المدخل فقط.`]
+        : undefined,
     }
   );
 }
