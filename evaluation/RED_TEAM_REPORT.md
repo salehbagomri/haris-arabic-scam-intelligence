@@ -1,7 +1,7 @@
 # HARIS (حارس) — Adversarial Red-Team Evaluation Report
 **Report Version:** 1.0.0  
 **Phase:** Phase 6B (Red-Team & Adversarial Evaluation)  
-**Evaluation Date:** 2026-09-12T23:29:06.954Z  
+**Evaluation Date:** 2026-09-12T23:30:40.324Z  
 **Pipeline Mode:** deterministic-baseline-redteam  
 
 ---
@@ -27,7 +27,7 @@ The goal of this evaluation is to systematically stress-test and probe vulnerabi
 
 | Metadata Field | Value | Notes |
 |---|---|---|
-| **Evaluation Source Commit** | `ed41e549e91916618cb061d4477acc85eb252f62` | Exact Git commit of codebase during evaluation |
+| **Evaluation Source Commit** | `cbf5ce7537dca30789b89dd69001a8c491c57f88` | Exact Git commit of codebase during evaluation |
 | **Dataset Version** | `1.0.0` | 48-case dedicated Red-Team corpus |
 | **Dataset SHA-256** | `72c5a8ac8de7fdd750f94a89f1a81ff6...` | Tamper-evident cryptographic hash |
 | **Runner Version** | `1.0.0` | Phase 6B Red-Team evaluator |

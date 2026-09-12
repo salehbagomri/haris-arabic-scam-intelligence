@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "evaluatedAt": "2026-09-12T23:29:06.954Z",
+  "evaluatedAt": "2026-09-12T23:30:40.324Z",
   "metadata": {
     "datasetVersion": "1.0.0",
     "datasetSha256": "72c5a8ac8de7fdd750f94a89f1a81ff67672f60085db57611e424ce17746e53f",
     "runnerVersion": "1.0.0",
-    "evaluationSourceCommit": "ed41e549e91916618cb061d4477acc85eb252f62",
+    "evaluationSourceCommit": "cbf5ce7537dca30789b89dd69001a8c491c57f88",
     "nodeVersion": "v24.14.0",
     "pipelineMode": "deterministic-baseline-redteam",
     "geminiConfigured": false
