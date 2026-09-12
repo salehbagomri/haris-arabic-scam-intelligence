@@ -1,16 +1,16 @@
 {
   "version": "1.1.0",
-  "evaluatedAt": "2026-09-12T20:16:18.345Z",
+  "evaluatedAt": "2026-09-12T20:17:40.127Z",
   "metadata": {
     "datasetVersion": "1.1.0",
     "datasetSha256": "abe2cdaa2ee5b1d22a15fd2a09a152810b89eb6c8d2c18476baa4dce860e44f3",
     "runnerVersion": "1.1.0",
-    "gitCommit": "50103c9bd7b0adca8d2d078449b5e20ba8778bb5",
+    "gitCommit": "2007ac7b33aee4c8ad718f807f01c6cba11d3d72",
     "nodeVersion": "v24.14.0",
     "geminiConfigured": false,
     "geminiModel": "gemini-2.5-flash",
     "pipelineMode": "deterministic-baseline",
-    "evaluatedAt": "2026-09-12T20:16:18.347Z",
+    "evaluatedAt": "2026-09-12T20:17:40.130Z",
     "evaluationConfig": {
       "offlineMode": true,
       "timeoutMs": 15000,

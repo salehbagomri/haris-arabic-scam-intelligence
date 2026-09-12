@@ -1,6 +1,6 @@
 # HARIS (حارس) — Arabic Scam Intelligence Baseline Benchmark Report
 **Report Version:** 1.1.0  
-**Evaluation Date:** 2026-09-12T20:16:18.345Z  
+**Evaluation Date:** 2026-09-12T20:17:40.127Z  
 **Pipeline Mode:** DETERMINISTIC-BASELINE  
 
 ---
@@ -9,7 +9,7 @@
 
 | Metadata Field | Value | Notes |
 |---|---|---|
-| **Git Commit Hash** | `50103c9bd7b0adca8d2d078449b5e20ba8778bb5` | Exact repository revision at time of benchmark run |
+| **Git Commit Hash** | `2007ac7b33aee4c8ad718f807f01c6cba11d3d72` | Exact repository revision at time of benchmark run |
 | **Dataset Version** | `1.1.0` | Versioned evaluation dataset |
 | **Dataset SHA-256** | `abe2cdaa2ee5b1d22a15fd2a09a15281...` | Cryptographic tamper-evident hash of all 70 test cases |
 | **Runner Version** | `1.1.0` | Evaluation harness release |
