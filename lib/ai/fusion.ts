@@ -28,14 +28,15 @@ import {
 } from '../analysis/taxonomy';
 import { DEFAULT_RISK_WEIGHTS } from '../config/weights';
 import { GeminiSemanticAnalysis, SemanticSignal, PsychologicalTactic } from './schema';
+import { ScreenshotExtractionData, VisualSignal } from '../vision/schema';
 
 export interface FusedEvidenceItem {
   id: string;
   title: string;
   description: string;
   severity: Severity;
-  source: 'technical' | 'linguistic' | 'behavioral' | 'ai';
-  provenance: 'deterministic' | 'ai';
+  source: 'technical' | 'linguistic' | 'behavioral' | 'ai' | 'visual';
+  provenance: 'deterministic' | 'ai' | 'ocr' | 'both';
 }
 
 export interface FusedDnaIndicator {
@@ -92,6 +93,12 @@ export interface FusedAnalysisResult {
   /** Psychological manipulation tactics identified by AI */
   psychologicalTactics: PsychologicalTactic[];
 
+  /** Visual extraction data if analyzed from a screenshot */
+  visualExtraction?: ScreenshotExtractionData;
+
+  /** Observable visual signals from screenshot */
+  visualSignals?: VisualSignal[];
+
   /** Actionable, context-tailored safety advice */
   actionableAdvice: string[];
 
@@ -109,6 +116,8 @@ export interface FusionOptions {
   modelUsed?: string;
   fallbackReason?: string;
   maxAiScoreContribution?: number;
+  maxVisualScoreContribution?: number;
+  visualData?: ScreenshotExtractionData | null;
 }
 
 /**
@@ -149,6 +158,57 @@ export function fuseEvidenceAndAssess(
         severity: sig.severity,
         source: 'ai',
         provenance: 'ai',
+      });
+    }
+  }
+
+  // 1c. Ingest visual signals and visible entities from screenshot
+  if (options.visualData) {
+    for (let i = 0; i < options.visualData.visualSignals.length; i++) {
+      const vs = options.visualData.visualSignals[i];
+      evidence.push({
+        id: `visual-signal-${i}-${Date.now()}`,
+        title: vs.type,
+        description: `${vs.description} — الدليل المرئي: "${vs.evidence}"`,
+        severity: vs.severity,
+        source: 'visual',
+        provenance: 'ai',
+      });
+    }
+
+    // Ingest high-confidence OCR visible entities
+    for (let i = 0; i < options.visualData.visibleEntities.length; i++) {
+      const ent = options.visualData.visibleEntities[i];
+      if (ent.confidence >= 0.8) {
+        evidence.push({
+          id: `ocr-entity-${i}-${Date.now()}`,
+          title: `كيان مرئي: ${ent.type}`,
+          description: `تم استخراج الكيان المرئي "${ent.text}" (ثقة القراءة: ${Math.round(ent.confidence * 100)}%)`,
+          severity: 'low',
+          source: 'visual',
+          provenance: 'ocr',
+        });
+      }
+    }
+
+    // Synergistic Brand Contradiction: Visual brand resemblance + Suspicious domain
+    const hasVisualBrand =
+      options.visualData.visualSignals.some(
+        (s) => s.type === 'impersonation_visual' || s.type === 'suspicious_branding'
+      ) || options.visualData.visibleEntities.some((e) => e.type === 'brand_logo');
+
+    const hasSuspiciousDomain = deterministic.urlResults.some(
+      (u) => u.brandSpoofing.detected || u.signals.length > 0
+    );
+
+    if (hasVisualBrand && hasSuspiciousDomain) {
+      evidence.push({
+        id: `brand-contradiction-${Date.now()}`,
+        title: 'تعارض الهوية البصرية مع النطاق الفعلي',
+        description: 'تُظهر الصورة عناصر تشبه علامة تجارية معروفة، بينما النطاق الإلكتروني الفعلي مشبوه أو منتحل.',
+        severity: 'high',
+        source: 'visual',
+        provenance: 'both',
       });
     }
   }
@@ -235,6 +295,20 @@ export function fuseEvidenceAndAssess(
     fusedScore = Math.min(100, Math.max(0, baseDeterministicScore + cappedAiContribution));
   }
 
+  // 3b. Add conservative bounded visual score contribution if screenshot was analyzed
+  if (options.visualData && options.visualData.visualSignals.length > 0) {
+    let rawVisualContribution = 0;
+    for (const vs of options.visualData.visualSignals) {
+      if (vs.severity === 'high') rawVisualContribution += 3;
+      else if (vs.severity === 'medium') rawVisualContribution += 2;
+      else rawVisualContribution += 1;
+    }
+    const maxVisualContribution =
+      options.maxVisualScoreContribution ?? DEFAULT_RISK_WEIGHTS.maxVisualScoreContribution;
+    const cappedVisualContribution = Math.min(rawVisualContribution, maxVisualContribution);
+    fusedScore = Math.min(100, Math.max(0, fusedScore + cappedVisualContribution));
+  }
+
   // 4. Resolve Risk Level
   let riskLevel: 'low' | 'suspicious' | 'high' = 'low';
   if (fusedScore >= DEFAULT_RISK_WEIGHTS.thresholds.highMin) {
@@ -293,6 +367,11 @@ export function fuseEvidenceAndAssess(
       'لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط).'
     );
   }
+  if (options.visualData && options.visualData.uncertainties.length > 0) {
+    for (const unc of options.visualData.uncertainties) {
+      uncertaintiesSet.add(`محدودية بصرية: ${unc}`);
+    }
+  }
   const uncertainties = Array.from(uncertaintiesSet);
 
   return {
@@ -310,6 +389,8 @@ export function fuseEvidenceAndAssess(
     evidence,
     semanticSignals: aiSemanticResult?.semanticSignals || [],
     psychologicalTactics: aiSemanticResult?.psychologicalTactics || [],
+    visualExtraction: options.visualData || undefined,
+    visualSignals: options.visualData?.visualSignals || [],
     actionableAdvice,
     uncertainties,
     deterministicResult: deterministic,

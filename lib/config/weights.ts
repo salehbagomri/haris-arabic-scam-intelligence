@@ -31,6 +31,13 @@ export interface WeightsConfig {
    */
   maxAiScoreContribution: number;
 
+  /**
+   * Maximum total points that visual/screenshot signals alone can contribute to the risk score.
+   * This is a conservative heuristic cap, not a scientific probability.
+   * Guarantees visual cues alone cannot unilaterally push clean content into high risk.
+   */
+  maxVisualScoreContribution: number;
+
   /** Classification thresholds for "درجة الاشتباه" (0 - 100) */
   thresholds: {
     lowMax: number;        // 0 - 29: منخفض
@@ -80,6 +87,10 @@ export const DEFAULT_RISK_WEIGHTS: WeightsConfig = {
   // Conservative heuristic cap: AI semantic signals alone can contribute at most 15 points.
   // This is a conservative heuristic cap, not a scientific probability.
   maxAiScoreContribution: 15,
+
+  // Conservative heuristic cap: Visual signals alone can contribute at most 10 points.
+  // This is a conservative heuristic cap, not a scientific probability.
+  maxVisualScoreContribution: 10,
 
   thresholds: {
     lowMax: 29,
