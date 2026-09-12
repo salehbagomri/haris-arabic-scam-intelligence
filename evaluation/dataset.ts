@@ -519,8 +519,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     input: {
       screenshot: {
         mimeType: SCREENSHOT_FIXTURES.SCAM_ARABIC_TEXT.mimeType,
-        data: SCREENSHOT_FIXTURES.SCAM_ARABIC_TEXT.dataUrl,
-        description: SCREENSHOT_FIXTURES.SCAM_ARABIC_TEXT.simulatedVisualDescription,
+        base64: SCREENSHOT_FIXTURES.SCAM_ARABIC_TEXT.dataUrl,
       },
     },
     expectedRiskCategory: 'high',
@@ -537,8 +536,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     input: {
       screenshot: {
         mimeType: SCREENSHOT_FIXTURES.OTP_HARVESTING_UI.mimeType,
-        data: SCREENSHOT_FIXTURES.OTP_HARVESTING_UI.dataUrl,
-        description: SCREENSHOT_FIXTURES.OTP_HARVESTING_UI.simulatedVisualDescription,
+        base64: SCREENSHOT_FIXTURES.OTP_HARVESTING_UI.dataUrl,
       },
     },
     expectedRiskCategory: 'high',
@@ -840,8 +838,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     input: {
       screenshot: {
         mimeType: SCREENSHOT_FIXTURES.LEGIT_SECURITY_ADVISORY.mimeType,
-        data: SCREENSHOT_FIXTURES.LEGIT_SECURITY_ADVISORY.dataUrl,
-        description: SCREENSHOT_FIXTURES.LEGIT_SECURITY_ADVISORY.simulatedVisualDescription,
+        base64: SCREENSHOT_FIXTURES.LEGIT_SECURITY_ADVISORY.dataUrl,
       },
     },
     expectedRiskCategory: 'low',
@@ -858,8 +855,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     input: {
       screenshot: {
         mimeType: SCREENSHOT_FIXTURES.VISUALLY_SUSPICIOUS_BENIGN.mimeType,
-        data: SCREENSHOT_FIXTURES.VISUALLY_SUSPICIOUS_BENIGN.dataUrl,
-        description: SCREENSHOT_FIXTURES.VISUALLY_SUSPICIOUS_BENIGN.simulatedVisualDescription,
+        base64: SCREENSHOT_FIXTURES.VISUALLY_SUSPICIOUS_BENIGN.dataUrl,
       },
     },
     expectedRiskCategory: 'low',
@@ -1079,8 +1075,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     input: {
       screenshot: {
         mimeType: SCREENSHOT_FIXTURES.UNREADABLE_LOW_QUALITY.mimeType,
-        data: SCREENSHOT_FIXTURES.UNREADABLE_LOW_QUALITY.dataUrl,
-        description: SCREENSHOT_FIXTURES.UNREADABLE_LOW_QUALITY.simulatedVisualDescription,
+        base64: SCREENSHOT_FIXTURES.UNREADABLE_LOW_QUALITY.dataUrl,
       },
     },
     expectedRiskCategory: 'low',

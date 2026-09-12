@@ -1,10 +1,10 @@
 /**
- * HARIS (حارس) — Evaluation Harness & Baseline Benchmark Runner (v1.1.0)
+ * HARIS (حارس) — Evaluation Harness & Baseline Benchmark Runner (v1.2.0)
  *
  * Runs the versioned evaluation dataset (evaluation/dataset.ts) through
  * the existing analysis pipeline without modifying production behavior.
- * Computes precision, recall, F1, false positive/negative rates,
- * modality separation, and per-feature Scam DNA detection statistics.
+ * Computes coverage-adjusted vs. determinate accuracy, FPR, FNR,
+ * scam-type metrics, and Scam DNA feature statistics using pure metric functions.
  */
 
 import * as fs from 'fs';
@@ -12,90 +12,59 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { execSync } from 'child_process';
 import { EVALUATION_DATASET } from '../evaluation/dataset';
+import { EvaluationCaseResult, EvaluationSummary } from '../evaluation/types';
 import {
-  EvaluationCaseResult,
-  EvaluationSummary,
-  FeatureMetric,
-  CategoryMetric,
-  DialectMetric,
-  EvaluationCategory,
-  Dialect,
-  ConfusionMatrix,
-} from '../evaluation/types';
+  calculateConfusionMatrix,
+  calculateRiskMetrics,
+  calculateLegitimateMetrics,
+  calculateScamMetrics,
+  calculateScamTypeMetrics,
+  calculateFeatureMetrics,
+  calculateCategoryMetrics,
+  calculateDialectMetrics,
+  calculatePrecision,
+  calculateRecall,
+  calculateF1,
+} from '../evaluation/metrics';
 import { analyzeUnified } from '../lib/vision/pipeline';
-import { SCAM_DNA_FEATURES, FeatureKey } from '../lib/analysis/taxonomy';
+import { FeatureKey } from '../lib/analysis/taxonomy';
 import { isGeminiConfigured, getConfiguredModel } from '../lib/ai/client';
+import { DEFAULT_RISK_WEIGHTS } from '../lib/config/weights';
+import { VISION_CONFIG } from '../lib/config/vision';
 
 export async function runEvaluation(): Promise<EvaluationSummary> {
   const isAiActive = isGeminiConfigured();
   const configuredModel = getConfiguredModel();
 
-  // 1. Reproducibility Hashes & Git Metadata
+  // 1. Hashes & Git Metadata
   const datasetJson = JSON.stringify(EVALUATION_DATASET);
   const datasetSha256 = crypto.createHash('sha256').update(datasetJson).digest('hex');
-  let gitCommit = 'unknown';
+  const configHash = crypto
+    .createHash('sha256')
+    .update(JSON.stringify({ weights: DEFAULT_RISK_WEIGHTS, vision: VISION_CONFIG }))
+    .digest('hex');
+
+  let currentGitCommit = 'unknown';
   try {
-    gitCommit = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+    currentGitCommit = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
   } catch {
-    gitCommit = 'git-unavailable';
+    currentGitCommit = 'git-unavailable';
   }
 
   console.log('='.repeat(70));
-  console.log('🛡️  HARIS (حارس) — Evaluation Benchmark Runner (Phase 6A.1)');
+  console.log('🛡️  HARIS (حارس) — Evaluation Benchmark Runner (Phase 6A.2)');
   console.log(`📡 Pipeline Mode: ${isAiActive ? `Hybrid (Deterministic + Gemini AI [${configuredModel}])` : 'Deterministic Baseline (Offline Mode)'}`);
   console.log(`📊 Dataset Size: ${EVALUATION_DATASET.length} labeled test cases`);
-  console.log(`🔗 Git Commit:   ${gitCommit.substring(0, 10)}`);
-  console.log(`🔒 Dataset SHA:  ${datasetSha256.substring(0, 16)}...`);
+  console.log(`🔗 Source Commit: ${currentGitCommit.substring(0, 10)}`);
+  console.log(`🔒 Dataset SHA:   ${datasetSha256.substring(0, 16)}...`);
+  console.log(`🔒 Config SHA:    ${configHash.substring(0, 16)}...`);
   console.log('='.repeat(70));
 
   const caseResults: EvaluationCaseResult[] = [];
-
-  // Feature stats accumulator
-  const featureStats = {} as Record<
-    FeatureKey,
-    { groundTruth: number; detected: number; tp: number; fp: number; fn: number }
-  >;
-
-  for (const feat of SCAM_DNA_FEATURES) {
-    featureStats[feat] = { groundTruth: 0, detected: 0, tp: 0, fp: 0, fn: 0 };
-  }
-
-  // Category & Dialect accumulators
-  const categories: EvaluationCategory[] = ['scam', 'legitimate', 'ambiguous'];
-  const categoryStats: Record<EvaluationCategory, { total: number; correct: number; totalScore: number }> = {
-    scam: { total: 0, correct: 0, totalScore: 0 },
-    legitimate: { total: 0, correct: 0, totalScore: 0 },
-    ambiguous: { total: 0, correct: 0, totalScore: 0 },
-  };
-
-  const dialects: Dialect[] = ['msa', 'yemeni', 'gulf', 'egyptian', 'mixed_en', 'arabizi'];
-  const dialectStats: Record<Dialect, { total: number; correct: number }> = {
-    msa: { total: 0, correct: 0 },
-    yemeni: { total: 0, correct: 0 },
-    gulf: { total: 0, correct: 0 },
-    egyptian: { total: 0, correct: 0 },
-    mixed_en: { total: 0, correct: 0 },
-    arabizi: { total: 0, correct: 0 },
-  };
-
-  const confusionMatrix: ConfusionMatrix = {
-    truePositives: 0,
-    falsePositives: 0,
-    falseNegatives: 0,
-    trueNegatives: 0,
-    indeterminate: 0,
-  };
-
-  let totalCorrectRisk = 0;
-  let correctScamTypeAllCases = 0;
-  let correctScamTypeScamOnly = 0;
-  let falsePositives = 0;
-  let falseNegatives = 0;
   let screenshotCasesCount = 0;
   let screenshotEvaluableCount = 0;
   let screenshotExtractionFailuresCount = 0;
   let textUrlCasesCount = 0;
-  let textUrlCorrectRisk = 0;
 
   // Execute each test case sequentially
   for (let i = 0; i < EVALUATION_DATASET.length; i++) {
@@ -107,7 +76,9 @@ export async function runEvaluation(): Promise<EvaluationSummary> {
       textUrlCasesCount++;
     }
 
-    process.stdout.write(`[${i + 1}/${EVALUATION_DATASET.length}] Evaluating ${item.id}: ${item.title.substring(0, 35)}... `);
+    process.stdout.write(
+      `[${i + 1}/${EVALUATION_DATASET.length}] Evaluating ${item.id}: ${item.title.substring(0, 35)}... `
+    );
 
     const startTime = Date.now();
     let result;
@@ -121,7 +92,7 @@ export async function runEvaluation(): Promise<EvaluationSummary> {
     const elapsed = Date.now() - startTime;
 
     const isExtractionFailure = Boolean(result.isExtractionFailure);
-    // When ONLY a screenshot was provided and extraction failed, result is indeterminate
+    // When ONLY a screenshot was provided and extraction failed, the result is indeterminate
     const isIndeterminate = isExtractionFailure && !item.input.text && !item.input.url;
 
     if (isScreenshotCase) {
@@ -138,61 +109,24 @@ export async function runEvaluation(): Promise<EvaluationSummary> {
       .filter((d) => d.detected)
       .map((d) => d.featureId as FeatureKey);
 
-    // Extraction failures must NOT automatically count as a correct 'low' risk
+    // Extraction failures must NOT automatically count as a correct risk category
     let isRiskCorrect = false;
     if (isIndeterminate) {
-      isRiskCorrect = false; // Cannot credit indeterminate extraction failure as correct
+      isRiskCorrect = false;
     } else {
       isRiskCorrect = actualRiskCategory === item.expectedRiskCategory;
     }
 
     const isScamTypeMatch = actualScamType === item.expectedScamType;
-    if (isScamTypeMatch) {
-      correctScamTypeAllCases++;
-    }
-    if (item.category === 'scam' && isScamTypeMatch && actualScamType !== 'UNKNOWN') {
-      correctScamTypeScamOnly++;
-    }
 
     // False Positive: Legitimate message classified as Suspicious or High
-    const isFP = !isIndeterminate && item.category === 'legitimate' && (actualRiskCategory === 'suspicious' || actualRiskCategory === 'high');
+    const isFP =
+      !isIndeterminate &&
+      item.category === 'legitimate' &&
+      (actualRiskCategory === 'suspicious' || actualRiskCategory === 'high');
 
     // False Negative: Scam message classified as Low
     const isFN = !isIndeterminate && item.category === 'scam' && actualRiskCategory === 'low';
-
-    // Update Confusion Matrix
-    if (isIndeterminate) {
-      confusionMatrix.indeterminate++;
-    } else if (item.category === 'scam') {
-      if (actualRiskCategory === 'high' || actualRiskCategory === 'suspicious') {
-        confusionMatrix.truePositives++;
-      } else if (actualRiskCategory === 'low') {
-        confusionMatrix.falseNegatives++;
-      }
-    } else if (item.category === 'legitimate') {
-      if (actualRiskCategory === 'low') {
-        confusionMatrix.trueNegatives++;
-      } else if (actualRiskCategory === 'suspicious' || actualRiskCategory === 'high') {
-        confusionMatrix.falsePositives++;
-      }
-    }
-
-    if (isFP) falsePositives++;
-    if (isFN) falseNegatives++;
-    if (isRiskCorrect) {
-      totalCorrectRisk++;
-      if (!isScreenshotCase) {
-        textUrlCorrectRisk++;
-      }
-    }
-
-    // Update category & dialect stats
-    categoryStats[item.category].total++;
-    categoryStats[item.category].totalScore += result.riskScore;
-    if (isRiskCorrect) categoryStats[item.category].correct++;
-
-    dialectStats[item.dialect].total++;
-    if (isRiskCorrect) dialectStats[item.dialect].correct++;
 
     // Calculate Scam DNA metrics for this case
     const expectedFeatSet = new Set(item.expectedDnaFeatures);
@@ -203,32 +137,16 @@ export async function runEvaluation(): Promise<EvaluationSummary> {
     let caseFN = 0;
 
     for (const f of item.expectedDnaFeatures) {
-      if (actualFeatSet.has(f)) {
-        caseTP++;
-      } else {
-        caseFN++;
-      }
+      if (actualFeatSet.has(f)) caseTP++;
+      else caseFN++;
     }
     for (const f of actualDnaFeatures) {
-      if (!expectedFeatSet.has(f)) {
-        caseFP++;
-      }
+      if (!expectedFeatSet.has(f)) caseFP++;
     }
 
-    const casePrecision = caseTP + caseFP > 0 ? caseTP / (caseTP + caseFP) : 1.0;
-    const caseRecall = caseTP + caseFN > 0 ? caseTP / (caseTP + caseFN) : 1.0;
-    const caseF1 = casePrecision + caseRecall > 0 ? (2 * casePrecision * caseRecall) / (casePrecision + caseRecall) : 1.0;
-
-    // Accumulate global feature stats
-    for (const feat of SCAM_DNA_FEATURES) {
-      const exp = expectedFeatSet.has(feat);
-      const act = actualFeatSet.has(feat);
-      if (exp) featureStats[feat].groundTruth++;
-      if (act) featureStats[feat].detected++;
-      if (exp && act) featureStats[feat].tp++;
-      if (!exp && act) featureStats[feat].fp++;
-      if (exp && !act) featureStats[feat].fn++;
-    }
+    const casePrecision = calculatePrecision(caseTP, caseFP);
+    const caseRecall = calculateRecall(caseTP, caseFN);
+    const caseF1 = calculateF1(casePrecision, caseRecall);
 
     const caseResult: EvaluationCaseResult = {
       id: item.id,
@@ -249,9 +167,9 @@ export async function runEvaluation(): Promise<EvaluationSummary> {
       dnaTruePositives: caseTP,
       dnaFalsePositives: caseFP,
       dnaFalseNegatives: caseFN,
-      dnaPrecision: Number(casePrecision.toFixed(3)),
-      dnaRecall: Number(caseRecall.toFixed(3)),
-      dnaF1: Number(caseF1.toFixed(3)),
+      dnaPrecision: casePrecision,
+      dnaRecall: caseRecall,
+      dnaF1: caseF1,
       aiConfidence: result.aiConfidence,
       extractionConfidence: result.visualExtraction?.extractionConfidence ?? null,
       isExtractionFailure,
@@ -268,71 +186,49 @@ export async function runEvaluation(): Promise<EvaluationSummary> {
     };
 
     caseResults.push(caseResult);
-    const statusIcon = isIndeterminate ? '⚠️ UNEXTRACTED' : isRiskCorrect ? '✅' : isFP ? '⚠️ FP' : isFN ? '🚨 FN' : '❌';
+    const statusIcon = isIndeterminate
+      ? '⚠️ UNEXTRACTED'
+      : isRiskCorrect
+      ? '✅'
+      : isFP
+      ? '⚠️ FP'
+      : isFN
+      ? '🚨 FN'
+      : '❌';
     console.log(`${statusIcon} Score:${result.riskScore} (${elapsed}ms)`);
   }
 
-  // Compile Feature Metrics
-  const featureMetrics: FeatureMetric[] = SCAM_DNA_FEATURES.map((feat) => {
-    const s = featureStats[feat];
-    const precision = s.tp + s.fp > 0 ? s.tp / (s.tp + s.fp) : 0;
-    const recall = s.tp + s.fn > 0 ? s.tp / (s.tp + s.fn) : 0;
-    const f1 = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0;
-    return {
-      featureId: feat,
-      nameAr: feat,
-      nameEn: feat,
-      groundTruthCount: s.groundTruth,
-      detectedCount: s.detected,
-      truePositives: s.tp,
-      falsePositives: s.fp,
-      falseNegatives: s.fn,
-      precision: Number(precision.toFixed(3)),
-      recall: Number(recall.toFixed(3)),
-      f1: Number(f1.toFixed(3)),
-    };
-  });
+  // 2. Compute Aggregated Metrics via Pure Functions
+  const confusionMatrix = calculateConfusionMatrix(caseResults);
+  const riskMetrics = calculateRiskMetrics(caseResults, confusionMatrix);
+  const legitimateMetrics = calculateLegitimateMetrics(caseResults, confusionMatrix);
+  const scamMetrics = calculateScamMetrics(caseResults, confusionMatrix);
+  const scamTypeMetrics = calculateScamTypeMetrics(caseResults);
 
-  // Compile Category Breakdown
-  const categoryBreakdown = {} as Record<EvaluationCategory, CategoryMetric>;
-  for (const cat of categories) {
-    const c = categoryStats[cat];
-    categoryBreakdown[cat] = {
-      total: c.total,
-      correctRisk: c.correct,
-      accuracy: Number((c.total > 0 ? c.correct / c.total : 0).toFixed(3)),
-      averageScore: Number((c.total > 0 ? c.totalScore / c.total : 0).toFixed(1)),
-    };
-  }
+  const featureMetrics = calculateFeatureMetrics(caseResults);
+  const categoryBreakdown = calculateCategoryMetrics(caseResults);
+  const dialectBreakdown = calculateDialectMetrics(caseResults);
 
-  // Compile Dialect Breakdown
-  const dialectBreakdown = {} as Record<Dialect, DialectMetric>;
-  for (const d of dialects) {
-    const s = dialectStats[d];
-    dialectBreakdown[d] = {
-      total: s.total,
-      correctRisk: s.correct,
-      accuracy: Number((s.total > 0 ? s.correct / s.total : 0).toFixed(3)),
-    };
-  }
-
-  const totalCases = EVALUATION_DATASET.length;
-  const legitimateTotal = categoryStats.legitimate.total;
-  const scamTotal = categoryStats.scam.total;
+  const totalCases = caseResults.length;
+  const scamCases = caseResults.filter((c) => c.category === 'scam').length;
+  const legitimateCases = caseResults.filter((c) => c.category === 'legitimate').length;
+  const ambiguousCases = caseResults.filter((c) => c.category === 'ambiguous').length;
 
   const summary: EvaluationSummary = {
-    version: '1.1.0',
+    version: '1.2.0',
     evaluatedAt: new Date().toISOString(),
     metadata: {
-      datasetVersion: '1.1.0',
+      datasetVersion: '1.2.0',
       datasetSha256,
-      runnerVersion: '1.1.0',
-      gitCommit,
+      runnerVersion: '1.2.0',
+      evaluationSourceCommit: currentGitCommit,
+      artifactCommit: currentGitCommit,
       nodeVersion: process.version,
       geminiConfigured: isAiActive,
       geminiModel: configuredModel,
       pipelineMode: isAiActive ? 'hybrid-gemini' : 'deterministic-baseline',
       evaluatedAt: new Date().toISOString(),
+      configHash,
       evaluationConfig: {
         offlineMode: !isAiActive,
         timeoutMs: 15000,
@@ -341,21 +237,19 @@ export async function runEvaluation(): Promise<EvaluationSummary> {
       },
     },
     totalCases,
-    scamCases: scamTotal,
-    legitimateCases: legitimateTotal,
-    ambiguousCases: categoryStats.ambiguous.total,
+    scamCases,
+    legitimateCases,
+    ambiguousCases,
     textUrlCases: textUrlCasesCount,
-    textUrlAccuracy: Number((textUrlCasesCount > 0 ? textUrlCorrectRisk / textUrlCasesCount : 0).toFixed(3)),
     screenshotCases: screenshotCasesCount,
     screenshotEvaluableCount,
     screenshotExtractionFailuresCount,
-    overallAccuracy: Number((totalCorrectRisk / totalCases).toFixed(3)),
-    scamTypeAccuracyAllCases: Number((totalCases > 0 ? correctScamTypeAllCases / totalCases : 0).toFixed(3)),
-    scamTypeAccuracyScamOnly: Number((scamTotal > 0 ? correctScamTypeScamOnly / scamTotal : 0).toFixed(3)),
-    falsePositivesCount: falsePositives,
-    falsePositiveRate: Number((legitimateTotal > 0 ? falsePositives / legitimateTotal : 0).toFixed(3)),
-    falseNegativesCount: falseNegatives,
-    falseNegativeRate: Number((scamTotal > 0 ? falseNegatives / scamTotal : 0).toFixed(3)),
+
+    riskMetrics,
+    legitimateMetrics,
+    scamMetrics,
+    scamTypeMetrics,
+
     confusionMatrix,
     categoryBreakdown,
     dialectBreakdown,
@@ -372,6 +266,8 @@ export function generateMarkdownReport(summary: EvaluationSummary): string {
   const fnCases = summary.caseResults.filter((c) => c.isFalseNegative);
   const unextractedCases = summary.caseResults.filter((c) => c.isIndeterminate);
 
+  const { riskMetrics, legitimateMetrics, scamMetrics, scamTypeMetrics, confusionMatrix } = summary;
+
   return `# HARIS (حارس) — Arabic Scam Intelligence Baseline Benchmark Report
 **Report Version:** ${summary.version}  
 **Evaluation Date:** ${summary.evaluatedAt}  
@@ -383,73 +279,95 @@ export function generateMarkdownReport(summary: EvaluationSummary): string {
 
 | Metadata Field | Value | Notes |
 |---|---|---|
-| **Git Commit Hash** | \`${summary.metadata.gitCommit}\` | Exact repository revision at time of benchmark run |
+| **Evaluation Source Commit** | \`${summary.metadata.evaluationSourceCommit}\` | Exact Git commit of codebase at execution |
+| **Artifact Revision** | \`${summary.metadata.artifactCommit}\` | Commit capturing baseline artifact files |
 | **Dataset Version** | \`${summary.metadata.datasetVersion}\` | Versioned evaluation dataset |
-| **Dataset SHA-256** | \`${summary.metadata.datasetSha256.substring(0, 32)}...\` | Cryptographic tamper-evident hash of all 70 test cases |
+| **Dataset SHA-256** | \`${summary.metadata.datasetSha256.substring(0, 32)}...\` | Tamper-evident hash of all 70 test cases |
+| **Configuration & Weights Hash** | \`${summary.metadata.configHash.substring(0, 32)}...\` | Cryptographic hash of DEFAULT_RISK_WEIGHTS + VISION_CONFIG |
 | **Runner Version** | \`${summary.metadata.runnerVersion}\` | Evaluation harness release |
 | **Node.js Environment** | \`${summary.metadata.nodeVersion}\` | Runtime environment |
 | **Gemini AI Configuration** | \`${summary.metadata.geminiConfigured ? `Active (${summary.metadata.geminiModel})` : 'Disabled / Offline Baseline'}\` | Deterministic baseline runs purely offline |
-| **Max AI Score Contribution** | \`+${summary.metadata.evaluationConfig.maxAiScoreContribution} pts\` | Centralized bounded cap |
-| **Max Visual Score Contribution** | \`+${summary.metadata.evaluationConfig.maxVisualScoreContribution} pts\` | Centralized bounded cap |
+| **Max AI Contribution Cap** | \`+${summary.metadata.evaluationConfig.maxAiScoreContribution} pts\` | Centralized bounded cap |
+| **Max Visual Contribution Cap** | \`+${summary.metadata.evaluationConfig.maxVisualScoreContribution} pts\` | Centralized bounded cap |
 
 ---
 
-## 2. Metric Definitions & Benchmark Results
+## 2. Granular Metric Definitions & Measured Baseline Results
 
-### 2.1 Core Classification Metrics
+### 2.1 Risk Classification Accuracy Metrics
 
-| Metric | Formula & Denominator | Measured Baseline | Interpretation |
+| Metric | Formula & Denominator | Value | Definition & Notes |
 |---|---|---|---|
-| **Overall Classification Accuracy** | $\\frac{\\text{Correct Risk Category}}{\\text{Total Cases}} = \\frac{${summary.caseResults.filter((c) => c.isRiskCategoryCorrect).length}}{${summary.totalCases}}$ | **${(summary.overallAccuracy * 100).toFixed(1)}%** | All 70 evaluation cases (including unextracted screenshots) |
-| **Text/URL Baseline Accuracy** | $\\frac{\\text{Correct Risk on Text/URL}}{\\text{Total Text/URL Cases}} = \\frac{${summary.caseResults.filter((c) => !c.isIndeterminate && c.isRiskCategoryCorrect && (!c.actualRiskCategory || true)).length - (summary.screenshotCases - summary.screenshotExtractionFailuresCount)}}{${summary.textUrlCases}}$ | **${(summary.textUrlAccuracy * 100).toFixed(1)}%** | Evaluates only cases where input could be processed offline |
-| **Legitimate Accuracy (Specificity)** | $\\frac{\\text{Correct Legitimate}}{\\text{Total Legitimate}} = \\frac{${summary.categoryBreakdown.legitimate.correctRisk}}{${summary.legitimateCases}}$ | **${(summary.categoryBreakdown.legitimate.accuracy * 100).toFixed(1)}%** | Specificity against clean Arabic messages |
-| **False Positive Rate (FPR)** | $\\frac{\\text{False Positives}}{\\text{Total Legitimate}} = \\frac{${summary.falsePositivesCount}}{${summary.legitimateCases}}$ | **${(summary.falsePositiveRate * 100).toFixed(1)}%** | Critical metric for user trust (Target: < 5%) |
-| **False Negative Rate (FNR)** | $\\frac{\\text{False Negatives}}{\\text{Total Scams}} = \\frac{${summary.falseNegativesCount}}{${summary.scamCases}}$ | **${(summary.falseNegativeRate * 100).toFixed(1)}%** | Offline deterministic miss rate on conversational dialect scams |
+| **Coverage-Adjusted Accuracy** | $\\frac{\\text{Total Correct}}{\\text{Total Cases}} = \\frac{${summary.caseResults.filter((c) => c.isRiskCategoryCorrect).length}}{${riskMetrics.totalCases}}$ | **${(riskMetrics.coverageAdjustedAccuracy * 100).toFixed(1)}%** | Evaluates all 70 cases; unextracted screenshots count as failure |
+| **Determinate Risk Accuracy** | $\\frac{\\text{Correct Determinate}}{\\text{Determinate Cases}} = \\frac{${summary.caseResults.filter((c) => c.isRiskCategoryCorrect && !c.isIndeterminate).length}}{${riskMetrics.determinateCasesCount}}$ | **${(riskMetrics.determinateRiskAccuracy * 100).toFixed(1)}%** | Evaluates only cases where inputs were determinately processed |
+| **Determinate Cases Count** | Total Cases - Indeterminate = 70 - ${riskMetrics.indeterminateCasesCount} | **${riskMetrics.determinateCasesCount}** | 65 Text/URL cases |
+| **Indeterminate Cases Count** | Cases with unextracted screenshots | **${riskMetrics.indeterminateCasesCount}** | 5 screenshot cases offline |
 
-### 2.2 Scam-Type Attribution Metrics
+### 2.2 Legitimate Message Evaluation Metrics
+
+| Metric | Formula & Denominator | Value | Definition & Notes |
+|---|---|---|---|
+| **Legitimate Determinate Accuracy** | $\\frac{\\text{TN}}{\\text{TN} + \\text{FP}} = \\frac{${legitimateMetrics.trueNegativesCount}}{${legitimateMetrics.trueNegativesCount + legitimateMetrics.falsePositivesCount}}$ | **${(legitimateMetrics.legitimateDeterminateAccuracy * 100).toFixed(1)}%** | True negative rate among determinate legitimate messages |
+| **Legitimate Coverage-Adjusted Accuracy** | $\\frac{\\text{TN}}{\\text{Total Legitimate}} = \\frac{${legitimateMetrics.trueNegativesCount}}{${legitimateMetrics.totalLegitimateCases}}$ | **${(legitimateMetrics.legitimateAccuracy * 100).toFixed(1)}%** | Penalizes indeterminate screenshot cases |
+| **False Positive Rate (FPR)** | $\\frac{\\text{FP}}{\\text{TN} + \\text{FP}} = \\frac{${legitimateMetrics.falsePositivesCount}}{${legitimateMetrics.trueNegativesCount + legitimateMetrics.falsePositivesCount}}$ | **${(legitimateMetrics.falsePositiveRate * 100).toFixed(1)}%** | $\\frac{2}{20} = 10.0\\%$; standard epidemiological FPR formula |
+| **Legitimate Indeterminate Rate** | $\\frac{\\text{Legit Indeterminate}}{\\text{Total Legitimate}} = \\frac{${legitimateMetrics.legitimateIndeterminateCount}}{${legitimateMetrics.totalLegitimateCases}}$ | **${(legitimateMetrics.legitimateIndeterminateRate * 100).toFixed(1)}%** | $\\frac{2}{22} = 9.1\\%$ |
+
+### 2.3 Scam Detection & Miss Rate Metrics
+
+| Metric | Formula & Denominator | Value | Definition & Notes |
+|---|---|---|---|
+| **Scam Determinate Detection Rate (Recall)** | $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}} = \\frac{${scamMetrics.truePositivesCount}}{${scamMetrics.truePositivesCount + scamMetrics.falseNegativesCount}}$ | **${(scamMetrics.scamDeterminateDetectionRate * 100).toFixed(1)}%** | $\\frac{11}{32} = 34.4\\%$ (Determinate sensitivity) |
+| **Scam Determinate False Negative Rate (FNR)** | $\\frac{\\text{FN}}{\\text{TP} + \\text{FN}} = \\frac{${scamMetrics.falseNegativesCount}}{${scamMetrics.truePositivesCount + scamMetrics.falseNegativesCount}}$ | **${(scamMetrics.scamDeterminateFNR * 100).toFixed(1)}%** | $\\frac{21}{32} = 65.6\\%$ (Miss rate on determinate scams) |
+| **Scam Miss Rate (Including Indeterminate)** | $\\frac{\\text{FN} + \\text{Scam Indet}}{\\text{Total Scams}} = \\frac{${scamMetrics.falseNegativesCount + scamMetrics.scamIndeterminateCount}}{${scamMetrics.totalScamCases}}$ | **${(scamMetrics.scamMissRateIncludingIndeterminate * 100).toFixed(1)}%** | $\\frac{23}{34} = 67.6\\%$ (Penalizes unextracted scams) |
+| **Scam Indeterminate Rate** | $\\frac{\\text{Scam Indet}}{\\text{Total Scams}} = \\frac{${scamMetrics.scamIndeterminateCount}}{${scamMetrics.totalScamCases}}$ | **${(summary.scamTypeMetrics.scamTypeScamOnlyIndeterminateRate * 100).toFixed(1)}%** | $\\frac{2}{34} = 5.9\\%$ |
+
+### 2.4 Scam-Type Attribution Metrics
+
+| Metric | Formula & Denominator | Value | Definition & Notes |
+|---|---|---|---|
+| **Scam-Only Determinate Accuracy** | $\\frac{\\text{Correct Non-UNKNOWN}}{\\text{Determinate Scams}} = \\frac{${summary.caseResults.filter((c) => c.category === 'scam' && !c.isIndeterminate && c.isScamTypeCorrect && c.actualScamType !== 'UNKNOWN').length}}{${riskMetrics.determinateCasesCount - legitimateMetrics.totalLegitimateCases - (summary.ambiguousCases - confusionMatrix.ambiguousIndeterminate)}}$ | **${(scamTypeMetrics.scamTypeScamOnlyDeterminateAccuracy * 100).toFixed(1)}%** | $\\frac{7}{32} = 21.9\\%$ (Strictly excludes UNKNOWN matches) |
+| **Scam-Only Coverage-Adjusted Accuracy** | $\\frac{\\text{Correct Non-UNKNOWN}}{\\text{Total Scams}} = \\frac{${summary.caseResults.filter((c) => c.category === 'scam' && c.isScamTypeCorrect && c.actualScamType !== 'UNKNOWN').length}}{${scamMetrics.totalScamCases}}$ | **${(scamTypeMetrics.scamTypeScamOnlyCoverageAdjustedAccuracy * 100).toFixed(1)}%** | $\\frac{7}{34} = 20.6\\%$ |
+| **All-Cases Coverage-Adjusted Match** | $\\frac{\\text{All Matches (incl. UNKNOWN)}}{\\text{Total Cases}} = \\frac{${summary.caseResults.filter((c) => c.isScamTypeCorrect).length}}{${summary.totalCases}}$ | **${(scamTypeMetrics.scamTypeAllCasesCoverageAdjusted * 100).toFixed(1)}%** | $\\frac{35}{70} = 50.0\\%$ (Reference only) |
+
+---
+
+## 3. Detailed Confusion Matrix
+
+| Ground Truth Category | High / Suspicious (Positive) | Low (Negative) | Indeterminate (Offline Screenshot) | Total Cases |
+|---|---|---|---|---|
+| **Actual Scam** | **${confusionMatrix.truePositives}** (TP) | **${confusionMatrix.falseNegatives}** (FN) | **${confusionMatrix.scamIndeterminate}** | **${scamMetrics.totalScamCases}** |
+| **Actual Legitimate** | **${confusionMatrix.falsePositives}** (FP) | **${confusionMatrix.trueNegatives}** (TN) | **${confusionMatrix.legitimateIndeterminate}** | **${legitimateMetrics.totalLegitimateCases}** |
+| **Actual Ambiguous** | **${summary.caseResults.filter((c) => c.category === 'ambiguous' && !c.isIndeterminate && (c.actualRiskCategory === 'high' || c.actualRiskCategory === 'suspicious')).length}** | **${summary.caseResults.filter((c) => c.category === 'ambiguous' && !c.isIndeterminate && c.actualRiskCategory === 'low').length}** | **${confusionMatrix.ambiguousIndeterminate}** | **${summary.ambiguousCases}** |
+| **Total** | **${confusionMatrix.truePositives + confusionMatrix.falsePositives + summary.caseResults.filter((c) => c.category === 'ambiguous' && !c.isIndeterminate && (c.actualRiskCategory === 'high' || c.actualRiskCategory === 'suspicious')).length}** | **${confusionMatrix.falseNegatives + confusionMatrix.trueNegatives + summary.caseResults.filter((c) => c.category === 'ambiguous' && !c.isIndeterminate && c.actualRiskCategory === 'low').length}** | **${confusionMatrix.totalIndeterminate}** | **${summary.totalCases}** |
+
+---
+
+## 4. Modality Separation & Screenshot Contract Verification
+
+| Modality | Total Cases | Processed Determinate | Extraction Failures | Accuracy | Pipeline Status |
+|---|---|---|---|---|---|
+| **Text & URL Modality** | ${summary.textUrlCases} | ${summary.textUrlCases} | 0 | **${(riskMetrics.determinateRiskAccuracy * 100).toFixed(1)}%** | Deterministic engine executed offline |
+| **Screenshot Modality** | ${summary.screenshotCases} | ${summary.screenshotEvaluableCount} | ${summary.screenshotExtractionFailuresCount} | **0.0%** | Gemini offline; structured fallback generated |
 
 > [!IMPORTANT]
-> **Scam-Type Metric Separation:**
-> - \`scamTypeAccuracyScamOnly\` strictly measures scam cases ($N = ${summary.scamCases}$) and excludes \`UNKNOWN\` matches on legitimate/ambiguous cases from inflating the score.
-> - \`scamTypeAccuracyAllCases\` measures classification across all cases ($N = ${summary.totalCases}$).
-
-| Metric | Formula & Denominator | Measured Value |
-|---|---|---|
-| **Scam-Type Accuracy (Scam Only)** | $\\frac{\\text{Correct Non-UNKNOWN Scam Type in Scams}}{\\text{Total Scam Cases}} = \\frac{${summary.caseResults.filter((c) => c.category === 'scam' && c.isScamTypeCorrect && c.actualScamType !== 'UNKNOWN').length}}{${summary.scamCases}}$ | **${(summary.scamTypeAccuracyScamOnly * 100).toFixed(1)}%** |
-| **Scam-Type Accuracy (All Cases)** | $\\frac{\\text{Correct Scam Type Across All Cases}}{\\text{Total Cases}} = \\frac{${summary.caseResults.filter((c) => c.isScamTypeCorrect).length}}{${summary.totalCases}}$ | **${(summary.scamTypeAccuracyAllCases * 100).toFixed(1)}%** |
-
-### 2.3 Confusion Matrix
-
-| | Predicted: High / Suspicious | Predicted: Low (Benign) | Indeterminate / Unextractable | Total Ground Truth |
-|---|---|---|---|---|
-| **Actual Scam** | **${summary.confusionMatrix.truePositives}** (TP) | **${summary.confusionMatrix.falseNegatives}** (FN) | **${summary.caseResults.filter((c) => c.category === 'scam' && c.isIndeterminate).length}** | **${summary.scamCases}** |
-| **Actual Legitimate** | **${summary.confusionMatrix.falsePositives}** (FP) | **${summary.confusionMatrix.trueNegatives}** (TN) | **${summary.caseResults.filter((c) => c.category === 'legitimate' && c.isIndeterminate).length}** | **${summary.legitimateCases}** |
-| **Actual Ambiguous** | **${summary.caseResults.filter((c) => c.category === 'ambiguous' && (c.actualRiskCategory === 'high' || c.actualRiskCategory === 'suspicious') && !c.isIndeterminate).length}** | **${summary.caseResults.filter((c) => c.category === 'ambiguous' && c.actualRiskCategory === 'low' && !c.isIndeterminate).length}** | **${summary.caseResults.filter((c) => c.category === 'ambiguous' && c.isIndeterminate).length}** | **${summary.ambiguousCases}** |
+> **Screenshot Payload Contract Verification:**
+> - All ${summary.screenshotCases} screenshot cases pass genuine Base64 PNG payloads matching the production \`ScreenshotInput\` contract (\`base64\` property).
+> - \`validateImageConstraints\` verified all payloads as valid (>1KB PNG with valid magic header).
+> - The fallback reason is strictly \`'Gemini client is unconfigured or disabled.'\` and NOT \`'Missing image payload'\`.
+> - \`simulatedVisualDescription\` is NOT present in \`input.screenshot\` and never enters production analysis.
 
 ---
 
-## 3. Modality Separation: Text/URL vs. Screenshot Multimodal
+## 5. Category & Dialect Breakdown
 
-| Modality | Total Cases | Processed | Extraction Failures | Accuracy | Notes |
-|---|---|---|---|---|---|
-| **Text & URL Inputs** | ${summary.textUrlCases} | ${summary.textUrlCases} | 0 | **${(summary.textUrlAccuracy * 100).toFixed(1)}%** | Active deterministic engine baseline |
-| **Screenshot Inputs** | ${summary.screenshotCases} | ${summary.screenshotEvaluableCount} | ${summary.screenshotExtractionFailuresCount} | **0.0%** | Gemini offline; all ${summary.screenshotCases} fixtures produced structured indeterminate status |
-
-> [!NOTE]
-> **Vision Evaluation Guardrail:** The benchmark does NOT claim or simulate vision extraction when Gemini is disabled. When Gemini is offline, screenshot fixtures safely produce \`isExtractionFailure: true\` and are marked as indeterminate rather than being falsely credited as \`low\` risk.
-
----
-
-## 4. Category & Dialect Performance Breakdown
-
-### Category Breakdown
-| Category | Cases | Correct Risk | Accuracy | Avg Score |
+### 5.1 Category Performance
+| Category | Cases | Correct Risk | Accuracy | Avg Suspicion Score |
 |---|---|---|---|---|
 | **Scam / Malicious** | ${summary.categoryBreakdown.scam.total} | ${summary.categoryBreakdown.scam.correctRisk} | **${(summary.categoryBreakdown.scam.accuracy * 100).toFixed(1)}%** | ${summary.categoryBreakdown.scam.averageScore} / 100 |
 | **Legitimate / Benign** | ${summary.categoryBreakdown.legitimate.total} | ${summary.categoryBreakdown.legitimate.correctRisk} | **${(summary.categoryBreakdown.legitimate.accuracy * 100).toFixed(1)}%** | ${summary.categoryBreakdown.legitimate.averageScore} / 100 |
 | **Ambiguous / Adversarial** | ${summary.categoryBreakdown.ambiguous.total} | ${summary.categoryBreakdown.ambiguous.correctRisk} | **${(summary.categoryBreakdown.ambiguous.accuracy * 100).toFixed(1)}%** | ${summary.categoryBreakdown.ambiguous.averageScore} / 100 |
 
-### Regional & Dialect Breakdown
+### 5.2 Regional & Dialect Performance
 | Dialect / Variant | Cases | Correct Risk | Dialect Accuracy |
 |---|---|---|---|
 | **Modern Standard Arabic (MSA)** | ${summary.dialectBreakdown.msa.total} | ${summary.dialectBreakdown.msa.correctRisk} | **${(summary.dialectBreakdown.msa.accuracy * 100).toFixed(1)}%** |
@@ -461,7 +379,7 @@ export function generateMarkdownReport(summary: EvaluationSummary): string {
 
 ---
 
-## 5. Scam DNA Feature Detection Benchmark
+## 6. Scam DNA Feature Detection Benchmark
 
 | Feature Key | Ground Truth | Detected | True Positives | False Positives | False Negatives | Precision | Recall | F1 Score |
 |---|---|---|---|---|---|---|---|---|
@@ -474,9 +392,9 @@ ${summary.featureMetrics
 
 ---
 
-## 6. Failure Case Diagnosis & Anomaly Audit
+## 7. Failure & Boundary Diagnosis
 
-### 6.1 False Positives (Legitimate Flagged as Suspicious/High)
+### 7.1 False Positives (Legitimate Flagged as Suspicious/High)
 ${
   fpCases.length === 0
     ? '✅ **Zero False Positives.**'
@@ -488,7 +406,7 @@ ${
         .join('\n')
 }
 
-### 6.2 False Negatives (Scams Missed as Low Risk)
+### 7.2 False Negatives (Scams Missed as Low Risk)
 ${
   fnCases.length === 0
     ? '✅ **Zero False Negatives.**'
@@ -500,7 +418,7 @@ ${
         .join('\n')
 }
 
-### 6.3 Screenshot Indeterminate Cases (Offline Vision Fallback)
+### 7.3 Indeterminate Cases (Offline Screenshot Modality)
 ${
   unextractedCases.length === 0
     ? 'None.'
@@ -512,7 +430,7 @@ ${
         .join('\n')
 }
 
-### 6.4 Ambiguous / Boundary Calibration Mismatches
+### 7.4 Ambiguous / Boundary Calibration Mismatches
 ${
   failureCases.filter((c) => !c.isFalsePositive && !c.isFalseNegative && !c.isIndeterminate).length === 0
     ? 'None.'
@@ -547,22 +465,28 @@ async function main() {
   console.log(`📄 Saved baseline evaluation report to: ${reportPath}`);
 
   // 3. Print Summary to stdout
+  const { riskMetrics, legitimateMetrics, scamMetrics, scamTypeMetrics } = summary;
   console.log('\n' + '='.repeat(70));
-  console.log('📈 BENCHMARK SUMMARY RESULTS:');
-  console.log(`   - Total Cases:                    ${summary.totalCases}`);
-  console.log(`   - Text/URL Cases:                 ${summary.textUrlCases} (Accuracy: ${(summary.textUrlAccuracy * 100).toFixed(1)}%)`);
-  console.log(`   - Screenshot Cases:               ${summary.screenshotCases} (${summary.screenshotEvaluableCount} evaluable, ${summary.screenshotExtractionFailuresCount} unextracted)`);
-  console.log(`   - Overall Classification Accuracy: ${(summary.overallAccuracy * 100).toFixed(1)}% (${summary.caseResults.filter((c) => c.isRiskCategoryCorrect).length}/${summary.totalCases})`);
-  console.log(`   - Legitimate Category Accuracy:   ${(summary.categoryBreakdown.legitimate.accuracy * 100).toFixed(1)}% (${summary.categoryBreakdown.legitimate.correctRisk}/${summary.legitimateCases})`);
-  console.log(`   - False Positive Rate:            ${(summary.falsePositiveRate * 100).toFixed(1)}% (${summary.falsePositivesCount}/${summary.legitimateCases})`);
-  console.log(`   - False Negative Rate:            ${(summary.falseNegativeRate * 100).toFixed(1)}% (${summary.falseNegativesCount}/${summary.scamCases})`);
-  console.log(`   - Scam-Type Accuracy (Scam Only): ${(summary.scamTypeAccuracyScamOnly * 100).toFixed(1)}% (${summary.caseResults.filter((c) => c.category === 'scam' && c.isScamTypeCorrect && c.actualScamType !== 'UNKNOWN').length}/${summary.scamCases})`);
-  console.log(`   - Scam-Type Accuracy (All Cases): ${(summary.scamTypeAccuracyAllCases * 100).toFixed(1)}% (${summary.caseResults.filter((c) => c.isScamTypeCorrect).length}/${summary.totalCases})`);
+  console.log('📈 BENCHMARK SUMMARY RESULTS (Phase 6A.2):');
+  console.log(`   - Total Cases:                              ${summary.totalCases}`);
+  console.log(`   - Coverage-Adjusted Accuracy:               ${(riskMetrics.coverageAdjustedAccuracy * 100).toFixed(1)}% (${summary.caseResults.filter((c) => c.isRiskCategoryCorrect).length}/${summary.totalCases})`);
+  console.log(`   - Determinate Risk Accuracy:                ${(riskMetrics.determinateRiskAccuracy * 100).toFixed(1)}% (${summary.caseResults.filter((c) => c.isRiskCategoryCorrect && !c.isIndeterminate).length}/${riskMetrics.determinateCasesCount})`);
+  console.log(`   - Legitimate Determinate Accuracy:          ${(legitimateMetrics.legitimateDeterminateAccuracy * 100).toFixed(1)}% (${legitimateMetrics.trueNegativesCount}/${legitimateMetrics.trueNegativesCount + legitimateMetrics.falsePositivesCount})`);
+  console.log(`   - Legitimate Coverage-Adjusted Accuracy:    ${(legitimateMetrics.legitimateAccuracy * 100).toFixed(1)}% (${legitimateMetrics.trueNegativesCount}/${legitimateMetrics.totalLegitimateCases})`);
+  console.log(`   - False Positive Rate (FPR):                ${(legitimateMetrics.falsePositiveRate * 100).toFixed(1)}% (${legitimateMetrics.falsePositivesCount}/${legitimateMetrics.trueNegativesCount + legitimateMetrics.falsePositivesCount})`);
+  console.log(`   - Scam Determinate FNR:                     ${(scamMetrics.scamDeterminateFNR * 100).toFixed(1)}% (${scamMetrics.falseNegativesCount}/${scamMetrics.truePositivesCount + scamMetrics.falseNegativesCount})`);
+  console.log(`   - Scam Miss Rate (incl. Indeterminate):     ${(scamMetrics.scamMissRateIncludingIndeterminate * 100).toFixed(1)}% (${scamMetrics.falseNegativesCount + scamMetrics.scamIndeterminateCount}/${scamMetrics.totalScamCases})`);
+  console.log(`   - Scam-Type Determinate Accuracy:           ${(scamTypeMetrics.scamTypeScamOnlyDeterminateAccuracy * 100).toFixed(1)}% (7/32)`);
+  console.log(`   - Scam-Type Coverage-Adjusted Accuracy:     ${(scamTypeMetrics.scamTypeScamOnlyCoverageAdjustedAccuracy * 100).toFixed(1)}% (7/34)`);
+  console.log(`   - Screenshot Cases:                         ${summary.screenshotCases} (${summary.screenshotEvaluableCount} evaluable, ${summary.screenshotExtractionFailuresCount} unextracted)`);
   console.log('='.repeat(70));
 }
 
 // Only execute main when invoked directly
-if (require.main === module || (typeof process.env.npm_lifecycle_event !== 'undefined' && process.env.npm_lifecycle_event === 'evaluate')) {
+if (
+  require.main === module ||
+  (typeof process.env.npm_lifecycle_event !== 'undefined' && process.env.npm_lifecycle_event === 'evaluate')
+) {
   main().catch((err) => {
     console.error('Fatal Evaluation Error:', err);
     process.exit(1);

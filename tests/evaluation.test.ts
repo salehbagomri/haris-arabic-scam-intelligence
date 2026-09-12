@@ -1,23 +1,37 @@
 /**
- * HARIS (حارس) — Phase 6A.1: Evaluation Integrity & Formula Regression Tests
+ * HARIS (حارس) — Phase 6A.2: Evaluation Integrity & Formula Regression Tests
  *
  * Verifies:
  * 1. Dataset structure, distribution, dialect diversity, and schema validity.
- * 2. Dataset safety invariants: no literal phone numbers, raw OTPs, or real account IDs.
- * 3. Screenshot fixtures: authentic high-resolution PNGs (not 1x1 placeholders) with PNG magic headers.
- * 4. Deterministic evaluator mathematical formulas: accuracy, FPR, FNR, TP/FP/FN/TN,
- *    Scam DNA precision/recall/F1, scamTypeAccuracyScamOnly vs scamTypeAccuracyAllCases,
- *    and extraction failure / indeterminate accounting.
+ * 2. Comprehensive PII safety scan across all text, URLs, descriptions, rationales, and fixtures.
+ * 3. Screenshot payload contract: real base64 PNGs matching production ScreenshotInput;
+ *    zero data/description leakage; fallback reason is unconfigured Gemini, NOT missing payload.
+ * 4. Pure metric calculation functions: zero-division safety, indeterminate isolation,
+ *    FPR = FP/(TN+FP), determinate FNR, miss rate including indeterminate, and scam-type metrics.
+ * 5. Runner integration and pipeline accounting with screenshot cases.
  */
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { EVALUATION_DATASET } from '../evaluation/dataset';
 import { SCREENSHOT_FIXTURES } from '../evaluation/fixtures/screenshots';
-import { SCAM_TYPES, SCAM_DNA_FEATURES, FeatureKey } from '../lib/analysis/taxonomy';
-import { RiskLevel } from '../lib/types/analysis';
+import { SCAM_TYPES, SCAM_DNA_FEATURES } from '../lib/analysis/taxonomy';
+import { validateImageConstraints } from '../lib/config/vision';
+import { extractScreenshotContent } from '../lib/vision/analyzer';
+import { analyzeUnified } from '../lib/vision/pipeline';
+import {
+  calculateConfusionMatrix,
+  calculateRiskMetrics,
+  calculateLegitimateMetrics,
+  calculateScamMetrics,
+  calculateScamTypeMetrics,
+  calculatePrecision,
+  calculateRecall,
+  calculateF1,
+} from '../evaluation/metrics';
+import { EvaluationCaseResult } from '../evaluation/types';
 
-describe('HARIS Phase 6A.1: Evaluation Dataset Integrity & Invariants', () => {
+describe('HARIS Phase 6A.2: Evaluation Dataset Integrity & Invariants', () => {
   it('1. dataset contains at least 60 labeled cases', () => {
     assert.ok(
       EVALUATION_DATASET.length >= 60,
@@ -61,7 +75,7 @@ describe('HARIS Phase 6A.1: Evaluation Dataset Integrity & Invariants', () => {
 
       const hasText = typeof item.input.text === 'string' && item.input.text.length > 0;
       const hasUrl = typeof item.input.url === 'string' && item.input.url.length > 0;
-      const hasScreenshot = Boolean(item.input.screenshot?.data);
+      const hasScreenshot = Boolean(item.input.screenshot?.base64);
       assert.ok(
         hasText || hasUrl || hasScreenshot,
         `Item ${item.id} must have at least text, url, or screenshot`
@@ -98,7 +112,6 @@ describe('HARIS Phase 6A.1: Evaluation Dataset Integrity & Invariants', () => {
       assert.ok(fix.dataUrl.startsWith('data:image/png;base64,'));
       assert.ok(fix.simulatedVisualDescription);
 
-      // Verify authentic PNG payload: must not be a 1x1 pixel placeholder
       const base64Data = fix.dataUrl.replace(/^data:image\/png;base64,/, '');
       const buffer = Buffer.from(base64Data, 'base64');
       assert.ok(
@@ -106,11 +119,11 @@ describe('HARIS Phase 6A.1: Evaluation Dataset Integrity & Invariants', () => {
         `Fixture ${key} payload too small (${buffer.length} bytes), expected authentic image > 1KB`
       );
 
-      // Verify PNG magic bytes (\x89PNG\r\n\x1a\n)
+      // Verify PNG magic header (\x89PNG\r\n\x1a\n)
       assert.strictEqual(buffer[0], 0x89);
-      assert.strictEqual(buffer[1], 0x50); // P
-      assert.strictEqual(buffer[2], 0x4e); // N
-      assert.strictEqual(buffer[3], 0x47); // G
+      assert.strictEqual(buffer[1], 0x50);
+      assert.strictEqual(buffer[2], 0x4e);
+      assert.strictEqual(buffer[3], 0x47);
       assert.strictEqual(buffer[4], 0x0d);
       assert.strictEqual(buffer[5], 0x0a);
       assert.strictEqual(buffer[6], 0x1a);
@@ -119,267 +132,379 @@ describe('HARIS Phase 6A.1: Evaluation Dataset Integrity & Invariants', () => {
   });
 });
 
-describe('HARIS Phase 6A.1: Dataset Safety Guardrail (No PII / Real Literals)', () => {
-  it('enforces that no raw phone numbers, OTP codes, or account IDs appear in test cases', () => {
-    // Regex looking for phone patterns (e.g. 05xxxxxxxx, 01xxxxxxxxx, 00967xxxxxxx, +966xxxxxxx)
+describe('HARIS Phase 6A.2: Comprehensive Dataset & Fixture Safety Guardrail (Zero PII)', () => {
+  it('enforces that no raw phone numbers, OTP literals, or account IDs exist in any text field or fixture', () => {
     const rawPhoneRegex = /(?:\+?96[67]\d{7,9}|0096[67]\d{7,9}|05\d{8}|01[0125]\d{8}|00\d{10,14})/;
-    // Regex looking for literal OTP assignments (e.g. "رمز التحقق هو 123456")
     const rawOtpLiteralRegex = /(?:رمز التحقق(?: الخاص بك)?(?: هو)?:\s*\d{4,8})/;
-    // Regex looking for literal account assignments without placeholders (e.g. "محفظة رقم 771234567")
     const rawAccountLiteralRegex = /(?:محفظة(?:\s+\w+)?\s+رقم\s+\d{6,})/;
 
+    // 1. Scan all fields across all dataset items
     for (const item of EVALUATION_DATASET) {
-      const text = item.input.text || '';
+      const fieldsToScan: Record<string, string> = {
+        title: item.title,
+        description: item.description,
+        rationale: item.rationale,
+        text: item.input.text || '',
+        url: item.input.url || '',
+        adversarialSubtype: item.adversarialSubtype || '',
+      };
 
+      for (const [fieldName, val] of Object.entries(fieldsToScan)) {
+        assert.strictEqual(
+          rawPhoneRegex.test(val),
+          false,
+          `[${item.id}.${fieldName}] Found literal phone number: "${val}". Must use [PHONE] placeholder.`
+        );
+
+        assert.strictEqual(
+          rawOtpLiteralRegex.test(val),
+          false,
+          `[${item.id}.${fieldName}] Found literal OTP code: "${val}". Must use [OTP] placeholder.`
+        );
+
+        assert.strictEqual(
+          rawAccountLiteralRegex.test(val),
+          false,
+          `[${item.id}.${fieldName}] Found literal account ID: "${val}". Must use [ACCOUNT_ID] placeholder.`
+        );
+      }
+    }
+
+    // 2. Scan all fixture metadata text
+    for (const [key, fix] of Object.entries(SCREENSHOT_FIXTURES)) {
       assert.strictEqual(
-        rawPhoneRegex.test(text),
+        rawPhoneRegex.test(fix.name) || rawPhoneRegex.test(fix.simulatedVisualDescription),
         false,
-        `[${item.id}] Found literal phone number in text. Must use [PHONE] placeholder: "${text}"`
+        `[Fixture ${key}] Found literal phone number in fixture text.`
       );
-
       assert.strictEqual(
-        rawOtpLiteralRegex.test(text),
+        rawOtpLiteralRegex.test(fix.name) || rawOtpLiteralRegex.test(fix.simulatedVisualDescription),
         false,
-        `[${item.id}] Found literal OTP code in text. Must use [OTP] placeholder: "${text}"`
-      );
-
-      assert.strictEqual(
-        rawAccountLiteralRegex.test(text),
-        false,
-        `[${item.id}] Found literal account ID in text. Must use [ACCOUNT_ID] placeholder: "${text}"`
+        `[Fixture ${key}] Found literal OTP in fixture text.`
       );
     }
   });
 });
 
-describe('HARIS Phase 6A.1: Evaluator Mathematical Formula & Accounting Tests', () => {
-  // Deterministic mock fixtures with known ground truth and known mock runner results
-  interface MiniCase {
-    id: string;
-    category: 'scam' | 'legitimate' | 'ambiguous';
-    expectedRisk: RiskLevel;
-    actualRisk: RiskLevel;
-    expectedScamType: string;
-    actualScamType: string;
-    expectedDna: FeatureKey[];
-    actualDna: FeatureKey[];
-    isScreenshot: boolean;
-    isExtractionFailure: boolean;
-  }
+describe('HARIS Phase 6A.2: Screenshot Payload Contract & Analyzer Verification', () => {
+  it('1. verifies that all evaluation screenshot inputs match production ScreenshotInput and have zero data/description leakage', () => {
+    const screenshotCases = EVALUATION_DATASET.filter((c) => Boolean(c.input.screenshot));
+    assert.strictEqual(screenshotCases.length, 5, 'Expected exactly 5 screenshot cases in dataset');
 
-  const MINI_CASES: MiniCase[] = [
-    // Case 1: Scam, correctly detected (TP, correct risk, correct scam type)
+    for (const c of screenshotCases) {
+      const screenshot = c.input.screenshot!;
+      assert.ok(screenshot.base64, `[${c.id}] screenshot.base64 must be defined`);
+      assert.strictEqual(screenshot.mimeType, 'image/png');
+
+      // Crucial: Old .data and .description must NOT exist on input
+      const rawInput = screenshot as unknown as Record<string, unknown>;
+      assert.strictEqual(rawInput.data, undefined, `[${c.id}] screenshot.data must not exist; use base64`);
+      assert.strictEqual(
+        rawInput.description,
+        undefined,
+        `[${c.id}] screenshot.description must not leak into production input`
+      );
+    }
+  });
+
+  it('2. confirms production validateImageConstraints accepts evaluation screenshot payloads', () => {
+    const screenshotCases = EVALUATION_DATASET.filter((c) => Boolean(c.input.screenshot));
+
+    for (const c of screenshotCases) {
+      const validation = validateImageConstraints(c.input.screenshot!);
+      assert.strictEqual(validation.valid, true, `[${c.id}] Screenshot payload failed constraint validation: ${validation.error}`);
+      assert.ok(validation.byteLength && validation.byteLength > 1000, `[${c.id}] Byte length must be > 1KB`);
+    }
+  });
+
+  it('3. confirms extractScreenshotContent fallback reason is unconfigured Gemini, NOT missing image payload', async () => {
+    const sampleScreenshotCase = EVALUATION_DATASET.find((c) => c.id === 'SCAM-033');
+    assert.ok(sampleScreenshotCase?.input.screenshot);
+
+    const result = await extractScreenshotContent(sampleScreenshotCase.input.screenshot, {});
+    assert.strictEqual(result.success, false);
+    // Must fail because Gemini is unconfigured, NOT because image data was missing
+    assert.ok(
+      result.fallbackReason?.includes('Gemini') && result.fallbackReason?.includes('not configured'),
+      `Expected unconfigured Gemini fallback, got: ${result.fallbackReason}`
+    );
+    assert.notStrictEqual(result.fallbackReason, 'No image data provided (neither buffer nor base64).');
+    assert.notStrictEqual(result.fallbackReason, 'Missing image payload (no buffer or base64 string provided).');
+  });
+
+  it('4. confirms analyzeUnified marks screenshot-only inputs as isExtractionFailure: true and returns structured advice', async () => {
+    const sampleScreenshotCase = EVALUATION_DATASET.find((c) => c.id === 'SCAM-033');
+    assert.ok(sampleScreenshotCase);
+
+    const result = await analyzeUnified(sampleScreenshotCase.input);
+    assert.strictEqual(result.isExtractionFailure, true);
+    assert.strictEqual(result.riskLevel, 'low'); // default fallback structure
+    assert.strictEqual(result.riskScore, 0);
+    assert.ok(result.uncertainties.some((u) => u.includes('فشل استخراج محتوى لقطة الشاشة')));
+    assert.ok(result.actionableAdvice.some((a) => a.includes('يرجى إعادة رفع لقطة شاشة')));
+  });
+});
+
+describe('HARIS Phase 6A.2: Pure Metric Calculation Functions & Granular Accounting', () => {
+  // Controlled mock dataset to test all mathematical equations deterministically
+  const MOCK_CASE_RESULTS: EvaluationCaseResult[] = [
+    // 1. Scam: Detected (TP, correct risk, correct scam type)
     {
-      id: 'TEST-001',
+      id: 'MOCK-001',
+      title: 'Scam TP',
       category: 'scam',
-      expectedRisk: 'high',
-      actualRisk: 'high',
+      dialect: 'msa',
+      expectedRiskCategory: 'high',
+      actualRiskCategory: 'high',
+      riskScore: 85,
       expectedScamType: 'BANK_IMPERSONATION',
       actualScamType: 'BANK_IMPERSONATION',
-      expectedDna: ['impersonation', 'urgency'],
-      actualDna: ['impersonation', 'urgency', 'suspicious_url'], // TP=2, FP=1, FN=0
-      isScreenshot: false,
+      expectedDnaFeatures: ['impersonation'],
+      actualDnaFeatures: ['impersonation'],
+      isRiskCategoryCorrect: true,
+      isScamTypeCorrect: true,
+      isFalsePositive: false,
+      isFalseNegative: false,
+      dnaTruePositives: 1,
+      dnaFalsePositives: 0,
+      dnaFalseNegatives: 0,
+      dnaPrecision: 1,
+      dnaRecall: 1,
+      dnaF1: 1,
+      aiConfidence: null,
+      extractionConfidence: null,
       isExtractionFailure: false,
+      isIndeterminate: false,
     },
-    // Case 2: Scam, missed as low (FN, incorrect risk, incorrect scam type)
+    // 2. Scam: Missed as low (FN, incorrect risk, incorrect scam type)
     {
-      id: 'TEST-002',
+      id: 'MOCK-002',
+      title: 'Scam FN',
       category: 'scam',
-      expectedRisk: 'high',
-      actualRisk: 'low',
+      dialect: 'yemeni',
+      expectedRiskCategory: 'high',
+      actualRiskCategory: 'low',
+      riskScore: 0,
       expectedScamType: 'DELIVERY_SCAM',
       actualScamType: 'UNKNOWN',
-      expectedDna: ['financial_lure'],
-      actualDna: [], // TP=0, FP=0, FN=1
-      isScreenshot: false,
+      expectedDnaFeatures: ['urgency'],
+      actualDnaFeatures: [],
+      isRiskCategoryCorrect: false,
+      isScamTypeCorrect: false,
+      isFalsePositive: false,
+      isFalseNegative: true,
+      dnaTruePositives: 0,
+      dnaFalsePositives: 0,
+      dnaFalseNegatives: 1,
+      dnaPrecision: 0,
+      dnaRecall: 0,
+      dnaF1: 0,
+      aiConfidence: null,
+      extractionConfidence: null,
       isExtractionFailure: false,
+      isIndeterminate: false,
     },
-    // Case 3: Legitimate, correctly identified (TN, correct risk, UNKNOWN matches UNKNOWN)
+    // 3. Scam: Unextracted Screenshot (Indeterminate, must NOT count as correct or clean negative)
     {
-      id: 'TEST-003',
-      category: 'legitimate',
-      expectedRisk: 'low',
-      actualRisk: 'low',
-      expectedScamType: 'UNKNOWN',
-      actualScamType: 'UNKNOWN',
-      expectedDna: [],
-      actualDna: [],
-      isScreenshot: false,
-      isExtractionFailure: false,
-    },
-    // Case 4: Legitimate, falsely flagged as suspicious (FP, incorrect risk)
-    {
-      id: 'TEST-004',
-      category: 'legitimate',
-      expectedRisk: 'low',
-      actualRisk: 'suspicious',
-      expectedScamType: 'UNKNOWN',
-      actualScamType: 'UNKNOWN',
-      expectedDna: [],
-      actualDna: ['urgency'], // TP=0, FP=1, FN=0
-      isScreenshot: false,
-      isExtractionFailure: false,
-    },
-    // Case 5: Screenshot with extraction failure, expected high (Indeterminate, NOT counted as correct risk)
-    {
-      id: 'TEST-005',
+      id: 'MOCK-003',
+      title: 'Scam Indeterminate Screenshot',
       category: 'scam',
-      expectedRisk: 'high',
-      actualRisk: 'low', // default fallback is low
+      dialect: 'msa',
+      expectedRiskCategory: 'high',
+      actualRiskCategory: 'low',
+      riskScore: 0,
       expectedScamType: 'ACCOUNT_TAKEOVER',
       actualScamType: 'UNKNOWN',
-      expectedDna: ['otp_request'],
-      actualDna: [],
-      isScreenshot: true,
+      expectedDnaFeatures: ['otp_request'],
+      actualDnaFeatures: [],
+      isRiskCategoryCorrect: false,
+      isScamTypeCorrect: false,
+      isFalsePositive: false,
+      isFalseNegative: false, // Marked indeterminate, not ordinary FN
+      dnaTruePositives: 0,
+      dnaFalsePositives: 0,
+      dnaFalseNegatives: 1,
+      dnaPrecision: 0,
+      dnaRecall: 0,
+      dnaF1: 0,
+      aiConfidence: null,
+      extractionConfidence: null,
       isExtractionFailure: true,
+      isIndeterminate: true,
+    },
+    // 4. Legitimate: Clean benign (TN, correct risk, UNKNOWN matches UNKNOWN)
+    {
+      id: 'MOCK-004',
+      title: 'Legit TN',
+      category: 'legitimate',
+      dialect: 'msa',
+      expectedRiskCategory: 'low',
+      actualRiskCategory: 'low',
+      riskScore: 0,
+      expectedScamType: 'UNKNOWN',
+      actualScamType: 'UNKNOWN',
+      expectedDnaFeatures: [],
+      actualDnaFeatures: [],
+      isRiskCategoryCorrect: true,
+      isScamTypeCorrect: true,
+      isFalsePositive: false,
+      isFalseNegative: false,
+      dnaTruePositives: 0,
+      dnaFalsePositives: 0,
+      dnaFalseNegatives: 0,
+      dnaPrecision: 1,
+      dnaRecall: 1,
+      dnaF1: 1,
+      aiConfidence: null,
+      extractionConfidence: null,
+      isExtractionFailure: false,
+      isIndeterminate: false,
+    },
+    // 5. Legitimate: Flagged as suspicious (FP, incorrect risk)
+    {
+      id: 'MOCK-005',
+      title: 'Legit FP',
+      category: 'legitimate',
+      dialect: 'gulf',
+      expectedRiskCategory: 'low',
+      actualRiskCategory: 'suspicious',
+      riskScore: 35,
+      expectedScamType: 'UNKNOWN',
+      actualScamType: 'UNKNOWN',
+      expectedDnaFeatures: [],
+      actualDnaFeatures: ['urgency'],
+      isRiskCategoryCorrect: false,
+      isScamTypeCorrect: true,
+      isFalsePositive: true,
+      isFalseNegative: false,
+      dnaTruePositives: 0,
+      dnaFalsePositives: 1,
+      dnaFalseNegatives: 0,
+      dnaPrecision: 0,
+      dnaRecall: 0,
+      dnaF1: 0,
+      aiConfidence: null,
+      extractionConfidence: null,
+      isExtractionFailure: false,
+      isIndeterminate: false,
+    },
+    // 6. Legitimate: Unextracted Screenshot (Indeterminate, must NOT count as correct TN)
+    {
+      id: 'MOCK-006',
+      title: 'Legit Indeterminate Screenshot',
+      category: 'legitimate',
+      dialect: 'msa',
+      expectedRiskCategory: 'low',
+      actualRiskCategory: 'low',
+      riskScore: 0,
+      expectedScamType: 'UNKNOWN',
+      actualScamType: 'UNKNOWN',
+      expectedDnaFeatures: [],
+      actualDnaFeatures: [],
+      isRiskCategoryCorrect: false,
+      isScamTypeCorrect: false,
+      isFalsePositive: false,
+      isFalseNegative: false,
+      dnaTruePositives: 0,
+      dnaFalsePositives: 0,
+      dnaFalseNegatives: 0,
+      dnaPrecision: 1,
+      dnaRecall: 1,
+      dnaF1: 1,
+      aiConfidence: null,
+      extractionConfidence: null,
+      isExtractionFailure: true,
+      isIndeterminate: true,
     },
   ];
 
-  it('1. correctly computes overall, legitimate, and scam accuracy', () => {
-    let totalCorrect = 0;
-    let legitCorrect = 0;
-    let legitTotal = 0;
-    let scamCorrect = 0;
-    let scamTotal = 0;
-
-    for (const c of MINI_CASES) {
-      const isIndeterminate = c.isExtractionFailure && c.isScreenshot;
-      const isRiskCorrect = !isIndeterminate && c.actualRisk === c.expectedRisk;
-
-      if (isRiskCorrect) totalCorrect++;
-      if (c.category === 'legitimate') {
-        legitTotal++;
-        if (isRiskCorrect) legitCorrect++;
-      }
-      if (c.category === 'scam') {
-        scamTotal++;
-        if (isRiskCorrect) scamCorrect++;
-      }
-    }
-
-    // Total: 5 cases. Correct: TEST-001 (scam) and TEST-003 (legit) = 2.
-    // TEST-005 is unextracted screenshot, so it must NOT count as correct!
-    assert.strictEqual(totalCorrect, 2);
-    assert.strictEqual(totalCorrect / MINI_CASES.length, 0.4);
-
-    // Legitimate: 2 cases (TEST-003, TEST-004). Correct: TEST-003 = 1.
-    assert.strictEqual(legitTotal, 2);
-    assert.strictEqual(legitCorrect, 1);
-    assert.strictEqual(legitCorrect / legitTotal, 0.5);
-
-    // Scam: 3 cases (TEST-001, TEST-002, TEST-005). Correct: TEST-001 = 1.
-    assert.strictEqual(scamTotal, 3);
-    assert.strictEqual(scamCorrect, 1);
-    assert.strictEqual(Number((scamCorrect / scamTotal).toFixed(3)), 0.333);
+  it('1. calculates Confusion Matrix accurately with indeterminate breakdown', () => {
+    const matrix = calculateConfusionMatrix(MOCK_CASE_RESULTS);
+    assert.strictEqual(matrix.truePositives, 1);
+    assert.strictEqual(matrix.falseNegatives, 1);
+    assert.strictEqual(matrix.scamIndeterminate, 1);
+    assert.strictEqual(matrix.trueNegatives, 1);
+    assert.strictEqual(matrix.falsePositives, 1);
+    assert.strictEqual(matrix.legitimateIndeterminate, 1);
+    assert.strictEqual(matrix.totalIndeterminate, 2);
   });
 
-  it('2. correctly computes FPR, FNR, and confusion matrix', () => {
-    let tp = 0;
-    let fp = 0;
-    let fn = 0;
-    let tn = 0;
-    let indeterminate = 0;
+  it('2. calculates Risk Metrics (coverage-adjusted vs. determinate accuracy)', () => {
+    const matrix = calculateConfusionMatrix(MOCK_CASE_RESULTS);
+    const risk = calculateRiskMetrics(MOCK_CASE_RESULTS, matrix);
 
-    for (const c of MINI_CASES) {
-      const isIndet = c.isExtractionFailure && c.isScreenshot;
-      if (isIndet) {
-        indeterminate++;
-      } else if (c.category === 'scam') {
-        if (c.actualRisk === 'high' || c.actualRisk === 'suspicious') tp++;
-        else if (c.actualRisk === 'low') fn++;
-      } else if (c.category === 'legitimate') {
-        if (c.actualRisk === 'low') tn++;
-        else if (c.actualRisk === 'suspicious' || c.actualRisk === 'high') fp++;
-      }
-    }
+    assert.strictEqual(risk.totalCases, 6);
+    assert.strictEqual(risk.indeterminateCasesCount, 2);
+    assert.strictEqual(risk.determinateCasesCount, 4);
 
-    assert.strictEqual(tp, 1, 'True Positives mismatch');
-    assert.strictEqual(fp, 1, 'False Positives mismatch');
-    assert.strictEqual(fn, 1, 'False Negatives mismatch');
-    assert.strictEqual(tn, 1, 'True Negatives mismatch');
-    assert.strictEqual(indeterminate, 1, 'Indeterminate count mismatch');
+    // Total correct: MOCK-001 (TP) and MOCK-004 (TN) = 2.
+    // Coverage-adjusted: 2 / 6 = 0.333
+    assert.strictEqual(risk.coverageAdjustedAccuracy, 0.333);
 
-    const fpr = fp / (fp + tn); // 1 / 2 = 0.5
-    const fnr = fn / (tp + fn); // 1 / 2 = 0.5
-    assert.strictEqual(fpr, 0.5);
-    assert.strictEqual(fnr, 0.5);
+    // Determinate: 2 / 4 = 0.500
+    assert.strictEqual(risk.determinateRiskAccuracy, 0.5);
   });
 
-  it('3. isolates scamTypeAccuracyScamOnly and prevents UNKNOWN matches from inflating accuracy', () => {
-    let correctAll = 0;
-    let correctScamOnly = 0;
-    let scamCount = 0;
+  it('3. calculates Legitimate Metrics (FPR = FP / (TN + FP))', () => {
+    const matrix = calculateConfusionMatrix(MOCK_CASE_RESULTS);
+    const legit = calculateLegitimateMetrics(MOCK_CASE_RESULTS, matrix);
 
-    for (const c of MINI_CASES) {
-      const isMatch = c.actualScamType === c.expectedScamType;
-      if (isMatch) correctAll++;
+    assert.strictEqual(legit.totalLegitimateCases, 3);
+    assert.strictEqual(legit.trueNegativesCount, 1);
+    assert.strictEqual(legit.falsePositivesCount, 1);
+    assert.strictEqual(legit.legitimateIndeterminateCount, 1);
 
-      if (c.category === 'scam') {
-        scamCount++;
-        // Must match expected scam type AND must not be UNKNOWN
-        if (isMatch && c.actualScamType !== 'UNKNOWN') {
-          correctScamOnly++;
-        }
-      }
-    }
+    // FPR = FP / (TN + FP) = 1 / (1 + 1) = 0.500 (NOT 1 / 3 = 0.333)
+    assert.strictEqual(legit.falsePositiveRate, 0.5);
+    assert.strictEqual(legit.legitimateDeterminateAccuracy, 0.5);
 
-    // Scam Only: 3 scams (TEST-001 matches BANK_IMPERSONATION; TEST-002, TEST-005 do not).
-    assert.strictEqual(scamCount, 3);
-    assert.strictEqual(correctScamOnly, 1);
-    const scamOnlyAccuracy = correctScamOnly / scamCount;
-    assert.strictEqual(Number(scamOnlyAccuracy.toFixed(3)), 0.333);
-
-    // All Cases: matches on TEST-001 (BANK_IMPERSONATION) and TEST-003, TEST-004 (UNKNOWN)
-    // 3 out of 5 = 0.60
-    assert.strictEqual(correctAll, 3);
-    assert.strictEqual(correctAll / MINI_CASES.length, 0.6);
-
-    // Assert that scamOnly accuracy is strictly separated and not inflated by UNKNOWN matches
-    assert.notStrictEqual(scamOnlyAccuracy, correctAll / MINI_CASES.length);
+    // Coverage-adjusted accuracy: TN / Total = 1 / 3 = 0.333
+    assert.strictEqual(legit.legitimateAccuracy, 0.333);
+    assert.strictEqual(legit.legitimateIndeterminateRate, 0.333);
   });
 
-  it('4. calculates Scam DNA precision, recall, and F1 equations correctly', () => {
-    // Test Case 1: expected ['impersonation', 'urgency'], actual ['impersonation', 'urgency', 'suspicious_url']
-    const c1 = MINI_CASES[0];
-    const expSet = new Set(c1.expectedDna);
-    const actSet = new Set(c1.actualDna);
+  it('4. calculates Scam Metrics (determinate FNR vs. miss rate including indeterminate)', () => {
+    const matrix = calculateConfusionMatrix(MOCK_CASE_RESULTS);
+    const scam = calculateScamMetrics(MOCK_CASE_RESULTS, matrix);
 
-    let tp = 0;
-    let fp = 0;
-    let fn = 0;
+    assert.strictEqual(scam.totalScamCases, 3);
+    assert.strictEqual(scam.truePositivesCount, 1);
+    assert.strictEqual(scam.falseNegativesCount, 1);
+    assert.strictEqual(scam.scamIndeterminateCount, 1);
 
-    for (const f of c1.expectedDna) {
-      if (actSet.has(f)) tp++;
-      else fn++;
-    }
-    for (const f of c1.actualDna) {
-      if (!expSet.has(f)) fp++;
-    }
+    // Determinate Recall: TP / (TP + FN) = 1 / 2 = 0.500
+    assert.strictEqual(scam.scamDeterminateDetectionRate, 0.5);
 
-    assert.strictEqual(tp, 2);
-    assert.strictEqual(fp, 1);
-    assert.strictEqual(fn, 0);
+    // Determinate FNR: FN / (TP + FN) = 1 / 2 = 0.500
+    assert.strictEqual(scam.scamDeterminateFNR, 0.5);
 
-    const precision = tp / (tp + fp); // 2/3
-    const recall = tp / (tp + fn); // 2/2 = 1.0
-    const f1 = (2 * precision * recall) / (precision + recall); // 2 * (2/3) / (5/3) = 4/5 = 0.8
-
-    assert.strictEqual(Number(precision.toFixed(3)), 0.667);
-    assert.strictEqual(recall, 1.0);
-    assert.strictEqual(f1, 0.8);
+    // Miss rate including indeterminate: (FN + Indet) / Total = (1 + 1) / 3 = 0.667
+    assert.strictEqual(scam.scamMissRateIncludingIndeterminate, 0.667);
   });
 
-  it('5. enforces extraction failure accounting on unextractable screenshots', () => {
-    const c5 = MINI_CASES[4];
-    assert.strictEqual(c5.isScreenshot, true);
-    assert.strictEqual(c5.isExtractionFailure, true);
+  it('5. calculates Scam-Type Metrics and isolates UNKNOWN from inflating scam accuracy', () => {
+    const scamType = calculateScamTypeMetrics(MOCK_CASE_RESULTS);
 
-    // Even though actualRisk is 'low' (the fallback default) and expectedRisk might be tested,
-    // an extraction failure must be marked indeterminate and never recorded as a clean correct classification.
-    const isIndeterminate = c5.isExtractionFailure && c5.isScreenshot;
-    assert.strictEqual(isIndeterminate, true);
+    // Determinate Scams: 2 (MOCK-001, MOCK-002). MOCK-001 matches BANK_IMPERSONATION.
+    // 1 / 2 = 0.500
+    assert.strictEqual(scamType.scamTypeScamOnlyDeterminateAccuracy, 0.5);
 
-    const isRiskCorrect = !isIndeterminate && c5.actualRisk === c5.expectedRisk;
-    assert.strictEqual(isRiskCorrect, false, 'Extraction failure must not be credited as correct risk');
+    // Total Scams: 3. Correct non-unknown: 1.
+    // 1 / 3 = 0.333
+    assert.strictEqual(scamType.scamTypeScamOnlyCoverageAdjustedAccuracy, 0.333);
+    assert.strictEqual(scamType.scamTypeScamOnlyIndeterminateRate, 0.333);
+
+    // All Cases: matches on MOCK-001 (BANK_IMPERSONATION) and MOCK-004, MOCK-005 (UNKNOWN) = 3 / 6 = 0.500
+    assert.strictEqual(scamType.scamTypeAllCasesCoverageAdjusted, 0.5);
+  });
+
+  it('6. safe divide-by-zero handling in precision, recall, and F1', () => {
+    assert.strictEqual(calculatePrecision(0, 0), 0);
+    assert.strictEqual(calculateRecall(0, 0), 0);
+    assert.strictEqual(calculateF1(0, 0), 0);
+
+    assert.strictEqual(calculatePrecision(5, 0), 1.0);
+    assert.strictEqual(calculateRecall(5, 0), 1.0);
+    assert.strictEqual(calculateF1(1.0, 1.0), 1.0);
   });
 });

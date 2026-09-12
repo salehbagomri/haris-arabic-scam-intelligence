@@ -1,3 +1,13 @@
+/**
+ * HARIS (حارس) — Synthetic Screenshot Fixture Generator (Development-Only)
+ *
+ * NOTE: This script is for development/authoring time only to deterministically
+ * generate authentic, multi-kilobyte synthetic PNG screenshot fixtures with sharp.
+ * The production runtime and evaluation runner do NOT execute this script;
+ * they strictly consume the self-contained base64 data URLs embedded in
+ * evaluation/fixtures/screenshots.ts.
+ */
+
 import sharp from 'sharp';
 import * as fs from 'fs';
 import * as path from 'path';
