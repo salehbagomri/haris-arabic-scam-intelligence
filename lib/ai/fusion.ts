@@ -119,7 +119,8 @@ export function fuseEvidenceAndAssess(
   aiSemanticResult?: GeminiSemanticAnalysis | null,
   options: FusionOptions = {}
 ): FusedAnalysisResult {
-  const maxAiContribution = options.maxAiScoreContribution ?? 15;
+  // Consume centralized heuristic cap from weights configuration
+  const maxAiContribution = options.maxAiScoreContribution ?? DEFAULT_RISK_WEIGHTS.maxAiScoreContribution;
   const isAiAvailable = !!aiSemanticResult;
 
   // 1. Resolve Evidence Items with explicit provenance

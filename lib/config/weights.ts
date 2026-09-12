@@ -24,6 +24,13 @@ export interface WeightsConfig {
   /** Multi-feature synergy bonus (when multiple correlated high-threat features appear together) */
   synergyBonusMultiplier: number;
 
+  /**
+   * Maximum total points that semantic AI signals alone can contribute to the risk score.
+   * This is a conservative heuristic cap, not a scientific probability.
+   * Guarantees AI cannot unilaterally push an otherwise benign message into suspicious or high risk.
+   */
+  maxAiScoreContribution: number;
+
   /** Classification thresholds for "درجة الاشتباه" (0 - 100) */
   thresholds: {
     lowMax: number;        // 0 - 29: منخفض
@@ -69,6 +76,10 @@ export const DEFAULT_RISK_WEIGHTS: WeightsConfig = {
 
   // Synergy bonus: when 3+ high-severity features combine (e.g. impersonation + urgency + credential_request)
   synergyBonusMultiplier: 1.15,
+
+  // Conservative heuristic cap: AI semantic signals alone can contribute at most 15 points.
+  // This is a conservative heuristic cap, not a scientific probability.
+  maxAiScoreContribution: 15,
 
   thresholds: {
     lowMax: 29,

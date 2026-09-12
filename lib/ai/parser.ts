@@ -2,10 +2,11 @@
  * HARIS (حارس) — Gemini Response Parser & Hallucination Guard
  *
  * Parses raw model output, enforces Zod schema validation,
- * and validates that cited evidence actually exists in user text.
+ * and symmetrically validates that cited evidence actually exists in user text.
  */
 
 import { GeminiSemanticAnalysis, GeminiSemanticAnalysisSchema } from './schema';
+import { stripDiacriticsAndTatweel, normalizeArabicLetters } from '../analysis/normalizer';
 
 export interface ParseResult {
   success: boolean;
@@ -29,30 +30,68 @@ export function cleanJsonFence(rawText: string): string {
 }
 
 /**
- * Check if evidence text has plausible overlap with the source message
+ * Normalize text symmetrically for evidence grounding verification
+ * Applies the exact same Arabic cleaning strategy (diacritics, tatweel, letter normalization)
  */
-function isEvidenceGrounded(evidence: string, originalText: string, normalizedText: string): boolean {
+export function normalizeForEvidenceMatching(text: string): string {
+  if (!text) return '';
+
+  let cleaned = text
+    .toLowerCase()
+    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ');
+
+  cleaned = stripDiacriticsAndTatweel(cleaned);
+  cleaned = normalizeArabicLetters(cleaned);
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+  return cleaned;
+}
+
+/**
+ * Check if evidence text actually exists in the source message after symmetric normalization.
+ *
+ * STRICT PRECISION PRINCIPLE:
+ * Evidence presented by the model as a quotation MUST actually appear as a contiguous substring
+ * in the source text. Partial-token overlap or paraphrasing is strictly rejected.
+ */
+export function isEvidenceGrounded(evidence: string, originalText: string, normalizedText: string): boolean {
   if (!evidence || evidence.trim().length === 0) {
     return false;
   }
 
-  const cleanEv = evidence.trim().toLowerCase();
-  const cleanOrig = originalText.toLowerCase();
-  const cleanNorm = normalizedText.toLowerCase();
+  const normEv = normalizeForEvidenceMatching(evidence);
+  if (normEv.length === 0) {
+    return false;
+  }
 
-  // 1. Exact substring match in original or normalized text
-  if (cleanOrig.includes(cleanEv) || cleanNorm.includes(cleanEv)) {
+  // Strip leading/trailing quotation punctuation that the model might wrap around evidence
+  const cleanEv = normEv.replace(/^["'«»“”„]+|["'«»“”„]+$/g, '').trim();
+  if (cleanEv.length === 0) {
+    return false;
+  }
+
+  const normOrig = normalizeForEvidenceMatching(originalText);
+  const normText = normalizeForEvidenceMatching(normalizedText);
+
+  // 1. Direct normalized contiguous substring match
+  if (normOrig.includes(cleanEv) || normText.includes(cleanEv)) {
     return true;
   }
 
-  // 2. Token overlap check (at least 50% of non-trivial words must appear in source)
-  const tokens = cleanEv.split(/\s+/).filter((t) => t.length >= 3);
-  if (tokens.length === 0) {
-    return cleanOrig.includes(cleanEv);
+  // 2. Normalized punctuation-agnostic contiguous substring match
+  // Handles minor internal punctuation differences (e.g. "البطاقة، ورمز" vs "البطاقة ورمز")
+  const noPunctEv = cleanEv.replace(/[.,;:\n!?؟،؛\-_\/\\()[\]{}«»"']/g, ' ').replace(/\s+/g, ' ').trim();
+  if (noPunctEv.length >= 3) {
+    const noPunctOrig = normOrig.replace(/[.,;:\n!?؟،؛\-_\/\\()[\]{}«»"']/g, ' ').replace(/\s+/g, ' ').trim();
+    const noPunctText = normText.replace(/[.,;:\n!?؟،؛\-_\/\\()[\]{}«»"']/g, ' ').replace(/\s+/g, ' ').trim();
+
+    if (noPunctOrig.includes(noPunctEv) || noPunctText.includes(noPunctEv)) {
+      return true;
+    }
   }
 
-  const matchingTokens = tokens.filter((t) => cleanOrig.includes(t) || cleanNorm.includes(t));
-  return matchingTokens.length / tokens.length >= 0.5;
+  // Any other candidate (such as partial token overlap, disjoint words, or paraphrases) is REJECTED
+  return false;
 }
 
 /**

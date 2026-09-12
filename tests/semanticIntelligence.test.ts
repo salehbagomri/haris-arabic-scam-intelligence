@@ -23,8 +23,10 @@ import {
   GeminiSemanticAnalysis,
   analyzeSemantics,
   analyzeWithSemanticIntelligence,
+  isEvidenceGrounded,
 } from '../lib/ai';
 import { analyzeDeterministic } from '../lib/analysis';
+import { DEFAULT_RISK_WEIGHTS } from '../lib/config/weights';
 
 describe('HARIS Phase 4A: Gemini Semantic Intelligence & Evidence Fusion Tests', () => {
   // =========================================================================
@@ -104,6 +106,99 @@ describe('HARIS Phase 4A: Gemini Semantic Intelligence & Evidence Fusion Tests',
       assert.strictEqual(res.data.semanticSignals[0].evidence, 'الرقم السري');
       assert.strictEqual(res.data.scamDnaCandidates.length, 1);
       assert.strictEqual(res.data.scamDnaCandidates[0].feature, 'credential_request');
+    });
+
+    // --- Specific Anti-Hallucination Guard Regression Cases ---
+    it('Guard Case 1: exact evidence → accepted', () => {
+      const evidence = 'الرمز السري';
+      const orig = 'يرجى إدخال الرمز السري لتأكيد الدخول';
+      const norm = 'يرجى ادخال الرمز السري لتاكيد الدخول';
+      assert.strictEqual(isEvidenceGrounded(evidence, orig, norm), true);
+    });
+
+    it('Guard Case 2: Arabic normalization difference (hamza, diacritics, tatweel) → accepted', () => {
+      const evidenceWithHamza = 'إيقاف بطاقتك';
+      const origWithTashkeel = 'تنبيه: تم إِيْــــقَافُ بَطَاقَتِكَ مؤقتاً';
+      const normText = 'تنبيه: تم ايقاف بطاقتك مؤقتا';
+      assert.strictEqual(isEvidenceGrounded(evidenceWithHamza, origWithTashkeel, normText), true);
+
+      // Symmetrically: model output without hamza vs source with hamza
+      const evidencePlain = 'ايقاف بطاقتك';
+      const origHamza = 'تنبيه: تم إيقاف بطاقتك مؤقتاً';
+      assert.strictEqual(isEvidenceGrounded(evidencePlain, origHamza, normText), true);
+    });
+
+    it('Guard Case 3: fabricated paraphrase → rejected', () => {
+      const paraphrase = 'أدخل كود التفعيل لتحديث الحساب';
+      const orig = 'يرجى إرسال الرمز الخاص بك لتأكيد الهوية';
+      const norm = 'يرجى ارسال الرمز الخاص بك لتاكيد الهويه';
+      assert.strictEqual(isEvidenceGrounded(paraphrase, orig, norm), false);
+    });
+
+    it('Guard Case 4: partial-token overlap → rejected', () => {
+      // 3 of 6 words match disjointly, but the full phrase is fabricated
+      const partialEvidence = 'تم إيقاف بطاقتك وسرقة حسابك البنكي';
+      const orig = 'عزيزي العميل، تم إيقاف بطاقتك الائتمانية لأسباب أمنية';
+      const norm = 'عزيزي العميل، تم ايقاف بطاقتك الائتمانيه لاسباب امنيه';
+      assert.strictEqual(isEvidenceGrounded(partialEvidence, orig, norm), false);
+    });
+
+    it('Guard Case 5: unrelated phrase with one matching word → rejected', () => {
+      const singleWordMatch = 'كلمة المرور';
+      const orig = 'هذا مقال إخباري عام عن إدارة المرور العامة في العاصمة';
+      const norm = 'هذا مقال اخباري عام عن اداره المرور العامه في العاصمه';
+      assert.strictEqual(isEvidenceGrounded(singleWordMatch, orig, norm), false);
+    });
+
+    it('should reject oversized model outputs exceeding Zod schema boundaries', () => {
+      const baseValid = {
+        interpretation: 'تفسير صالح',
+        scamTypeCandidates: [{ type: 'BANK_IMPERSONATION', confidence: 0.9 }],
+        semanticSignals: [],
+        psychologicalTactics: [],
+        scamDnaCandidates: [],
+        aiConfidence: 0.8,
+        uncertainties: [],
+      };
+
+      // 1. Oversized interpretation (> 2000 chars)
+      const oversizedInterpretation = {
+        ...baseValid,
+        interpretation: 'أ'.repeat(2001),
+      };
+      const resInterp = parseAndValidateSemanticOutput(JSON.stringify(oversizedInterpretation), 'نص', 'نص');
+      assert.strictEqual(resInterp.success, false);
+      assert.ok(resInterp.error && resInterp.error.includes('2000'));
+
+      // 2. Oversized evidence (> 500 chars)
+      const oversizedEvidence = {
+        ...baseValid,
+        semanticSignals: [
+          {
+            type: 'نوع',
+            description: 'وصف',
+            evidence: 'د'.repeat(501),
+            severity: 'high',
+          },
+        ],
+      };
+      const resEv = parseAndValidateSemanticOutput(JSON.stringify(oversizedEvidence), 'نص', 'نص');
+      assert.strictEqual(resEv.success, false);
+      assert.ok(resEv.error && resEv.error.includes('500'));
+
+      // 3. Oversized array (> 20 items)
+      const oversizedArray = {
+        ...baseValid,
+        semanticSignals: Array.from({ length: 21 }, (_, i) => ({
+          type: `نوع ${i}`,
+          description: `وصف ${i}`,
+          evidence: `دليل ${i}`,
+          severity: 'low',
+        })),
+      };
+      const resArr = parseAndValidateSemanticOutput(JSON.stringify(oversizedArray), 'نص', 'نص');
+      assert.strictEqual(resArr.success, false);
+      assert.ok(resArr.error && resArr.error.includes('20'));
     });
   });
 
@@ -490,6 +585,84 @@ describe('HARIS Phase 4A: Gemini Semantic Intelligence & Evidence Fusion Tests',
       const paymentDna = fused.scamDna.find((d) => d.featureId === 'suspicious_payment_request');
       assert.ok(paymentDna);
       assert.strictEqual(paymentDna.provenance, 'both'); // both deterministic rule and AI identified it
+    });
+  });
+
+  // =========================================================================
+  // Requirement 4: Centralized AI Score Cap Regression Tests
+  // =========================================================================
+  describe('Centralized AI Score Cap Regression Tests (Requirement 4)', () => {
+    it('strictly clamps raw AI contribution when exceeding the 15-point heuristic cap', () => {
+      // Clean social message with zero deterministic signals (deterministic score = 0)
+      const text = 'السلام عليكم ورحمة الله، كيف حالك أخي الكريم؟ طمني عن صحتك وأحوال الأهل.';
+      const deterministic = analyzeDeterministic({ text });
+
+      assert.strictEqual(deterministic.assessment.score, 0);
+      assert.strictEqual(deterministic.assessment.level, 'low');
+      assert.strictEqual(deterministic.detectedFeatures.length, 0);
+
+      // Construct a mock AI response with 5 independent Scam DNA features + tactics
+      // In fusion.ts: each DNA candidate with confidence 1.0 contributes Math.round(5 * 1.0) = 5 points
+      // 5 features * 5 points = 25 raw contribution points + 2 points for tactics = 27 raw contribution points!
+      const mockAiWithAbundantEvidence: GeminiSemanticAnalysis = {
+        interpretation: 'رسالة تم تفسيرها بنوايا متعددة.',
+        scamTypeCandidates: [{ type: 'SOCIAL_ENGINEERING', confidence: 0.85 }],
+        semanticSignals: [
+          { type: 'ضغط زمني', description: 'وصف', evidence: 'طمني', severity: 'medium' },
+          { type: 'تودد اجتماعي', description: 'وصف', evidence: 'أخي الكريم', severity: 'low' },
+        ],
+        psychologicalTactics: [
+          { type: 'تلاعب عاطفي', description: 'وصف', evidence: 'طمني عن صحتك' },
+        ],
+        scamDnaCandidates: [
+          { feature: 'urgency', evidence: 'طمني', confidence: 1.0 },
+          { feature: 'secrecy_pressure', evidence: 'أخي الكريم', confidence: 1.0 },
+          { feature: 'action_pressure', evidence: 'طمني', confidence: 1.0 },
+          { feature: 'financial_lure', evidence: 'أحوال', confidence: 1.0 },
+          { feature: 'unexpected_contact', evidence: 'السلام عليكم', confidence: 1.0 },
+        ],
+        aiConfidence: 0.9,
+        uncertainties: [],
+      };
+
+      // Calculate raw AI contribution before cap:
+      let calculatedRawAiContribution = 0;
+      for (const cand of mockAiWithAbundantEvidence.scamDnaCandidates) {
+        calculatedRawAiContribution += Math.round(5 * cand.confidence);
+      }
+      calculatedRawAiContribution += Math.min(5, mockAiWithAbundantEvidence.psychologicalTactics.length * 2);
+
+      // Verify raw AI contribution is genuinely greater than 15
+      assert.ok(
+        calculatedRawAiContribution > 15,
+        `Expected raw AI contribution > 15, got ${calculatedRawAiContribution}`
+      );
+      assert.strictEqual(calculatedRawAiContribution, 27);
+
+      // Execute fusion with default weights
+      const fused = fuseEvidenceAndAssess(deterministic, mockAiWithAbundantEvidence);
+
+      // Verify final AI contribution is strictly capped at DEFAULT_RISK_WEIGHTS.maxAiScoreContribution (15)
+      const finalAiContribution = fused.riskScore - deterministic.assessment.score;
+      assert.ok(
+        finalAiContribution <= DEFAULT_RISK_WEIGHTS.maxAiScoreContribution,
+        `Expected final AI contribution <= ${DEFAULT_RISK_WEIGHTS.maxAiScoreContribution}, got ${finalAiContribution}`
+      );
+      assert.strictEqual(finalAiContribution, 15);
+      assert.strictEqual(fused.riskScore, 15);
+
+      // Verify that AI alone CANNOT push a clean deterministic result into 'suspicious' (>= 30) or 'high' (>= 70)
+      assert.strictEqual(fused.riskLevel, 'low');
+      assert.ok(fused.riskScore <= DEFAULT_RISK_WEIGHTS.thresholds.lowMax);
+
+      // Verify deterministic evidence remains intact (0 deterministic signals)
+      assert.strictEqual(fused.deterministicResult.assessment.score, 0);
+
+      // Verify provenance is accurately set to 'ai' for AI-derived DNA features
+      const urgencyDna = fused.scamDna.find((d) => d.featureId === 'urgency');
+      assert.ok(urgencyDna);
+      assert.strictEqual(urgencyDna.provenance, 'ai');
+      assert.strictEqual(urgencyDna.detected, true);
     });
   });
 });
