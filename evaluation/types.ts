@@ -60,6 +60,7 @@ export interface EvaluationCaseResult {
   aiConfidence: number | null;
   extractionConfidence: number | null;
   isExtractionFailure: boolean;
+  isIndeterminate: boolean;
   notes?: string;
 }
 
@@ -90,24 +91,53 @@ export interface DialectMetric {
   accuracy: number;
 }
 
+export interface ReproducibilityMetadata {
+  datasetVersion: string;
+  datasetSha256: string;
+  runnerVersion: string;
+  gitCommit: string;
+  nodeVersion: string;
+  geminiConfigured: boolean;
+  geminiModel: string;
+  pipelineMode: 'deterministic-baseline' | 'hybrid-gemini';
+  evaluatedAt: string;
+  evaluationConfig: {
+    offlineMode: boolean;
+    timeoutMs: number;
+    maxAiScoreContribution: number;
+    maxVisualScoreContribution: number;
+  };
+}
+
+export interface ConfusionMatrix {
+  truePositives: number; // Scam correctly identified as high/suspicious
+  falsePositives: number; // Legitimate incorrectly identified as high/suspicious
+  falseNegatives: number; // Scam incorrectly identified as low
+  trueNegatives: number; // Legitimate correctly identified as low
+  indeterminate: number; // Screenshot cases where extraction failed without text/URL
+}
+
 export interface EvaluationSummary {
   version: string;
   evaluatedAt: string;
-  environment: {
-    geminiConfigured: boolean;
-    nodeVersion: string;
-  };
+  metadata: ReproducibilityMetadata;
   totalCases: number;
   scamCases: number;
   legitimateCases: number;
   ambiguousCases: number;
+  textUrlCases: number;
+  textUrlAccuracy: number;
   screenshotCases: number;
+  screenshotEvaluableCount: number;
+  screenshotExtractionFailuresCount: number;
   overallAccuracy: number;
-  scamTypeAccuracy: number;
+  scamTypeAccuracyAllCases: number;
+  scamTypeAccuracyScamOnly: number;
   falsePositivesCount: number;
   falsePositiveRate: number;
   falseNegativesCount: number;
   falseNegativeRate: number;
+  confusionMatrix: ConfusionMatrix;
   categoryBreakdown: Record<EvaluationCategory, CategoryMetric>;
   dialectBreakdown: Record<Dialect, DialectMetric>;
   featureMetrics: FeatureMetric[];

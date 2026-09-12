@@ -78,7 +78,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'egyptian',
     input: {
-      text: 'تم حظر محفظة فودافون كاش الخاصة بك لوجود عمليات مشبوهة. كلم خدمة العملاء حالاً على الرقم 01009876543 لرفع الحظر واسترداد فلوسك قبل انتهاء المهلة.',
+      text: 'تم حظر محفظة فودافون كاش الخاصة بك لوجود عمليات مشبوهة. كلم خدمة العملاء حالاً على الرقم [PHONE] لرفع الحظر واسترداد فلوسك قبل انتهاء المهلة.',
     },
     expectedRiskCategory: 'high',
     expectedScamType: 'PAYMENT_SCAM',
@@ -108,7 +108,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'msa',
     input: {
-      text: 'شحنتك البريدية رقم SA-98213 معلقة في المستودع الرئيسي وتتطلب دفع رسوم توصيل رمزية قدرها 7.50 ريال سعودي. أكمل عملية الدفع عبر: https://aramex-delivery-tracking-sa.top/pay',
+      text: 'شحنتك البريدية رقم SA-[TRACKING_ID] معلقة في المستودع الرئيسي وتتطلب دفع رسوم توصيل رمزية قدرها 7.50 ريال سعودي. أكمل عملية الدفع عبر: https://aramex-delivery-tracking-sa.top/pay',
       url: 'https://aramex-delivery-tracking-sa.top/pay',
     },
     expectedRiskCategory: 'high',
@@ -154,7 +154,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'msa',
     input: {
-      text: 'مبروك! تم اختيار رقم هاتفك للفوز بجائزة نقدية كبرى قدرها 200,000 دولار وسيارة لاندكروزر موديل 2026. لتأكيد استلام الشيك البنكي، أرسل كلمة فوز إلى الرقم 9982 واستجب لرمز التفعيل.',
+      text: 'مبروك! تم اختيار رقم هاتفك للفوز بجائزة نقدية كبرى قدرها 200,000 دولار وسيارة لاندكروزر موديل 2026. لتأكيد استلام الشيك البنكي، أرسل كلمة فوز إلى الرقم [PHONE] واستجب لرمز التفعيل.',
     },
     expectedRiskCategory: 'high',
     expectedScamType: 'FAKE_PRIZE',
@@ -183,7 +183,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'gulf',
     input: {
-      text: 'مبروك يا بو فهد تم سحب رقمك وفزت بسبيكة ذهب عيار 24 من اتصالات. تواصل معنا على الواتساب على الرقم الدولي 002348123456 لإرسال بوليصة الشحن وصورة هويتك.',
+      text: 'مبروك يا بو فهد تم سحب رقمك وفزت بسبيكة ذهب عيار 24 من اتصالات. تواصل معنا على الواتساب على الرقم الدولي [PHONE] لإرسال بوليصة الشحن وصورة هويتك.',
     },
     expectedRiskCategory: 'high',
     expectedScamType: 'FAKE_PRIZE',
@@ -276,7 +276,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'yemeni',
     input: {
-      text: 'تنبيه من مصلحة الجمارك: سيارتك بدون ترقيم نظامي وتم رصدها في نقطة التفتيش. سارع بسداد الرسوم الجمركية المخفضة 25,000 ريال يمني على محفظة فلوسك Floosak رقم 771234567 قبل حجز السيارة.',
+      text: 'تنبيه من مصلحة الجمارك: سيارتك بدون ترقيم نظامي وتم رصدها في نقطة التفتيش. سارع بسداد الرسوم الجمركية المخفضة 25,000 ريال يمني على محفظة فلوسك Floosak رقم [ACCOUNT_ID] قبل حجز السيارة.',
     },
     expectedRiskCategory: 'high',
     expectedScamType: 'GOVERNMENT_IMPERSONATION',
@@ -384,7 +384,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'yemeni',
     input: {
-      text: 'أهل الخير وأصحاب القلوب الرحيمة، طفلة في تعز بين الحياة والموت تحتاج عملية قلب مفتوح عاجلة خلال 24 ساعة بمبلغ 800,000 ريال يمني. التبرع السريع عبر محفظة الكريمي مميز رقم 123456.',
+      text: 'أهل الخير وأصحاب القلوب الرحيمة، طفلة في تعز بين الحياة والموت تحتاج عملية قلب مفتوح عاجلة خلال 24 ساعة بمبلغ 800,000 ريال يمني. التبرع السريع عبر محفظة الكريمي مميز رقم [ACCOUNT_ID].',
     },
     expectedRiskCategory: 'suspicious',
     expectedScamType: 'PAYMENT_SCAM',
@@ -400,7 +400,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'msa',
     input: {
-      text: 'مرحباً بك، تم تأكيد حجزك الفندقي رقم 55421. للاطلاع على تفاصيل الفاتورة الإلكترونية وسياسة الإلغاء اضغط هنا: https://booking-reservation-confirm.co/guest',
+      text: 'مرحباً بك، تم تأكيد حجزك الفندقي رقم [RESERVATION_ID]. للاطلاع على تفاصيل الفاتورة الإلكترونية وسياسة الإلغاء اضغط هنا: https://booking-reservation-confirm.co/guest',
       url: 'https://booking-reservation-confirm.co/guest',
     },
     expectedRiskCategory: 'suspicious',
@@ -459,7 +459,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'scam',
     dialect: 'msa',
     input: {
-      text: 'محكمة التنفيذ: صدر أمر حبس تنفيذي لعدم سداد السند رقم 7712. لتسوية النزاع وتفادي الحجز على الحسابات والأملاك راجع الرابط: https://moj-gov-portal-settle.net/case',
+      text: 'محكمة التنفيذ: صدر أمر حبس تنفيذي لعدم سداد السند رقم [CASE_ID]. لتسوية النزاع وتفادي الحجز على الحسابات والأملاك راجع الرابط: https://moj-gov-portal-settle.net/case',
       url: 'https://moj-gov-portal-settle.net/case',
     },
     expectedRiskCategory: 'high',
@@ -572,7 +572,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'legitimate',
     dialect: 'msa',
     input: {
-      text: 'تمت عملية شراء عبر نقاط البيع بواسطة بطاقتك مدى المنتهية بـ 4091 بمبلغ 85.50 ريال لدى أسواق التميمي. رصيدك المتاح الحالي هو 4,210.25 ريال.',
+      text: 'تمت عملية شراء عبر نقاط البيع بواسطة بطاقتك مدى المنتهية بـ [CARD_LAST4] بمبلغ 85.50 ريال لدى أسواق التميمي. رصيدك المتاح الحالي هو 4,210.25 ريال.',
     },
     expectedRiskCategory: 'low',
     expectedScamType: 'UNKNOWN',
@@ -600,7 +600,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'legitimate',
     dialect: 'gulf',
     input: {
-      text: 'مساء الخير، مندوب هنقرستيشن وصل موقعك لطلبك رقم #8812. يرجى تزويد المندوب برمز الاستلام 4122 عند استلام الوجبة بالعافية.',
+      text: 'مساء الخير، مندوب هنقرستيشن وصل موقعك لطلبك رقم #[ORDER_ID]. يرجى تزويد المندوب برمز الاستلام [DELIVERY_PIN] عند استلام الوجبة بالعافية.',
     },
     expectedRiskCategory: 'low',
     expectedScamType: 'UNKNOWN',
@@ -670,7 +670,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'legitimate',
     dialect: 'msa',
     input: {
-      text: 'عزيزي المشترك، نشكركم على سداد فاتورة الكهرباء للحساب 100234891 بقيمة 320.00 ريال. تم قيد المبلغ بنجاح ورقم السداد المرجعي هو 992014.',
+      text: 'عزيزي المشترك، نشكركم على سداد فاتورة الكهرباء للحساب [ACCOUNT_ID] بقيمة 320.00 ريال. تم قيد المبلغ بنجاح ورقم السداد المرجعي هو [REF_ID].',
     },
     expectedRiskCategory: 'low',
     expectedScamType: 'UNKNOWN',
@@ -698,7 +698,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'legitimate',
     dialect: 'msa',
     input: {
-      text: 'رمز التحقق الخاص بك لمنصة الخدمات الإلكترونية هو: 839102. صالح لمدة 5 دقائق. لا تشارك هذا الرمز مع أي شخص.',
+      text: 'رمز التحقق الخاص بك لمنصة الخدمات الإلكترونية هو: [OTP]. صالح لمدة 5 دقائق. لا تشارك هذا الرمز مع أي شخص.',
     },
     expectedRiskCategory: 'low',
     expectedScamType: 'UNKNOWN',
@@ -940,7 +940,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'ambiguous',
     dialect: 'mixed_en',
     input: {
-      text: 'Dear Partner, kindly review invoice #INV-9902 regarding monthly cloud hosting payment before tomorrow 5 PM. يرجى إشعارنا فور التحويل البنكي للاعتماد.',
+      text: 'Dear Partner, kindly review invoice #INV-[INVOICE_ID] regarding monthly cloud hosting payment before tomorrow 5 PM. يرجى إشعارنا فور التحويل البنكي للاعتماد.',
     },
     expectedRiskCategory: 'low',
     expectedScamType: 'UNKNOWN',
@@ -970,7 +970,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'ambiguous',
     dialect: 'msa',
     input: {
-      text: 'مرحبا أنا السيدة إليزابيث من قسم التوظيف العالمي نحن نرى سيرتك ممتاز، نريد دفع لك 500 دولار يوم للعمل تقييم في بيتك أرسل واتساب إلى 0012025550192 للبدء حالا.',
+      text: 'مرحبا أنا السيدة إليزابيث من قسم التوظيف العالمي نحن نرى سيرتك ممتاز، نريد دفع لك 500 دولار يوم للعمل تقييم في بيتك أرسل واتساب إلى [PHONE] للبدء حالا.',
     },
     expectedRiskCategory: 'suspicious',
     expectedScamType: 'JOB_SCAM',
@@ -1001,7 +1001,7 @@ export const EVALUATION_DATASET: EvaluationItem[] = [
     category: 'ambiguous',
     dialect: 'msa',
     input: {
-      text: 'شهدت أسواق الذهب استقراراً ملحوظاً اليوم مع ترقب صدور بيانات التضخم العالمية وتراجع المؤشرات. وفي سياق آخر ساهم معنا في التبرع الفوري للحملة الأهلية غير المقيدة عبر تحويل كاش سريع لمحفظة 01198213.',
+      text: 'شهدت أسواق الذهب استقراراً ملحوظاً اليوم مع ترقب صدور بيانات التضخم العالمية وتراجع المؤشرات. وفي سياق آخر ساهم معنا في التبرع الفوري للحملة الأهلية غير المقيدة عبر تحويل كاش سريع لمحفظة [ACCOUNT_ID].',
     },
     expectedRiskCategory: 'suspicious',
     expectedScamType: 'PAYMENT_SCAM',
