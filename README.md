@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# حارس | HARIS — Arabic Scam Intelligence
 
-## Getting Started
+نظام أمني عربي لتحليل الرسائل المشبوهة، الروابط، ولقطات الشاشة، واستخراج **بصمة الاحتيال (Scam DNA)** وتقييم درجة الاشتباه وتقديم إرشادات وقائية مباشرة.
 
-First, run the development server:
+---
 
+## 🎯 رسالة المشروع
+حارس ليس روبوت محادثة عام، بل أداة وعي وتحليل سيبراني تهدف إلى:
+1. فحص المحتوى المشبوه (رسائل نصية، روابط، لقطات شاشة).
+2. استخراج مؤشرات الخطر وبصمة الاحتيال المنظمة (**Scam DNA**).
+3. تقديم تقييم شفاف لـ **درجة الاشتباه (0-100)** بدلاً من ادعاء يقين رياضي أو علمي مطلق.
+4. إبراز الأدلة الصريحة خلف التقييم.
+5. تقديم إجراءات وقائية فورية وقابلة للتنفيذ.
+
+---
+
+## 🛠 التقنيات والاعتماديات الأساسية
+- **الإطار:** Next.js (App Router) مع React 19 و TypeScript.
+- **الذكاء الاصطناعي:** `@google/genai` (يدعم نماذج Gemini عبر تكوين مرن `GEMINI_MODEL`).
+- **التحقق من البيانات:** `zod` لفرض مخططات بيانات صارمة (Strict Schemas).
+- **التحليل التقني السلبي للروابط:** `tldts` لفحص النطاقات، هجمات الـ Punycode، والنطاقات العلوية المشبوهة محلياً دون زيارة الروابط الخبيثة.
+- **الأيقونات:** `lucide-react`.
+
+---
+
+## 🚀 البدء والتشغيل
+
+### 1. تثبيت الحزم:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. إعداد متغيرات البيئة:
+انسخ ملف `.env.example` إلى `.env.local`:
+```bash
+cp .env.example .env.local
+```
+ثم أضف مفتاح Gemini API:
+```env
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-2.5-flash
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. تشغيل خادم التطوير:
+```bash
+npm run dev
+```
+افتح المتصفح على [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. تشغيل أداة التقييم المعياري الداخلي:
+```bash
+npm run evaluate
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📁 هيكلية المشروع
+- `app/`: واجهة التطبيق والمسارات البرمجية API (تطبيق موحد بدون Microservices).
+- `components/`: مكونات الواجهة التفاعلية (بطاقات Scam DNA، كاشف الروابط، مساحة اللقطات).
+- `lib/ai/`: تكامل الذكاء الاصطناعي والمخططات الصارمة للـ JSON.
+- `lib/analysis/`: معالج النصوص العربية واللهجات ومحرك الفحص التقني ومحرك تقييم الخطر.
+- `lib/vision/`: خط أنابيب معالجة لقطات الشاشة واستخراج النصوص.
+- `lib/evaluation/`: مجموعة بيانات التقييم المعيارية وأداة حساب الدقة والاستدعاء.
+- `scripts/`: أدوات سطر الأوامر (CLI Tools).
