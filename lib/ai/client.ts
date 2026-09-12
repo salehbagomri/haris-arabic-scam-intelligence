@@ -38,16 +38,25 @@ export function getGeminiTimeoutMs(): number {
  * Obtain singleton GoogleGenAI instance or null if unconfigured
  */
 export function getGeminiClient(): GoogleGenAI | null {
+  if (cachedClient) {
+    return cachedClient;
+  }
+
   if (!isGeminiConfigured()) {
     return null;
   }
 
-  if (!cachedClient) {
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
-    cachedClient = new GoogleGenAI({ apiKey });
-  }
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  cachedClient = new GoogleGenAI({ apiKey });
 
   return cachedClient;
+}
+
+/**
+ * Set client instance directly for test execution without environment dependency
+ */
+export function setGeminiClientForTesting(client: GoogleGenAI | null): void {
+  cachedClient = client;
 }
 
 /**
