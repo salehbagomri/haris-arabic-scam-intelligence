@@ -1,0 +1,4559 @@
+{
+  "version": "1.0.0",
+  "evaluatedAt": "2026-09-12T23:29:06.954Z",
+  "metadata": {
+    "datasetVersion": "1.0.0",
+    "datasetSha256": "72c5a8ac8de7fdd750f94a89f1a81ff67672f60085db57611e424ce17746e53f",
+    "runnerVersion": "1.0.0",
+    "evaluationSourceCommit": "ed41e549e91916618cb061d4477acc85eb252f62",
+    "nodeVersion": "v24.14.0",
+    "pipelineMode": "deterministic-baseline-redteam",
+    "geminiConfigured": false
+  },
+  "totalCases": 48,
+  "failedCasesCount": 33,
+  "overallFailureRate": 0.688,
+  "falsePositivesCount": 1,
+  "falsePositiveRate": 0.053,
+  "falseNegativesCount": 14,
+  "falseNegativeRate": 0.483,
+  "indeterminateCount": 6,
+  "indeterminateRate": 0.125,
+  "totalFailuresCount": 47,
+  "failuresByCategoryType": {
+    "FALSE_NEGATIVE": 14,
+    "FALSE_POSITIVE": 1,
+    "WRONG_SCAM_TYPE": 8,
+    "MISSED_DNA": 11,
+    "UNSUPPORTED_EVIDENCE": 2,
+    "EXTRACTION_FAILURE": 6,
+    "CONTRADICTORY_FUSION_FAILURE": 5,
+    "OTHER": 0
+  },
+  "failuresBySeverity": {
+    "Critical": 19,
+    "High": 9,
+    "Medium": 14,
+    "Low": 5
+  },
+  "evidenceIntegrityViolationsCount": 2,
+  "scamTypeDeterminateAccuracy": 0.231,
+  "scamTypeEvaluatedCases": 26,
+  "categoryBreakdown": {
+    "brand_mention_no_impersonation": {
+      "category": "brand_mention_no_impersonation",
+      "categoryName": "1. Brand Mention Without Impersonation",
+      "totalCases": 3,
+      "failedCases": 0,
+      "failureRate": 0,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 0
+    },
+    "legitimate_otp_warnings": {
+      "category": "legitimate_otp_warnings",
+      "categoryName": "2. Legitimate OTP Warnings (Polarity Inversion)",
+      "totalCases": 3,
+      "failedCases": 1,
+      "failureRate": 0.333,
+      "falsePositives": 1,
+      "falseNegatives": 0,
+      "evidenceViolations": 1,
+      "averageScore": 10.7
+    },
+    "legitimate_urgency": {
+      "category": "legitimate_urgency",
+      "categoryName": "3. Legitimate Urgency (Operational Deadlines)",
+      "totalCases": 3,
+      "failedCases": 0,
+      "failureRate": 0,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 12
+    },
+    "benign_suspicious_domains": {
+      "category": "benign_suspicious_domains",
+      "categoryName": "4. Benign Suspicious-Looking Domains",
+      "totalCases": 3,
+      "failedCases": 0,
+      "failureRate": 0,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 0
+    },
+    "arabizi_obfuscation": {
+      "category": "arabizi_obfuscation",
+      "categoryName": "5. Arabizi Obfuscation (Script Evasion)",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 3,
+      "evidenceViolations": 0,
+      "averageScore": 21.3
+    },
+    "unicode_confusables": {
+      "category": "unicode_confusables",
+      "categoryName": "6. Unicode Confusables / Zero-Width / Tatweel",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 1,
+      "evidenceViolations": 1,
+      "averageScore": 72.7
+    },
+    "excessive_punctuation_emojis": {
+      "category": "excessive_punctuation_emojis",
+      "categoryName": "7. Excessive Punctuation / Emojis",
+      "totalCases": 3,
+      "failedCases": 0,
+      "failureRate": 0,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 6
+    },
+    "broken_arabic": {
+      "category": "broken_arabic",
+      "categoryName": "8. Broken / Machine-Translated Arabic",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 3,
+      "evidenceViolations": 0,
+      "averageScore": 20
+    },
+    "mixed_arabic_english": {
+      "category": "mixed_arabic_english",
+      "categoryName": "9. Mixed Arabic + English Concealment",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 38
+    },
+    "misleading_screenshots": {
+      "category": "misleading_screenshots",
+      "categoryName": "10. Misleading Screenshots / Layout Spoofing",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 0
+    },
+    "visual_brand_resemblance": {
+      "category": "visual_brand_resemblance",
+      "categoryName": "11. Visual Brand Resemblance (Color/Icon)",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 0
+    },
+    "multiple_contradictory_urls": {
+      "category": "multiple_contradictory_urls",
+      "categoryName": "12. Multiple / Decoy URLs",
+      "totalCases": 3,
+      "failedCases": 2,
+      "failureRate": 0.667,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "evidenceViolations": 0,
+      "averageScore": 29.3
+    },
+    "contradictory_evidence_fusion": {
+      "category": "contradictory_evidence_fusion",
+      "categoryName": "13. Contradictory Evidence Fusion",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 1,
+      "evidenceViolations": 0,
+      "averageScore": 41.3
+    },
+    "scam_language_no_url": {
+      "category": "scam_language_no_url",
+      "categoryName": "14. Scam Language Without Any URL",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 2,
+      "evidenceViolations": 0,
+      "averageScore": 18.7
+    },
+    "suspicious_url_in_legitimate_msg": {
+      "category": "suspicious_url_in_legitimate_msg",
+      "categoryName": "15. Suspicious URL Inside Legitimate Message",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 2,
+      "evidenceViolations": 0,
+      "averageScore": 26
+    },
+    "long_distracting_text": {
+      "category": "long_distracting_text",
+      "categoryName": "16. Long Distracting Text Containing Malicious Instructions",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1,
+      "falsePositives": 0,
+      "falseNegatives": 2,
+      "evidenceViolations": 0,
+      "averageScore": 26
+    }
+  },
+  "dialectBreakdown": {
+    "yemeni": {
+      "dialect": "yemeni",
+      "totalCases": 6,
+      "failedCases": 3,
+      "failureRate": 0.5
+    },
+    "gulf": {
+      "dialect": "gulf",
+      "totalCases": 8,
+      "failedCases": 5,
+      "failureRate": 0.625
+    },
+    "msa": {
+      "dialect": "msa",
+      "totalCases": 21,
+      "failedCases": 15,
+      "failureRate": 0.714
+    },
+    "mixed_en": {
+      "dialect": "mixed_en",
+      "totalCases": 5,
+      "failedCases": 3,
+      "failureRate": 0.6
+    },
+    "arabizi": {
+      "dialect": "arabizi",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1
+    },
+    "egyptian": {
+      "dialect": "egyptian",
+      "totalCases": 2,
+      "failedCases": 1,
+      "failureRate": 0.5
+    },
+    "broken_arabic": {
+      "dialect": "broken_arabic",
+      "totalCases": 3,
+      "failedCases": 3,
+      "failureRate": 1
+    }
+  },
+  "modalityBreakdown": {
+    "text": {
+      "modality": "text",
+      "totalCases": 15,
+      "failedCases": 4,
+      "failureRate": 0.267
+    },
+    "url": {
+      "modality": "url",
+      "totalCases": 3,
+      "failedCases": 0,
+      "failureRate": 0
+    },
+    "text_url": {
+      "modality": "text_url",
+      "totalCases": 24,
+      "failedCases": 23,
+      "failureRate": 0.958
+    },
+    "screenshot": {
+      "modality": "screenshot",
+      "totalCases": 6,
+      "failedCases": 6,
+      "failureRate": 1
+    }
+  },
+  "dnaFeatureRecall": [
+    {
+      "feature": "urgency",
+      "expectedCount": 3,
+      "detectedCount": 1,
+      "recall": 0.333
+    },
+    {
+      "feature": "credential_request",
+      "expectedCount": 10,
+      "detectedCount": 0,
+      "recall": 0
+    },
+    {
+      "feature": "otp_request",
+      "expectedCount": 5,
+      "detectedCount": 1,
+      "recall": 0.2
+    },
+    {
+      "feature": "impersonation",
+      "expectedCount": 16,
+      "detectedCount": 4,
+      "recall": 0.25
+    },
+    {
+      "feature": "financial_lure",
+      "expectedCount": 10,
+      "detectedCount": 1,
+      "recall": 0.1
+    },
+    {
+      "feature": "suspicious_url",
+      "expectedCount": 0,
+      "detectedCount": 0,
+      "recall": 1
+    },
+    {
+      "feature": "threat_language",
+      "expectedCount": 11,
+      "detectedCount": 4,
+      "recall": 0.364
+    },
+    {
+      "feature": "unexpected_contact",
+      "expectedCount": 2,
+      "detectedCount": 0,
+      "recall": 0
+    },
+    {
+      "feature": "secrecy_pressure",
+      "expectedCount": 0,
+      "detectedCount": 0,
+      "recall": 1
+    },
+    {
+      "feature": "suspicious_payment_request",
+      "expectedCount": 4,
+      "detectedCount": 0,
+      "recall": 0
+    },
+    {
+      "feature": "action_pressure",
+      "expectedCount": 3,
+      "detectedCount": 0,
+      "recall": 0
+    }
+  ],
+  "highestSeverityFailures": [
+    {
+      "id": "RED-039",
+      "title": "تحية عائلية ومشاعر قرابة متبوعة بطلب رمز تحقق (لهجة يمنية)",
+      "taxonomyCategory": "contradictory_evidence_fusion",
+      "taxonomyCategoryName": "13. Contradictory Evidence Fusion",
+      "dialect": "yemeni",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "otp_request",
+        "impersonation"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        },
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: low)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-013",
+      "title": "تصيد بنكي بالأرابيزي لسرقة رمز الـ OTP",
+      "taxonomyCategory": "arabizi_obfuscation",
+      "taxonomyCategoryName": "5. Arabizi Obfuscation (Script Evasion)",
+      "dialect": "arabizi",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "otp_request",
+        "urgency"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-014",
+      "title": "جائزة وهمية بالأرابيزي تطلب رقم البطاقة",
+      "taxonomyCategory": "arabizi_obfuscation",
+      "taxonomyCategoryName": "5. Arabizi Obfuscation (Script Evasion)",
+      "dialect": "arabizi",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-015",
+      "title": "احتيال توصيل طرود بالأرابيزي ورسوم غير مدفوعة",
+      "taxonomyCategory": "arabizi_obfuscation",
+      "taxonomyCategoryName": "5. Arabizi Obfuscation (Script Evasion)",
+      "dialect": "arabizi",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 24,
+      "expectedScamType": "DELIVERY_SCAM",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"aramex\"",
+          "quote": "انتحال صفة (أرامكس) مقترناً بطلب إجراء أو تهديد أو رابط غير رسمي.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"aramex-pay.club\"",
+          "quote": "النطاق (aramex-pay.club) يحاكي اسم أرامكس ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 24)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-018",
+      "title": "تصيد يخلط محارف كيريلية شبيهة بالعربية واللاتينية (Homoglyphs)",
+      "taxonomyCategory": "unicode_confusables",
+      "taxonomyCategoryName": "6. Unicode Confusables / Zero-Width / Tatweel",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 24,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"snb\"",
+          "quote": "انتحال صفة (البنك الأهلي) مقترناً بطلب إجراء أو تهديد أو رابط غير رسمي.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"snb-login.club\"",
+          "quote": "النطاق (snb-login.club) يحاكي اسم البنك الأهلي السعودي (SNB) ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 24)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-022",
+      "title": "احتيال توظيف بركاكة لغوية ناتجة عن ترجمة آلية أجنبية",
+      "taxonomyCategory": "broken_arabic",
+      "taxonomyCategoryName": "8. Broken / Machine-Translated Arabic",
+      "dialect": "broken_arabic",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "JOB_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "unexpected_contact"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-023",
+      "title": "احتيال عملات مشفرة مترجم آلياً من عصابات أجنبية",
+      "taxonomyCategory": "broken_arabic",
+      "taxonomyCategoryName": "8. Broken / Machine-Translated Arabic",
+      "dialect": "broken_arabic",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "INVESTMENT_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-024",
+      "title": "احتيال الميراث والرسوم المسبقة بلغة مترجمة متهالكة",
+      "taxonomyCategory": "broken_arabic",
+      "taxonomyCategoryName": "8. Broken / Machine-Translated Arabic",
+      "dialect": "broken_arabic",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "PAYMENT_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-034",
+      "title": "رسالة تحوي رابطاً رسمياً كتمويه وبجانبه رابط تصيد بنكي خبيث",
+      "taxonomyCategory": "multiple_contradictory_urls",
+      "taxonomyCategoryName": "12. Multiple / Decoy URLs",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 44,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url",
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"alrajhi-update.top\"",
+          "quote": "النطاق (alrajhi-update.top) يحاكي اسم مصرف الراجحي ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [credential_request]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-035",
+      "title": "رابط حساب تويتر رسمي مرفق مع رابط مسابقة وجائزة وهمية",
+      "taxonomyCategory": "multiple_contradictory_urls",
+      "taxonomyCategoryName": "12. Multiple / Decoy URLs",
+      "dialect": "gulf",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 44,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "impersonation"
+      ],
+      "actualDnaFeatures": [
+        "impersonation",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 3,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"stc\"",
+          "quote": "انتحال صفة (شركة الاتصالات (stc)) مقترناً بطلب إجراء أو تهديد أو رابط غير رسمي.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"stc-gift.click\"",
+          "quote": "النطاق (stc-gift.click) يحاكي اسم شركة الاتصالات (stc) ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected FAKE_PRIZE, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [financial_lure]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-037",
+      "title": "افتتاحية دينية ودية ملحقة بتهديد بنكي عاجل بالتجميد",
+      "taxonomyCategory": "contradictory_evidence_fusion",
+      "taxonomyCategoryName": "13. Contradictory Evidence Fusion",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 66,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "urgency"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "threat_language",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 3,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"خلال 30\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"سيتم تجميد حسابك\"",
+          "quote": "استخدام التهديد بتجميد الحساب أو فرض غرامات لإرهاب الضحية واستدراجها.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "تجاهل التهديد بوقف الحساب؛ البنوك والجهات الرسمية لا تجمد الحسابات عبر رسائل فورية عشوائية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [impersonation]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-038",
+      "title": "مخاطبة حكومية رسمية مهذبة تتضمن تحويلاً مالياً لجهة مجهولة",
+      "taxonomyCategory": "contradictory_evidence_fusion",
+      "taxonomyCategoryName": "13. Contradictory Evidence Fusion",
+      "dialect": "gulf",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "GOVERNMENT_IMPERSONATION",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected GOVERNMENT_IMPERSONATION, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, threat_language, suspicious_payment_request]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-040",
+      "title": "جائزة نقدية تدعو للاتصال الهاتفي والتوجه للصراف (لهجة يمنية)",
+      "taxonomyCategory": "scam_language_no_url",
+      "taxonomyCategoryName": "14. Scam Language Without Any URL",
+      "dialect": "yemeni",
+      "modality": "text",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 18,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "action_pressure"
+      ],
+      "actualDnaFeatures": [
+        "financial_lure"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فزت معنا\"",
+          "quote": "استدراج الضحية بإيهامها بالحصول على مبالغ مالية غير واقعية أو مكافآت وجوائز وهمية.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "تحقق من هوية المرسل وقناة التواصل قبل مشاركة أي معلومات أو اتخاذ إجراء.",
+        "إذا كان المحتوى يتعلق بتعامل مالي، استشر شخصاً موثوقاً أو اتصل بجهة الدعم الرسمية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 18)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-042",
+      "title": "منحة بنكية وهمية توجه للاتصال بالهاتف فوراً (لهجة مصرية)",
+      "taxonomyCategory": "scam_language_no_url",
+      "taxonomyCategoryName": "14. Scam Language Without Any URL",
+      "dialect": "egyptian",
+      "modality": "text",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "impersonation",
+        "action_pressure"
+      ],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 0)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-043",
+      "title": "تهنئة عيد فطر دافئة ملغمة برابط تصيد خبيث (فصحى)",
+      "taxonomyCategory": "suspicious_url_in_legitimate_msg",
+      "taxonomyCategoryName": "15. Suspicious URL Inside Legitimate Message",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "unexpected_contact"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-045",
+      "title": "تبريكات بشهر رمضان الكريم ملحومة برابط باقة مجانية (لهجة يمنية)",
+      "taxonomyCategory": "suspicious_url_in_legitimate_msg",
+      "taxonomyCategoryName": "15. Suspicious URL Inside Legitimate Message",
+      "dialect": "yemeni",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-047",
+      "title": "مقال علمي عن الذكاء الاصطناعي يخفي رابط استثمار وهمي عالي الربح",
+      "taxonomyCategory": "long_distracting_text",
+      "taxonomyCategoryName": "16. Long Distracting Text Containing Malicious Instructions",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "INVESTMENT_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-048",
+      "title": "تعميم إداري لموظفي شركة يحتوي على طلب إدخال كلمة مرور بريد داخلي",
+      "taxonomyCategory": "long_distracting_text",
+      "taxonomyCategoryName": "16. Long Distracting Text Containing Malicious Instructions",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "credential_request",
+        "otp_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-006",
+      "title": "تذكير أمني صارم ضد الهندسة الاجتماعية (لهجة خليجية)",
+      "taxonomyCategory": "legitimate_otp_warnings",
+      "taxonomyCategoryName": "2. Legitimate OTP Warnings (Polarity Inversion)",
+      "dialect": "gulf",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 32,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [
+        "otp_request"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": true,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"شاركه \"",
+          "quote": "طلب صريح لإرسال أو مشاركة رمز التحقق فوراً رغم الإشارة لسرية الرمز.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تشارك رمز التحقق لمرة واحدة (OTP) أو كود المصادقة مع أي شخص تحت أي ظرف.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_POSITIVE",
+          "severity": "High",
+          "description": "False alarm on benign stress input: expected LOW risk, but engine classified as SUSPICIOUS (Score: 32)."
+        },
+        {
+          "category": "UNSUPPORTED_EVIDENCE",
+          "severity": "High",
+          "description": "Negative security advisory mentioning OTP was falsely treated as OTP harvesting request."
+        }
+      ],
+      "evidenceIntegrityViolations": [
+        {
+          "rule": "negative_otp_warning_as_scam",
+          "description": "Negative security advisory mentioning OTP was falsely treated as OTP harvesting request.",
+          "severity": "High"
+        }
+      ],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-017",
+      "title": "تصيد بفواصل ومسافات صفرية (Zero-Width Space)",
+      "taxonomyCategory": "unicode_confusables",
+      "taxonomyCategoryName": "6. Unicode Confusables / Zero-Width / Tatweel",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "high",
+      "riskScore": 94,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "threat_language",
+        "suspicious_url",
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 4,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"عاجل\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"تم حظر حسابك\"",
+          "quote": "استخدام التهديد بتجميد الحساب أو فرض غرامات لإرهاب الضحية واستدراجها.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"alrajhi-verify.xyz\"",
+          "quote": "النطاق (alrajhi-verify.xyz) يحاكي اسم مصرف الراجحي ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "تجاهل التهديد بوقف الحساب؛ البنوك والجهات الرسمية لا تجمد الحسابات عبر رسائل فورية عشوائية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "UNSUPPORTED_EVIDENCE",
+          "severity": "High",
+          "description": "Evidence quote \"تم حظر حسابك\" was fabricated or not present in input."
+        }
+      ],
+      "evidenceIntegrityViolations": [
+        {
+          "rule": "ungrounded_evidence_quote",
+          "description": "Evidence quote \"تم حظر حسابك\" is not grounded in source input text.",
+          "severity": "High"
+        }
+      ],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-025",
+      "title": "تصيد Apple ID يجمع بين إشعار أمني إنجليزي وتوجيه عربي",
+      "taxonomyCategory": "mixed_arabic_english",
+      "taxonomyCategoryName": "9. Mixed Arabic + English Concealment",
+      "dialect": "mixed_en",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected ACCOUNT_TAKEOVER, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, credential_request, threat_language]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-026",
+      "title": "تنبيه بنكي ثنائي اللغة يطلب تحديث KYC عبر رابط تصيد",
+      "taxonomyCategory": "mixed_arabic_english",
+      "taxonomyCategoryName": "9. Mixed Arabic + English Concealment",
+      "dialect": "mixed_en",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"urgent\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected BANK_IMPERSONATION, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, threat_language, credential_request]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-027",
+      "title": "تصيد محفظة رقمية Metamask بطلب الكلمات المفتاحية (Seed Phrase)",
+      "taxonomyCategory": "mixed_arabic_english",
+      "taxonomyCategoryName": "9. Mixed Arabic + English Concealment",
+      "dialect": "mixed_en",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "INVESTMENT_SCAM",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected INVESTMENT_SCAM, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [credential_request, threat_language]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-044",
+      "title": "تهنئة باليوم الوطني تحتوي على رابط سحب احتيالي (لهجة خليجية)",
+      "taxonomyCategory": "suspicious_url_in_legitimate_msg",
+      "taxonomyCategoryName": "15. Suspicious URL Inside Legitimate Message",
+      "dialect": "gulf",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "financial_lure"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected FAKE_PRIZE, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [financial_lure]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-046",
+      "title": "مقال تحليلي اقتصادي مطول يخفي في نهايته رابط تحديث بنكي عاجل",
+      "taxonomyCategory": "long_distracting_text",
+      "taxonomyCategoryName": "16. Long Distracting Text Containing Malicious Instructions",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected BANK_IMPERSONATION, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, credential_request, threat_language]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    }
+  ],
+  "caseResults": [
+    {
+      "id": "RED-001",
+      "title": "سؤال استفساري عام عن تطبيق بنك الكريمي (لهجة يمنية)",
+      "taxonomyCategory": "brand_mention_no_impersonation",
+      "taxonomyCategoryName": "1. Brand Mention Without Impersonation",
+      "dialect": "yemeni",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-002",
+      "title": "مقارنة حيادية لبطاقات مصرف الراجحي (لهجة خليجية)",
+      "taxonomyCategory": "brand_mention_no_impersonation",
+      "taxonomyCategoryName": "1. Brand Mention Without Impersonation",
+      "dialect": "gulf",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-003",
+      "title": "خبر صحفي عام عن شركة الاتصالات السعودية STC (فصحى)",
+      "taxonomyCategory": "brand_mention_no_impersonation",
+      "taxonomyCategoryName": "1. Brand Mention Without Impersonation",
+      "dialect": "msa",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-004",
+      "title": "تحذير أمني بنكي ينهى عن مشاركة رمز التحقق OTP (لهجة يمنية)",
+      "taxonomyCategory": "legitimate_otp_warnings",
+      "taxonomyCategoryName": "2. Legitimate OTP Warnings (Polarity Inversion)",
+      "dialect": "yemeni",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-005",
+      "title": "نصيحة أمنية رسمية توعوية بعدم مشاركة OTP (فصحى)",
+      "taxonomyCategory": "legitimate_otp_warnings",
+      "taxonomyCategoryName": "2. Legitimate OTP Warnings (Polarity Inversion)",
+      "dialect": "msa",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-006",
+      "title": "تذكير أمني صارم ضد الهندسة الاجتماعية (لهجة خليجية)",
+      "taxonomyCategory": "legitimate_otp_warnings",
+      "taxonomyCategoryName": "2. Legitimate OTP Warnings (Polarity Inversion)",
+      "dialect": "gulf",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 32,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [
+        "otp_request"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": true,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"شاركه \"",
+          "quote": "طلب صريح لإرسال أو مشاركة رمز التحقق فوراً رغم الإشارة لسرية الرمز.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تشارك رمز التحقق لمرة واحدة (OTP) أو كود المصادقة مع أي شخص تحت أي ظرف.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_POSITIVE",
+          "severity": "High",
+          "description": "False alarm on benign stress input: expected LOW risk, but engine classified as SUSPICIOUS (Score: 32)."
+        },
+        {
+          "category": "UNSUPPORTED_EVIDENCE",
+          "severity": "High",
+          "description": "Negative security advisory mentioning OTP was falsely treated as OTP harvesting request."
+        }
+      ],
+      "evidenceIntegrityViolations": [
+        {
+          "rule": "negative_otp_warning_as_scam",
+          "description": "Negative security advisory mentioning OTP was falsely treated as OTP harvesting request.",
+          "severity": "High"
+        }
+      ],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-007",
+      "title": "دعوة طارئة لاجتماع جمعية سكنية محلية (لهجة يمنية)",
+      "taxonomyCategory": "legitimate_urgency",
+      "taxonomyCategoryName": "3. Legitimate Urgency (Operational Deadlines)",
+      "dialect": "yemeni",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 18,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [
+        "urgency"
+      ],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"عاجل\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "تحقق من هوية المرسل وقناة التواصل قبل مشاركة أي معلومات أو اتخاذ إجراء.",
+        "إذا كان المحتوى يتعلق بتعامل مالي، استشر شخصاً موثوقاً أو اتصل بجهة الدعم الرسمية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-008",
+      "title": "تذكير بانتهاء مهلة تجديد اشتراك رياضي (لهجة خليجية)",
+      "taxonomyCategory": "legitimate_urgency",
+      "taxonomyCategoryName": "3. Legitimate Urgency (Operational Deadlines)",
+      "dialect": "gulf",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-009",
+      "title": "إشعار صعود فوري لطائرة في المطار (فصحى)",
+      "taxonomyCategory": "legitimate_urgency",
+      "taxonomyCategoryName": "3. Legitimate Urgency (Operational Deadlines)",
+      "dialect": "msa",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 18,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [
+        "urgency"
+      ],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"عاجل\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "تحقق من هوية المرسل وقناة التواصل قبل مشاركة أي معلومات أو اتخاذ إجراء.",
+        "إذا كان المحتوى يتعلق بتعامل مالي، استشر شخصاً موثوقاً أو اتصل بجهة الدعم الرسمية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-010",
+      "title": "رابط بوابة نتائج دراسية جامعة صنعاء (.edu.ye)",
+      "taxonomyCategory": "benign_suspicious_domains",
+      "taxonomyCategoryName": "4. Benign Suspicious-Looking Domains",
+      "dialect": "msa",
+      "modality": "url",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "تحقق من هوية المرسل وقناة التواصل قبل مشاركة أي معلومات أو اتخاذ إجراء.",
+        "إذا كان المحتوى يتعلق بتعامل مالي، استشر شخصاً موثوقاً أو اتصل بجهة الدعم الرسمية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-011",
+      "title": "رابط خدمة بلدية حكومية إقليمية طويلة المسار (.gov.om)",
+      "taxonomyCategory": "benign_suspicious_domains",
+      "taxonomyCategoryName": "4. Benign Suspicious-Looking Domains",
+      "dialect": "msa",
+      "modality": "url",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-012",
+      "title": "رابط واجهة مراقبة حوسبة سحابية أكاديمية (.ac.ae)",
+      "taxonomyCategory": "benign_suspicious_domains",
+      "taxonomyCategoryName": "4. Benign Suspicious-Looking Domains",
+      "dialect": "mixed_en",
+      "modality": "url",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-013",
+      "title": "تصيد بنكي بالأرابيزي لسرقة رمز الـ OTP",
+      "taxonomyCategory": "arabizi_obfuscation",
+      "taxonomyCategoryName": "5. Arabizi Obfuscation (Script Evasion)",
+      "dialect": "arabizi",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "otp_request",
+        "urgency"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-014",
+      "title": "جائزة وهمية بالأرابيزي تطلب رقم البطاقة",
+      "taxonomyCategory": "arabizi_obfuscation",
+      "taxonomyCategoryName": "5. Arabizi Obfuscation (Script Evasion)",
+      "dialect": "arabizi",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-015",
+      "title": "احتيال توصيل طرود بالأرابيزي ورسوم غير مدفوعة",
+      "taxonomyCategory": "arabizi_obfuscation",
+      "taxonomyCategoryName": "5. Arabizi Obfuscation (Script Evasion)",
+      "dialect": "arabizi",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 24,
+      "expectedScamType": "DELIVERY_SCAM",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"aramex\"",
+          "quote": "انتحال صفة (أرامكس) مقترناً بطلب إجراء أو تهديد أو رابط غير رسمي.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"aramex-pay.club\"",
+          "quote": "النطاق (aramex-pay.club) يحاكي اسم أرامكس ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 24)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-016",
+      "title": "تصيد بنكي بحروف مطولة عمداً (تطويل/تطعيج الكلمات)",
+      "taxonomyCategory": "unicode_confusables",
+      "taxonomyCategoryName": "6. Unicode Confusables / Zero-Width / Tatweel",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "high",
+      "riskScore": 100,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "otp_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "otp_request",
+        "urgency",
+        "threat_language",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 4,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"ارسل رمز التحقق\"",
+          "quote": "طلب صريح لإدخال أو مشاركة رمز التحقق لمرة واحدة (OTP) المخصص للمصادقة وتأكيد العمليات.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"تم ايقاف بطاقتك\"",
+          "quote": "استخدام التهديد بتجميد الحساب أو فرض غرامات لإرهاب الضحية واستدراجها.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "لا تشارك رمز التحقق لمرة واحدة (OTP) أو كود المصادقة مع أي شخص تحت أي ظرف.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "تجاهل التهديد بوقف الحساب؛ البنوك والجهات الرسمية لا تجمد الحسابات عبر رسائل فورية عشوائية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected ACCOUNT_TAKEOVER, but attributed to BANK_IMPERSONATION."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [impersonation]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-017",
+      "title": "تصيد بفواصل ومسافات صفرية (Zero-Width Space)",
+      "taxonomyCategory": "unicode_confusables",
+      "taxonomyCategoryName": "6. Unicode Confusables / Zero-Width / Tatweel",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "high",
+      "riskScore": 94,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "threat_language",
+        "suspicious_url",
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 4,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"عاجل\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"تم حظر حسابك\"",
+          "quote": "استخدام التهديد بتجميد الحساب أو فرض غرامات لإرهاب الضحية واستدراجها.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"alrajhi-verify.xyz\"",
+          "quote": "النطاق (alrajhi-verify.xyz) يحاكي اسم مصرف الراجحي ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "تجاهل التهديد بوقف الحساب؛ البنوك والجهات الرسمية لا تجمد الحسابات عبر رسائل فورية عشوائية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "UNSUPPORTED_EVIDENCE",
+          "severity": "High",
+          "description": "Evidence quote \"تم حظر حسابك\" was fabricated or not present in input."
+        }
+      ],
+      "evidenceIntegrityViolations": [
+        {
+          "rule": "ungrounded_evidence_quote",
+          "description": "Evidence quote \"تم حظر حسابك\" is not grounded in source input text.",
+          "severity": "High"
+        }
+      ],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-018",
+      "title": "تصيد يخلط محارف كيريلية شبيهة بالعربية واللاتينية (Homoglyphs)",
+      "taxonomyCategory": "unicode_confusables",
+      "taxonomyCategoryName": "6. Unicode Confusables / Zero-Width / Tatweel",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 24,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"snb\"",
+          "quote": "انتحال صفة (البنك الأهلي) مقترناً بطلب إجراء أو تهديد أو رابط غير رسمي.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"snb-login.club\"",
+          "quote": "النطاق (snb-login.club) يحاكي اسم البنك الأهلي السعودي (SNB) ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 24)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-019",
+      "title": "عروض تخفيضات تجارية بلهجة مصرية مليئة بالنيران والإيموجي",
+      "taxonomyCategory": "excessive_punctuation_emojis",
+      "taxonomyCategoryName": "7. Excessive Punctuation / Emojis",
+      "dialect": "egyptian",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 18,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [
+        "urgency"
+      ],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "تحقق من هوية المرسل وقناة التواصل قبل مشاركة أي معلومات أو اتخاذ إجراء.",
+        "إذا كان المحتوى يتعلق بتعامل مالي، استشر شخصاً موثوقاً أو اتصل بجهة الدعم الرسمية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-020",
+      "title": "عرض مطعم خليجي بخصم كبير مع إيموجي وعلامات تعجب",
+      "taxonomyCategory": "excessive_punctuation_emojis",
+      "taxonomyCategoryName": "7. Excessive Punctuation / Emojis",
+      "dialect": "gulf",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-021",
+      "title": "تهنئة تخرج جامعي مليئة بإيموجي الاحتفال (فصحى)",
+      "taxonomyCategory": "excessive_punctuation_emojis",
+      "taxonomyCategoryName": "7. Excessive Punctuation / Emojis",
+      "dialect": "msa",
+      "modality": "text",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-022",
+      "title": "احتيال توظيف بركاكة لغوية ناتجة عن ترجمة آلية أجنبية",
+      "taxonomyCategory": "broken_arabic",
+      "taxonomyCategoryName": "8. Broken / Machine-Translated Arabic",
+      "dialect": "broken_arabic",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "JOB_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "unexpected_contact"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-023",
+      "title": "احتيال عملات مشفرة مترجم آلياً من عصابات أجنبية",
+      "taxonomyCategory": "broken_arabic",
+      "taxonomyCategoryName": "8. Broken / Machine-Translated Arabic",
+      "dialect": "broken_arabic",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "INVESTMENT_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-024",
+      "title": "احتيال الميراث والرسوم المسبقة بلغة مترجمة متهالكة",
+      "taxonomyCategory": "broken_arabic",
+      "taxonomyCategoryName": "8. Broken / Machine-Translated Arabic",
+      "dialect": "broken_arabic",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "PAYMENT_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-025",
+      "title": "تصيد Apple ID يجمع بين إشعار أمني إنجليزي وتوجيه عربي",
+      "taxonomyCategory": "mixed_arabic_english",
+      "taxonomyCategoryName": "9. Mixed Arabic + English Concealment",
+      "dialect": "mixed_en",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected ACCOUNT_TAKEOVER, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, credential_request, threat_language]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-026",
+      "title": "تنبيه بنكي ثنائي اللغة يطلب تحديث KYC عبر رابط تصيد",
+      "taxonomyCategory": "mixed_arabic_english",
+      "taxonomyCategoryName": "9. Mixed Arabic + English Concealment",
+      "dialect": "mixed_en",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"urgent\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected BANK_IMPERSONATION, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, threat_language, credential_request]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-027",
+      "title": "تصيد محفظة رقمية Metamask بطلب الكلمات المفتاحية (Seed Phrase)",
+      "taxonomyCategory": "mixed_arabic_english",
+      "taxonomyCategoryName": "9. Mixed Arabic + English Concealment",
+      "dialect": "mixed_en",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "INVESTMENT_SCAM",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected INVESTMENT_SCAM, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [credential_request, threat_language]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-028",
+      "title": "لقطة شاشة: لافتة إنذار بنكي مصورة تحث على الاتصال برقم مريب",
+      "taxonomyCategory": "misleading_screenshots",
+      "taxonomyCategoryName": "10. Misleading Screenshots / Layout Spoofing",
+      "dialect": "msa",
+      "modality": "screenshot",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "urgency"
+      ],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": true,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط).",
+        "فشل استخراج محتوى لقطة الشاشة: Gemini API is not configured on the server (GEMINI_API_KEY missing or empty).",
+        "نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة.",
+        "يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.",
+        "يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "EXTRACTION_FAILURE",
+          "severity": "Medium",
+          "description": "Unextracted screenshot or degraded input resulted in indeterminate analysis state."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-029",
+      "title": "لقطة شاشة: واجهة نظام حمراء بريئة تحذر من امتلاء القرص",
+      "taxonomyCategory": "misleading_screenshots",
+      "taxonomyCategoryName": "10. Misleading Screenshots / Layout Spoofing",
+      "dialect": "msa",
+      "modality": "screenshot",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": true,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط).",
+        "فشل استخراج محتوى لقطة الشاشة: Gemini API is not configured on the server (GEMINI_API_KEY missing or empty).",
+        "نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة.",
+        "يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.",
+        "يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "EXTRACTION_FAILURE",
+          "severity": "Medium",
+          "description": "Unextracted screenshot or degraded input resulted in indeterminate analysis state."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-030",
+      "title": "لقطة شاشة: صورة باهتة ومشوشة رديئة الدقة",
+      "taxonomyCategory": "misleading_screenshots",
+      "taxonomyCategoryName": "10. Misleading Screenshots / Layout Spoofing",
+      "dialect": "msa",
+      "modality": "screenshot",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": true,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط).",
+        "فشل استخراج محتوى لقطة الشاشة: Gemini API is not configured on the server (GEMINI_API_KEY missing or empty).",
+        "نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة.",
+        "يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.",
+        "يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "EXTRACTION_FAILURE",
+          "severity": "Medium",
+          "description": "Unextracted screenshot or degraded input resulted in indeterminate analysis state."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-031",
+      "title": "لقطة شاشة: واجهة حصاد رمز التحقق OTP بهوية مؤسسية مزيفة",
+      "taxonomyCategory": "visual_brand_resemblance",
+      "taxonomyCategoryName": "11. Visual Brand Resemblance (Color/Icon)",
+      "dialect": "msa",
+      "modality": "screenshot",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [
+        "otp_request",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": true,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط).",
+        "فشل استخراج محتوى لقطة الشاشة: Gemini API is not configured on the server (GEMINI_API_KEY missing or empty).",
+        "نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة.",
+        "يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.",
+        "يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "EXTRACTION_FAILURE",
+          "severity": "Medium",
+          "description": "Unextracted screenshot or degraded input resulted in indeterminate analysis state."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-032",
+      "title": "لقطة شاشة: بوابة حكومية مصورة تطلب إدخال رقم الهوية وتاريخ الميلاد",
+      "taxonomyCategory": "visual_brand_resemblance",
+      "taxonomyCategoryName": "11. Visual Brand Resemblance (Color/Icon)",
+      "dialect": "msa",
+      "modality": "screenshot",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "GOVERNMENT_IMPERSONATION",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": true,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط).",
+        "فشل استخراج محتوى لقطة الشاشة: Gemini API is not configured on the server (GEMINI_API_KEY missing or empty).",
+        "نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة.",
+        "يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.",
+        "يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "EXTRACTION_FAILURE",
+          "severity": "Medium",
+          "description": "Unextracted screenshot or degraded input resulted in indeterminate analysis state."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-033",
+      "title": "لقطة شاشة: ملصق توعوي معتمد يحمل ألواناً مصرفية رسمية بريئة",
+      "taxonomyCategory": "visual_brand_resemblance",
+      "taxonomyCategoryName": "11. Visual Brand Resemblance (Color/Icon)",
+      "dialect": "msa",
+      "modality": "screenshot",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": true,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط).",
+        "فشل استخراج محتوى لقطة الشاشة: Gemini API is not configured on the server (GEMINI_API_KEY missing or empty).",
+        "نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة.",
+        "يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.",
+        "يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "EXTRACTION_FAILURE",
+          "severity": "Medium",
+          "description": "Unextracted screenshot or degraded input resulted in indeterminate analysis state."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-034",
+      "title": "رسالة تحوي رابطاً رسمياً كتمويه وبجانبه رابط تصيد بنكي خبيث",
+      "taxonomyCategory": "multiple_contradictory_urls",
+      "taxonomyCategoryName": "12. Multiple / Decoy URLs",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 44,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "credential_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url",
+        "impersonation"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"alrajhi-update.top\"",
+          "quote": "النطاق (alrajhi-update.top) يحاكي اسم مصرف الراجحي ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [credential_request]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-035",
+      "title": "رابط حساب تويتر رسمي مرفق مع رابط مسابقة وجائزة وهمية",
+      "taxonomyCategory": "multiple_contradictory_urls",
+      "taxonomyCategoryName": "12. Multiple / Decoy URLs",
+      "dialect": "gulf",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 44,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "impersonation"
+      ],
+      "actualDnaFeatures": [
+        "impersonation",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 3,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"stc\"",
+          "quote": "انتحال صفة (شركة الاتصالات (stc)) مقترناً بطلب إجراء أو تهديد أو رابط غير رسمي.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \"stc-gift.click\"",
+          "quote": "النطاق (stc-gift.click) يحاكي اسم شركة الاتصالات (stc) ولكنه ليس النطاق الرسمي المسجل للجهة.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected FAKE_PRIZE, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [financial_lure]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-036",
+      "title": "رسالة تقنية بريئة تحوي روابط توثيق متعددة",
+      "taxonomyCategory": "multiple_contradictory_urls",
+      "taxonomyCategoryName": "12. Multiple / Decoy URLs",
+      "dialect": "mixed_en",
+      "modality": "text_url",
+      "expectedRiskCategory": "low",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "UNKNOWN",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": false
+    },
+    {
+      "id": "RED-037",
+      "title": "افتتاحية دينية ودية ملحقة بتهديد بنكي عاجل بالتجميد",
+      "taxonomyCategory": "contradictory_evidence_fusion",
+      "taxonomyCategoryName": "13. Contradictory Evidence Fusion",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 66,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "urgency"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "threat_language",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 3,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"خلال 30\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"سيتم تجميد حسابك\"",
+          "quote": "استخدام التهديد بتجميد الحساب أو فرض غرامات لإرهاب الضحية واستدراجها.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "تجاهل التهديد بوقف الحساب؛ البنوك والجهات الرسمية لا تجمد الحسابات عبر رسائل فورية عشوائية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [impersonation]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-038",
+      "title": "مخاطبة حكومية رسمية مهذبة تتضمن تحويلاً مالياً لجهة مجهولة",
+      "taxonomyCategory": "contradictory_evidence_fusion",
+      "taxonomyCategoryName": "13. Contradictory Evidence Fusion",
+      "dialect": "gulf",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "GOVERNMENT_IMPERSONATION",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: suspicious)."
+        },
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected GOVERNMENT_IMPERSONATION, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, threat_language, suspicious_payment_request]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-039",
+      "title": "تحية عائلية ومشاعر قرابة متبوعة بطلب رمز تحقق (لهجة يمنية)",
+      "taxonomyCategory": "contradictory_evidence_fusion",
+      "taxonomyCategoryName": "13. Contradictory Evidence Fusion",
+      "dialect": "yemeni",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "otp_request",
+        "impersonation"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        },
+        {
+          "category": "CONTRADICTORY_FUSION_FAILURE",
+          "severity": "Critical",
+          "description": "Signal dilution or decoy URL bypassed threat detection (actual risk: low)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-040",
+      "title": "جائزة نقدية تدعو للاتصال الهاتفي والتوجه للصراف (لهجة يمنية)",
+      "taxonomyCategory": "scam_language_no_url",
+      "taxonomyCategoryName": "14. Scam Language Without Any URL",
+      "dialect": "yemeni",
+      "modality": "text",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 18,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "action_pressure"
+      ],
+      "actualDnaFeatures": [
+        "financial_lure"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فزت معنا\"",
+          "quote": "استدراج الضحية بإيهامها بالحصول على مبالغ مالية غير واقعية أو مكافآت وجوائز وهمية.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "تحقق من هوية المرسل وقناة التواصل قبل مشاركة أي معلومات أو اتخاذ إجراء.",
+        "إذا كان المحتوى يتعلق بتعامل مالي، استشر شخصاً موثوقاً أو اتصل بجهة الدعم الرسمية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 18)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-041",
+      "title": "إنذار بإيقاف بطاقة مدى يدعو لمراسلة واتساب هاتفياً (لهجة خليجية)",
+      "taxonomyCategory": "scam_language_no_url",
+      "taxonomyCategoryName": "14. Scam Language Without Any URL",
+      "dialect": "gulf",
+      "modality": "text",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "BANK_IMPERSONATION",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "threat_language",
+        "action_pressure"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "threat_language"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"عاجل\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"تم ايقاف\"",
+          "quote": "استخدام التهديد بتجميد الحساب أو فرض غرامات لإرهاب الضحية واستدراجها.",
+          "severity": "high",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "تواصل فوراً مع الجهة الرسمية عبر قنواتها المعتمدة أو الرقم المطبوع خلف بطاقتك المصرفية.",
+        "تجاهل التهديد بوقف الحساب؛ البنوك والجهات الرسمية لا تجمد الحسابات عبر رسائل فورية عشوائية.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "MISSED_DNA",
+          "severity": "Low",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, action_pressure]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-042",
+      "title": "منحة بنكية وهمية توجه للاتصال بالهاتف فوراً (لهجة مصرية)",
+      "taxonomyCategory": "scam_language_no_url",
+      "taxonomyCategoryName": "14. Scam Language Without Any URL",
+      "dialect": "egyptian",
+      "modality": "text",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 0,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "UNKNOWN",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "impersonation",
+        "action_pressure"
+      ],
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 0,
+      "evidenceItems": [],
+      "uncertainties": [
+        "الفحص استدلالي محلي يعتمد على القواعد المعلنة ولا يغطي السياقات غير المتاحة في النص.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "المحتوى لا يظهر علامات احتيال ظاهرة، ولكن احرص دائماً على عدم مشاركة بياناتك الحساسة."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 0)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-043",
+      "title": "تهنئة عيد فطر دافئة ملغمة برابط تصيد خبيث (فصحى)",
+      "taxonomyCategory": "suspicious_url_in_legitimate_msg",
+      "taxonomyCategoryName": "15. Suspicious URL Inside Legitimate Message",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "unexpected_contact"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-044",
+      "title": "تهنئة باليوم الوطني تحتوي على رابط سحب احتيالي (لهجة خليجية)",
+      "taxonomyCategory": "suspicious_url_in_legitimate_msg",
+      "taxonomyCategoryName": "15. Suspicious URL Inside Legitimate Message",
+      "dialect": "gulf",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "financial_lure"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected FAKE_PRIZE, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [financial_lure]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-045",
+      "title": "تبريكات بشهر رمضان الكريم ملحومة برابط باقة مجانية (لهجة يمنية)",
+      "taxonomyCategory": "suspicious_url_in_legitimate_msg",
+      "taxonomyCategoryName": "15. Suspicious URL Inside Legitimate Message",
+      "dialect": "yemeni",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "FAKE_PRIZE",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-046",
+      "title": "مقال تحليلي اقتصادي مطول يخفي في نهايته رابط تحديث بنكي عاجل",
+      "taxonomyCategory": "long_distracting_text",
+      "taxonomyCategoryName": "16. Long Distracting Text Containing Malicious Instructions",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
+      "expectedScamType": "BANK_IMPERSONATION",
+      "actualScamType": "DELIVERY_SCAM",
+      "expectedDnaFeatures": [
+        "impersonation",
+        "credential_request",
+        "threat_language"
+      ],
+      "actualDnaFeatures": [
+        "urgency",
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": false,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 2,
+      "evidenceItems": [
+        {
+          "type": "linguistic",
+          "description": "الدليل المرصود: \"فورا\"",
+          "quote": "ممارسة ضغط زمني مصطنع لإرباك المستخدم ودفعه للاستجابة السريعة دون تدقيق.",
+          "severity": "high",
+          "source": "deterministic"
+        },
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".top\"",
+          "quote": "النطاق العلوي (.top) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "افتح التطبيق الرسمي لشركة التوصيل برقم التتبع للتحقق من وجود أي شحنة مسجلة برقم هويتك.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "WRONG_SCAM_TYPE",
+          "severity": "Medium",
+          "description": "Misattribution of threat category: expected BANK_IMPERSONATION, but attributed to DELIVERY_SCAM."
+        },
+        {
+          "category": "MISSED_DNA",
+          "severity": "High",
+          "description": "Missed expected Scam DNA feature(s): [impersonation, credential_request, threat_language]."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-047",
+      "title": "مقال علمي عن الذكاء الاصطناعي يخفي رابط استثمار وهمي عالي الربح",
+      "taxonomyCategory": "long_distracting_text",
+      "taxonomyCategoryName": "16. Long Distracting Text Containing Malicious Instructions",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "INVESTMENT_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "financial_lure",
+        "suspicious_payment_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".xyz\"",
+          "quote": "النطاق العلوي (.xyz) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    },
+    {
+      "id": "RED-048",
+      "title": "تعميم إداري لموظفي شركة يحتوي على طلب إدخال كلمة مرور بريد داخلي",
+      "taxonomyCategory": "long_distracting_text",
+      "taxonomyCategoryName": "16. Long Distracting Text Containing Malicious Instructions",
+      "dialect": "msa",
+      "modality": "text_url",
+      "expectedRiskCategory": "high",
+      "actualRiskCategory": "low",
+      "riskScore": 20,
+      "expectedScamType": "ACCOUNT_TAKEOVER",
+      "actualScamType": "SOCIAL_ENGINEERING",
+      "expectedDnaFeatures": [
+        "credential_request",
+        "otp_request"
+      ],
+      "actualDnaFeatures": [
+        "suspicious_url"
+      ],
+      "isRiskCategoryCorrect": false,
+      "isScamTypeCorrect": false,
+      "isFalsePositive": false,
+      "isFalseNegative": true,
+      "isIndeterminate": false,
+      "evidenceItemsCount": 1,
+      "evidenceItems": [
+        {
+          "type": "technical",
+          "description": "الدليل المرصود: \".click\"",
+          "quote": "النطاق العلوي (.click) غير شائع للاستخدام المؤسسي ومصنف دولياً بارتفاع وتيرة حملات الاحتيال عبره.",
+          "severity": "medium",
+          "source": "deterministic"
+        }
+      ],
+      "uncertainties": [
+        "التقييم استدلالي محلي مبني على المؤشرات اللغوية والهندسية والتقنية المتاحة في النص/الرابط.",
+        "حارس لا يقوم بالاتصال بالروابط المشبوهة أو فحص خوادمها الحية تأكيداً لسياسة الفحص السلبي الآمن.",
+        "هذه النتيجة تعبر عن \"درجة الاشتباه\" وفق القواعد المرصودة ولا تمثل حكماً قضائياً أو قانونياً قاطعاً.",
+        "لم يتم تطبيق التحليل الدلالي بالذكاء الاصطناعي في هذا الفحص (يعتمد التقييم على القواعد الحتمية المحلية فقط)."
+      ],
+      "actionableAdvice": [
+        "لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.",
+        "احظر جهة الاتصال المشبوهة وأبلغ عنها للجهات الرسمية لمكافحة الاحتيال."
+      ],
+      "aiConfidence": null,
+      "extractionConfidence": null,
+      "failures": [
+        {
+          "category": "FALSE_NEGATIVE",
+          "severity": "Critical",
+          "description": "Scam evasion successful: expected HIGH risk, but engine classified as LOW (Score: 20)."
+        }
+      ],
+      "evidenceIntegrityViolations": [],
+      "hasFailure": true
+    }
+  ]
+}

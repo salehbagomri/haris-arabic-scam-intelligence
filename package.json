@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "tsx --test tests/**/*.test.ts",
-    "evaluate": "tsx scripts/evaluate.ts"
+    "evaluate": "tsx scripts/evaluate.ts",
+    "evaluate:red-team": "tsx scripts/evaluate_red_team.ts"
   },
   "dependencies": {
     "@google/genai": "^2.22.0",
