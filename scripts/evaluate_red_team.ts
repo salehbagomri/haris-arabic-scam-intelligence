@@ -84,13 +84,13 @@ async function runRedTeamEvaluation() {
 
   // Print Summary Table to Terminal
   console.log('\n======================================================================');
-  console.log('📈 RED-TEAM ADVERSARIAL BENCHMARK SUMMARY (Phase 6B):');
+  console.log('📈 RED-TEAM ADVERSARIAL BENCHMARK SUMMARY (Phase 6B.1):');
   console.log(`   - Total Attack Cases:                     ${summary.totalCases}`);
-  console.log(`   - Overall Attack Failure Rate:             ${(summary.overallFailureRate * 100).toFixed(1)}% (${summary.failedCasesCount}/${summary.totalCases})`);
-  console.log(`   - False Positive Rate (Benign Attacks):   ${(summary.falsePositiveRate * 100).toFixed(1)}% (${summary.falsePositivesCount}/${caseResults.filter((c) => c.expectedRiskCategory === 'low').length})`);
-  console.log(`   - False Negative Rate (Malicious Evasion): ${(summary.falseNegativeRate * 100).toFixed(1)}% (${summary.falseNegativesCount}/${caseResults.filter((c) => c.expectedRiskCategory !== 'low').length})`);
-  console.log(`   - Indeterminate Rate (Screenshots):       ${(summary.indeterminateRate * 100).toFixed(1)}% (${summary.indeterminateCount}/${summary.totalCases})`);
-  console.log(`   - Total Distinct Failures Logged:         ${summary.totalFailuresCount}`);
+  console.log(`   - Case-Level Failure Count:               ${summary.failedCasesCount}/${summary.totalCases} (${(summary.overallFailureRate * 100).toFixed(1)}%)`);
+  console.log(`   - Cumulative Defect Instances:            ${summary.totalFailuresCount}`);
+  console.log(`   - Determinate False Positive Rate (FPR):   ${(summary.determinateFalsePositiveRate * 100).toFixed(1)}% (${summary.falsePositivesCount}/${summary.determinateBenignCases}) [Total-Corpus: ${(summary.totalCorpusFalsePositiveRate * 100).toFixed(1)}% (${summary.falsePositivesCount}/${summary.totalBenignCases})]`);
+  console.log(`   - Determinate False Negative Rate (FNR):   ${(summary.determinateFalseNegativeRate * 100).toFixed(1)}% (${summary.falseNegativesCount}/${summary.determinateMaliciousCases}) [Total-Corpus: ${(summary.totalCorpusFalseNegativeRate * 100).toFixed(1)}% (${summary.falseNegativesCount}/${summary.totalMaliciousCases})]`);
+  console.log(`   - Indeterminate Rate:                     ${(summary.indeterminateRate * 100).toFixed(1)}% (${summary.indeterminateCount}/${summary.totalCases}) [Benign: ${summary.indeterminateBenignCases}/${summary.totalBenignCases}, Malicious: ${summary.indeterminateMaliciousCases}/${summary.totalMaliciousCases}]`);
   console.log(`   - Evidence Integrity Violations:          ${summary.evidenceIntegrityViolationsCount}`);
   console.log(`   - Scam-Type Determinate Accuracy:         ${(summary.scamTypeDeterminateAccuracy * 100).toFixed(1)}%`);
   console.log('======================================================================\n');
@@ -115,10 +115,11 @@ The goal of this evaluation is to systematically stress-test and probe vulnerabi
 
 ### Key Headline Metrics
 - **Total Attack Corpus:** ${summary.totalCases} cases across 16 categories.
-- **Overall Failure Rate:** **${(summary.overallFailureRate * 100).toFixed(1)}%** (${summary.failedCasesCount}/${summary.totalCases} cases triggered at least one failure mode).
-- **False Positive Rate (Benign Stress Tests):** **${(summary.falsePositiveRate * 100).toFixed(1)}%** (${summary.falsePositivesCount} benign cases misclassified as suspicious/high).
-- **False Negative Rate (Evasion Attacks):** **${(summary.falseNegativeRate * 100).toFixed(1)}%** (${summary.falseNegativesCount} malicious evasion cases misclassified as low risk).
-- **Indeterminate Rate (Screenshots):** **${(summary.indeterminateRate * 100).toFixed(1)}%** (${summary.indeterminateCount}/${summary.totalCases} offline screenshot extraction state).
+- **Case-Level Failure Count:** **${summary.failedCasesCount} / ${summary.totalCases}** (**${(summary.overallFailureRate * 100).toFixed(1)}%** of cases triggered at least one failure mode).
+- **Cumulative Defect Instances:** **${summary.totalFailuresCount}** failure mode instances logged across failing cases.
+- **Determinate False Positive Rate (FPR):** **${(summary.determinateFalsePositiveRate * 100).toFixed(1)}%** (${summary.falsePositivesCount}/${summary.determinateBenignCases} determinate benign cases misclassified) | Total-Corpus FPR: ${(summary.totalCorpusFalsePositiveRate * 100).toFixed(1)}% (${summary.falsePositivesCount}/${summary.totalBenignCases}).
+- **Determinate False Negative Rate (FNR):** **${(summary.determinateFalseNegativeRate * 100).toFixed(1)}%** (${summary.falseNegativesCount}/${summary.determinateMaliciousCases} determinate evasion cases misclassified) | Total-Corpus FNR: ${(summary.totalCorpusFalseNegativeRate * 100).toFixed(1)}% (${summary.falseNegativesCount}/${summary.totalMaliciousCases}).
+- **Indeterminate Rate (Screenshots):** **${(summary.indeterminateRate * 100).toFixed(1)}%** (${summary.indeterminateCount}/${summary.totalCases} total) — Breakdown: Benign Indeterminate = ${(summary.benignIndeterminateRate * 100).toFixed(1)}% (${summary.indeterminateBenignCases}/${summary.totalBenignCases}), Malicious Indeterminate = ${(summary.maliciousIndeterminateRate * 100).toFixed(1)}% (${summary.indeterminateMaliciousCases}/${summary.totalMaliciousCases}).
 - **Evidence Integrity Violations:** **${summary.evidenceIntegrityViolationsCount}** recorded across all cases.
 - **Scam-Type Attribution Accuracy (Determinate Scams):** **${(summary.scamTypeDeterminateAccuracy * 100).toFixed(1)}%**.
 
@@ -226,7 +227,7 @@ ${
 ${summary.dnaFeatureRecall
   .map(
     (f) =>
-      `| \`${f.feature}\` | ${getFeatureArabicName(f.feature)} | ${f.expectedCount} | ${f.detectedCount} | **${(f.recall * 100).toFixed(1)}%** |`
+      `| \`${f.feature}\` | ${getFeatureArabicName(f.feature)} | ${f.expectedCount} | ${f.detectedCount} | ${f.recall === null ? 'N/A (0/0)' : `**${(f.recall * 100).toFixed(1)}%**`} |`
   )
   .join('\n')}
 

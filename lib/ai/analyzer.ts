@@ -10,6 +10,7 @@ import { getGeminiClient, getConfiguredModel, getGeminiTimeoutMs } from './clien
 import { GeminiInputContext, GeminiSemanticAnalysis } from './schema';
 import { HARIS_SYSTEM_PROMPT, buildUserPrompt } from './prompts';
 import { parseAndValidateSemanticOutput } from './parser';
+import { sanitizeInternalErrorMessage } from '../security/safeErrors';
 
 export interface SemanticAnalysisExecutionResult {
   success: boolean;
@@ -109,7 +110,7 @@ export async function analyzeSemantics(
       success: false,
       fallbackReason: isTimeout
         ? `Gemini request timed out after ${timeoutMs}ms.`
-        : `Gemini API execution error: ${errorMessage}`,
+        : `Gemini API execution error: ${sanitizeInternalErrorMessage(errorMessage)}`,
     };
   }
 }

@@ -532,7 +532,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  max-width: 420px;
+  max-width: 480px;
   margin: 0 auto;
   text-align: right;
 }
@@ -547,7 +547,7 @@
   color: var(--text-muted);
   background: var(--bg-surface-subtle);
   border: 1px solid transparent;
-  transition: all var(--transition-normal);
+  transition: all var(--transition-fast);
 }
 
 .haris-stage-item.active {
@@ -559,6 +559,8 @@
 
 .haris-stage-item.completed {
   color: var(--success-text);
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 /* --- Results View --- */
@@ -753,6 +755,15 @@
   }
 }
 
+.haris-dna-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
 .haris-dna-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
@@ -765,13 +776,14 @@
 }
 
 .haris-dna-card.detected {
-  border-color: var(--danger-border);
-  background: linear-gradient(180deg, rgba(239, 68, 68, 0.05), var(--bg-surface));
+  border-color: rgba(239, 68, 68, 0.45);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), var(--bg-surface));
+  box-shadow: 0 4px 16px -4px rgba(239, 68, 68, 0.18);
 }
 
-.haris-dna-card.not-detected {
-  opacity: 0.65;
-  border-style: dashed;
+.haris-dna-card.detected:hover {
+  border-color: var(--danger);
+  transform: translateY(-1px);
 }
 
 .haris-dna-card-header {
@@ -798,6 +810,84 @@
   line-height: 1.5;
 }
 
+.haris-dna-evidence-tag {
+  font-size: 11px;
+  margin-top: var(--space-1);
+  background: var(--bg-surface-subtle);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  line-height: 1.4;
+}
+
+.haris-dna-card-footer {
+  margin-top: auto;
+  padding-top: var(--space-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.haris-dna-empty-observed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-lg);
+  color: var(--success-text);
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+.haris-dna-unobserved-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+@media (min-width: 640px) {
+  .haris-dna-unobserved-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .haris-dna-unobserved-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.haris-dna-unobserved-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-surface-subtle);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  opacity: 0.75;
+  transition: opacity var(--transition-fast), border-color var(--transition-fast);
+}
+
+.haris-dna-unobserved-item:hover {
+  opacity: 1;
+  border-color: var(--border-default);
+}
+
+.haris-dna-unobserved-name {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.haris-dna-unobserved-en {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
 /* --- Evidence Section --- */
 .haris-evidence-list {
   display: flex;
@@ -813,6 +903,11 @@
   display: flex;
   gap: var(--space-3);
   align-items: flex-start;
+  transition: border-color var(--transition-fast);
+}
+
+.haris-evidence-card:hover {
+  border-color: var(--border-strong);
 }
 
 .haris-evidence-icon {
@@ -831,7 +926,8 @@
 .haris-evidence-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  width: 100%;
 }
 
 .haris-evidence-title {
@@ -846,6 +942,52 @@
   line-height: 1.6;
 }
 
+.haris-evidence-verbatim-container {
+  margin-top: 2px;
+  background: rgba(14, 165, 233, 0.04);
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.haris-evidence-verbatim-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.haris-evidence-quote-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.haris-evidence-verbatim-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-text);
+  letter-spacing: 0.01em;
+}
+
+.haris-evidence-quote-box {
+  background: var(--bg-surface-subtle);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.haris-evidence-quote-text {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
 /* --- Actionable Advice Section --- */
 .haris-advice-card {
   background: var(--bg-surface);
@@ -853,6 +995,34 @@
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   box-shadow: var(--shadow-card);
+  transition: border-color var(--transition-normal), background var(--transition-normal);
+}
+
+.haris-advice-card.risk-high {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), var(--bg-surface));
+  box-shadow: 0 4px 16px -4px rgba(239, 68, 68, 0.12);
+}
+
+.haris-advice-card.risk-suspicious {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), var(--bg-surface));
+  box-shadow: 0 4px 16px -4px rgba(245, 158, 11, 0.1);
+}
+
+.haris-advice-card.risk-low {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), var(--bg-surface));
+  box-shadow: 0 4px 16px -4px rgba(16, 185, 129, 0.1);
+}
+
+.haris-advice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-1);
 }
 
 .haris-advice-list {
@@ -872,10 +1042,19 @@
   line-height: 1.5;
 }
 
+.haris-advice-card.risk-low .haris-advice-item {
+  color: var(--text-secondary);
+}
+
+.haris-advice-card.risk-high .haris-advice-item {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
 .haris-advice-bullet {
-  color: var(--accent);
   margin-top: 2px;
   flex-shrink: 0;
+  transition: color var(--transition-fast);
 }
 
 /* --- Uncertainty & Transparency Notice --- */

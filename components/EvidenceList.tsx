@@ -1,9 +1,35 @@
 import React from 'react';
-import { Search, ShieldAlert, Cpu, MessageSquareWarning, Eye, Sparkles } from 'lucide-react';
+import { Search, ShieldAlert, Cpu, MessageSquareWarning, Eye, Sparkles, Quote } from 'lucide-react';
 import { EvidenceItem } from '../lib/types/analysis';
 
 interface EvidenceListProps {
   evidence: EvidenceItem[];
+}
+
+function parseEvidenceDescription(description: string) {
+  // Strict match for explicit evidence markers: "الدليل المرصود", "الدليل المرئي", "الدليل", "المقتبس"
+  const markerMatch = description.match(
+    /(?:^|[—\-\s])(?:الدليل(?:\s+المرصود|\s+المرئي)?|المقتبس|النص\s+المقتبس):\s*"([^"]+)"(.*)$/
+  );
+
+  if (markerMatch) {
+    const quote = markerMatch[1].trim();
+    const beforeMarker = description.slice(0, markerMatch.index).trim();
+    const afterQuote = (markerMatch[2] || '').trim();
+    const combined = [beforeMarker, afterQuote].filter(Boolean).join(' ');
+    const cleanExplanation = combined.replace(/^[\s\-–—:]+|[\s\-–—:]+$/g, '').trim();
+
+    return {
+      verbatimQuote: quote,
+      explanation: cleanExplanation,
+    };
+  }
+
+  // If no explicit evidence marker is present, do NOT treat arbitrary quotes as verbatim source evidence
+  return {
+    verbatimQuote: null,
+    explanation: description,
+  };
 }
 
 export function EvidenceList({ evidence }: EvidenceListProps) {
@@ -29,16 +55,17 @@ export function EvidenceList({ evidence }: EvidenceListProps) {
       <div className="haris-section-title">
         <Search size={20} color="var(--accent)" />
         <h2 id="evidence-heading" style={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}>
-          الأدلة والمؤشرات الملموسة
+          الأدلة والمؤشرات الملموسة (Evidence)
         </h2>
       </div>
       <p className="haris-section-desc">
-        العناصر الصريحة المستخلصة من المحتوى والتي بُني عليها تقييم درجة الاشتباه.
+        النصوص والعناصر الصريحة المستخلصة حرفياً من المحتوى والتي بُني عليها تقييم درجة الاشتباه.
       </p>
 
       <div className="haris-evidence-list">
         {evidence.map((item) => {
           const sourceInfo = getSourceBadge(item.source);
+          const { verbatimQuote, explanation } = parseEvidenceDescription(item.description);
 
           return (
             <div key={item.id} className="haris-evidence-card">
@@ -52,7 +79,22 @@ export function EvidenceList({ evidence }: EvidenceListProps) {
                     {sourceInfo.label}
                   </span>
                 </div>
-                <p className="haris-evidence-desc">{item.description}</p>
+
+                {explanation && <p className="haris-evidence-desc">{explanation}</p>}
+
+                {verbatimQuote ? (
+                  <div className="haris-evidence-verbatim-container">
+                    <div className="haris-evidence-verbatim-header">
+                      <Quote size={12} className="haris-evidence-quote-icon" />
+                      <span className="haris-evidence-verbatim-badge">دليل حرفي من الرسالة الأصلية (Verbatim Evidence):</span>
+                    </div>
+                    <div className="haris-evidence-quote-box">
+                      <span className="haris-evidence-quote-text font-mono">« {verbatimQuote} »</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="haris-evidence-desc">{item.description}</p>
+                )}
               </div>
             </div>
           );

@@ -13,6 +13,7 @@ import { VISION_CONFIG, isAllowedImageMimeType } from '../config/vision';
 export const SAFE_CLIENT_ERROR_MESSAGES = {
   BAD_REQUEST: 'تعذر التحقق من صحة المدخلات المرسلة. يرجى مراجعة النص أو الرابط أو ملف لقطة الشاشة والمحاولة مجدداً.',
   PAYLOAD_TOO_LARGE: 'حجم لقطة الشاشة المرفوعة يتجاوز الحد الأقصى المسموح به (10 ميجابايت).',
+  TOO_MANY_REQUESTS: 'تم تجاوز الحد الأقصى للطلبات المسموح بها مؤقتاً (10 طلبات في الدقيقة). يرجى الانتظار قليلاً والمحاولة مجدداً.',
   SERVER_ERROR: 'حدث خطأ غير متوقع في خادم التحليل أثناء معالجة المحتوى. يرجى المحاولة مرة أخرى لاحقاً.',
   NETWORK_ERROR: 'تعذر الاتصال بخادم الفحص. يرجى التحقق من اتصال الإنترنت لديك والمحاولة مجدداً.',
   MALFORMED_RESPONSE: 'استجابة خادم الفحص غير صالحة أو غير متوقعة. يرجى إعادة المحاولة لاحقاً.',
@@ -236,6 +237,10 @@ export async function executeRealAnalysis(
 
     if (res.status === 413) {
       throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.PAYLOAD_TOO_LARGE, 413);
+    }
+
+    if (res.status === 429) {
+      throw new AnalysisError(SAFE_CLIENT_ERROR_MESSAGES.TOO_MANY_REQUESTS, 429);
     }
 
     if (res.status === 500) {

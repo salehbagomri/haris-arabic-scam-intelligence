@@ -1,17 +1,17 @@
 {
   "version": "1.2.0",
-  "evaluatedAt": "2026-09-12T21:55:45.533Z",
+  "evaluatedAt": "2026-09-13T04:38:53.591Z",
   "metadata": {
     "datasetVersion": "1.2.0",
     "datasetSha256": "4e82b82e4d4822921cf8c2ee70b39bc51ed9e069694d721fb065bbf7d76be6c8",
     "runnerVersion": "1.2.0",
-    "evaluationSourceCommit": "b8572a6d8061f253a0b284a9c95789659f54c699",
-    "artifactCommit": "b8572a6d8061f253a0b284a9c95789659f54c699",
+    "evaluationSourceCommit": "f1e80fef3642ce7f26f254d07e742345f1cebd6f",
+    "artifactCommit": "f1e80fef3642ce7f26f254d07e742345f1cebd6f",
     "nodeVersion": "v24.14.0",
     "geminiConfigured": false,
     "geminiModel": "gemini-2.5-flash",
     "pipelineMode": "deterministic-baseline",
-    "evaluatedAt": "2026-09-12T21:55:45.535Z",
+    "evaluatedAt": "2026-09-13T04:38:53.593Z",
     "configHash": "a169d90c9c088f8bcf9e62abc9cd27079cd7f00adac9cebc9fbd0875f2407acb",
     "evaluationConfig": {
       "offlineMode": true,
@@ -29,42 +29,42 @@
   "screenshotEvaluableCount": 0,
   "screenshotExtractionFailuresCount": 5,
   "riskMetrics": {
-    "coverageAdjustedAccuracy": 0.429,
-    "determinateRiskAccuracy": 0.462,
+    "coverageAdjustedAccuracy": 0.529,
+    "determinateRiskAccuracy": 0.569,
     "totalCases": 70,
     "determinateCasesCount": 65,
     "indeterminateCasesCount": 5
   },
   "legitimateMetrics": {
-    "legitimateAccuracy": 0.818,
-    "legitimateDeterminateAccuracy": 0.9,
+    "legitimateAccuracy": 0.864,
+    "legitimateDeterminateAccuracy": 0.95,
     "legitimateIndeterminateCount": 2,
     "legitimateIndeterminateRate": 0.091,
-    "falsePositiveRate": 0.1,
-    "falsePositivesCount": 2,
-    "trueNegativesCount": 18,
+    "falsePositiveRate": 0.05,
+    "falsePositivesCount": 1,
+    "trueNegativesCount": 19,
     "totalLegitimateCases": 22
   },
   "scamMetrics": {
-    "truePositivesCount": 11,
-    "falseNegativesCount": 21,
+    "truePositivesCount": 14,
+    "falseNegativesCount": 18,
     "scamIndeterminateCount": 2,
-    "scamDeterminateDetectionRate": 0.344,
-    "scamDeterminateFNR": 0.656,
-    "scamMissRateIncludingIndeterminate": 0.676,
+    "scamDeterminateDetectionRate": 0.438,
+    "scamDeterminateFNR": 0.563,
+    "scamMissRateIncludingIndeterminate": 0.588,
     "totalScamCases": 34
   },
   "scamTypeMetrics": {
-    "scamTypeScamOnlyDeterminateAccuracy": 0.219,
-    "scamTypeScamOnlyCoverageAdjustedAccuracy": 0.206,
+    "scamTypeScamOnlyDeterminateAccuracy": 0.25,
+    "scamTypeScamOnlyCoverageAdjustedAccuracy": 0.235,
     "scamTypeScamOnlyIndeterminateRate": 0.059,
-    "scamTypeAllCasesCoverageAdjusted": 0.5
+    "scamTypeAllCasesCoverageAdjusted": 0.557
   },
   "confusionMatrix": {
-    "truePositives": 11,
-    "falsePositives": 2,
-    "falseNegatives": 21,
-    "trueNegatives": 18,
+    "truePositives": 14,
+    "falsePositives": 1,
+    "falseNegatives": 18,
+    "trueNegatives": 19,
     "scamIndeterminate": 2,
     "legitimateIndeterminate": 2,
     "ambiguousIndeterminate": 1,
@@ -73,33 +73,33 @@
   "categoryBreakdown": {
     "scam": {
       "total": 34,
-      "correctRisk": 3,
-      "accuracy": 0.088,
-      "averageScore": 23.8
+      "correctRisk": 7,
+      "accuracy": 0.206,
+      "averageScore": 32.3
     },
     "legitimate": {
       "total": 22,
-      "correctRisk": 18,
-      "accuracy": 0.818,
-      "averageScore": 2.8
+      "correctRisk": 19,
+      "accuracy": 0.864,
+      "averageScore": 2.4
     },
     "ambiguous": {
       "total": 14,
-      "correctRisk": 9,
-      "accuracy": 0.643,
-      "averageScore": 6.7
+      "correctRisk": 11,
+      "accuracy": 0.786,
+      "averageScore": 14.1
     }
   },
   "dialectBreakdown": {
     "msa": {
       "total": 34,
-      "correctRisk": 15,
-      "accuracy": 0.441
+      "correctRisk": 19,
+      "accuracy": 0.559
     },
     "yemeni": {
       "total": 13,
-      "correctRisk": 6,
-      "accuracy": 0.462
+      "correctRisk": 7,
+      "accuracy": 0.538
     },
     "gulf": {
       "total": 9,
@@ -118,8 +118,8 @@
     },
     "arabizi": {
       "total": 4,
-      "correctRisk": 1,
-      "accuracy": 0.25
+      "correctRisk": 3,
+      "accuracy": 0.75
     }
   },
   "featureMetrics": [
@@ -128,26 +128,26 @@
       "nameAr": "urgency",
       "nameEn": "urgency",
       "groundTruthCount": 23,
-      "detectedCount": 13,
-      "truePositives": 9,
-      "falsePositives": 4,
-      "falseNegatives": 14,
-      "precision": 0.692,
-      "recall": 0.391,
-      "f1": 0.5
+      "detectedCount": 16,
+      "truePositives": 13,
+      "falsePositives": 3,
+      "falseNegatives": 10,
+      "precision": 0.813,
+      "recall": 0.565,
+      "f1": 0.667
     },
     {
       "featureId": "credential_request",
       "nameAr": "credential_request",
       "nameEn": "credential_request",
       "groundTruthCount": 11,
-      "detectedCount": 2,
-      "truePositives": 1,
+      "detectedCount": 3,
+      "truePositives": 2,
       "falsePositives": 1,
-      "falseNegatives": 10,
-      "precision": 0.5,
-      "recall": 0.091,
-      "f1": 0.154
+      "falseNegatives": 9,
+      "precision": 0.667,
+      "recall": 0.182,
+      "f1": 0.286
     },
     {
       "featureId": "otp_request",
@@ -155,38 +155,38 @@
       "nameEn": "otp_request",
       "groundTruthCount": 6,
       "detectedCount": 4,
-      "truePositives": 2,
-      "falsePositives": 2,
-      "falseNegatives": 4,
-      "precision": 0.5,
-      "recall": 0.333,
-      "f1": 0.4
+      "truePositives": 3,
+      "falsePositives": 1,
+      "falseNegatives": 3,
+      "precision": 0.75,
+      "recall": 0.5,
+      "f1": 0.6
     },
     {
       "featureId": "impersonation",
       "nameAr": "impersonation",
       "nameEn": "impersonation",
       "groundTruthCount": 22,
-      "detectedCount": 4,
-      "truePositives": 4,
-      "falsePositives": 0,
-      "falseNegatives": 18,
-      "precision": 1,
-      "recall": 0.182,
-      "f1": 0.308
+      "detectedCount": 9,
+      "truePositives": 8,
+      "falsePositives": 1,
+      "falseNegatives": 14,
+      "precision": 0.889,
+      "recall": 0.364,
+      "f1": 0.517
     },
     {
       "featureId": "financial_lure",
       "nameAr": "financial_lure",
       "nameEn": "financial_lure",
       "groundTruthCount": 12,
-      "detectedCount": 2,
-      "truePositives": 2,
+      "detectedCount": 4,
+      "truePositives": 4,
       "falsePositives": 0,
-      "falseNegatives": 10,
+      "falseNegatives": 8,
       "precision": 1,
-      "recall": 0.167,
-      "f1": 0.286
+      "recall": 0.333,
+      "f1": 0.5
     },
     {
       "featureId": "suspicious_url",
@@ -219,13 +219,13 @@
       "nameAr": "unexpected_contact",
       "nameEn": "unexpected_contact",
       "groundTruthCount": 5,
-      "detectedCount": 0,
-      "truePositives": 0,
-      "falsePositives": 0,
-      "falseNegatives": 5,
-      "precision": 0,
-      "recall": 0,
-      "f1": 0
+      "detectedCount": 3,
+      "truePositives": 1,
+      "falsePositives": 2,
+      "falseNegatives": 4,
+      "precision": 0.333,
+      "recall": 0.2,
+      "f1": 0.25
     },
     {
       "featureId": "secrecy_pressure",
@@ -245,22 +245,22 @@
       "nameAr": "suspicious_payment_request",
       "nameEn": "suspicious_payment_request",
       "groundTruthCount": 10,
-      "detectedCount": 2,
-      "truePositives": 2,
-      "falsePositives": 0,
-      "falseNegatives": 8,
-      "precision": 1,
-      "recall": 0.2,
-      "f1": 0.333
+      "detectedCount": 4,
+      "truePositives": 3,
+      "falsePositives": 1,
+      "falseNegatives": 7,
+      "precision": 0.75,
+      "recall": 0.3,
+      "f1": 0.429
     },
     {
       "featureId": "action_pressure",
       "nameAr": "action_pressure",
       "nameEn": "action_pressure",
       "groundTruthCount": 6,
-      "detectedCount": 1,
+      "detectedCount": 6,
       "truePositives": 0,
-      "falsePositives": 1,
+      "falsePositives": 6,
       "falseNegatives": 6,
       "precision": 0,
       "recall": 0,
@@ -274,8 +274,8 @@
       "category": "scam",
       "dialect": "msa",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "suspicious",
-      "riskScore": 38,
+      "actualRiskCategory": "high",
+      "riskScore": 71,
       "expectedScamType": "BANK_IMPERSONATION",
       "actualScamType": "BANK_IMPERSONATION",
       "expectedDnaFeatures": [
@@ -286,23 +286,24 @@
       ],
       "actualDnaFeatures": [
         "urgency",
+        "impersonation",
         "threat_language"
       ],
-      "isRiskCategoryCorrect": false,
+      "isRiskCategoryCorrect": true,
       "isScamTypeCorrect": true,
       "isFalsePositive": false,
       "isFalseNegative": false,
-      "dnaTruePositives": 1,
+      "dnaTruePositives": 2,
       "dnaFalsePositives": 1,
-      "dnaFalseNegatives": 3,
-      "dnaPrecision": 0.5,
-      "dnaRecall": 0.25,
-      "dnaF1": 0.333,
+      "dnaFalseNegatives": 2,
+      "dnaPrecision": 0.667,
+      "dnaRecall": 0.5,
+      "dnaF1": 0.572,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "Mismatch: expected high, got suspicious (score 38)"
+      "notes": "OK"
     },
     {
       "id": "SCAM-002",
@@ -310,8 +311,8 @@
       "category": "scam",
       "dialect": "yemeni",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "suspicious",
-      "riskScore": 50,
+      "actualRiskCategory": "high",
+      "riskScore": 85,
       "expectedScamType": "ACCOUNT_TAKEOVER",
       "actualScamType": "BANK_IMPERSONATION",
       "expectedDnaFeatures": [
@@ -322,23 +323,24 @@
       ],
       "actualDnaFeatures": [
         "urgency",
-        "otp_request"
+        "otp_request",
+        "impersonation"
       ],
-      "isRiskCategoryCorrect": false,
+      "isRiskCategoryCorrect": true,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": false,
-      "dnaTruePositives": 2,
+      "dnaTruePositives": 3,
       "dnaFalsePositives": 0,
-      "dnaFalseNegatives": 2,
+      "dnaFalseNegatives": 1,
       "dnaPrecision": 1,
-      "dnaRecall": 0.5,
-      "dnaF1": 0.667,
+      "dnaRecall": 0.75,
+      "dnaF1": 0.857,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "Mismatch: expected high, got suspicious (score 50)"
+      "notes": "OK"
     },
     {
       "id": "SCAM-003",
@@ -349,7 +351,7 @@
       "actualRiskCategory": "suspicious",
       "riskScore": 38,
       "expectedScamType": "PAYMENT_SCAM",
-      "actualScamType": "DELIVERY_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
       "expectedDnaFeatures": [
         "impersonation",
         "urgency",
@@ -383,10 +385,10 @@
       "category": "scam",
       "dialect": "egyptian",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "low",
-      "riskScore": 20,
+      "actualRiskCategory": "suspicious",
+      "riskScore": 38,
       "expectedScamType": "PAYMENT_SCAM",
-      "actualScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "BANK_IMPERSONATION",
       "expectedDnaFeatures": [
         "impersonation",
         "urgency",
@@ -394,23 +396,24 @@
         "action_pressure"
       ],
       "actualDnaFeatures": [
+        "urgency",
         "threat_language"
       ],
       "isRiskCategoryCorrect": false,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
-      "isFalseNegative": true,
-      "dnaTruePositives": 1,
+      "isFalseNegative": false,
+      "dnaTruePositives": 2,
       "dnaFalsePositives": 0,
-      "dnaFalseNegatives": 3,
+      "dnaFalseNegatives": 2,
       "dnaPrecision": 1,
-      "dnaRecall": 0.25,
-      "dnaF1": 0.4,
+      "dnaRecall": 0.5,
+      "dnaF1": 0.667,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 20)"
+      "notes": "Mismatch: expected high, got suspicious (score 38)"
     },
     {
       "id": "SCAM-005",
@@ -487,32 +490,37 @@
       "category": "scam",
       "dialect": "yemeni",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "low",
-      "riskScore": 0,
+      "actualRiskCategory": "high",
+      "riskScore": 87,
       "expectedScamType": "PAYMENT_SCAM",
-      "actualScamType": "UNKNOWN",
+      "actualScamType": "PAYMENT_SCAM",
       "expectedDnaFeatures": [
         "impersonation",
         "financial_lure",
         "suspicious_payment_request",
         "urgency"
       ],
-      "actualDnaFeatures": [],
-      "isRiskCategoryCorrect": false,
-      "isScamTypeCorrect": false,
+      "actualDnaFeatures": [
+        "urgency",
+        "impersonation",
+        "financial_lure",
+        "suspicious_payment_request"
+      ],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
       "isFalsePositive": false,
-      "isFalseNegative": true,
-      "dnaTruePositives": 0,
+      "isFalseNegative": false,
+      "dnaTruePositives": 4,
       "dnaFalsePositives": 0,
-      "dnaFalseNegatives": 4,
-      "dnaPrecision": 0,
-      "dnaRecall": 0,
-      "dnaF1": 0,
+      "dnaFalseNegatives": 0,
+      "dnaPrecision": 1,
+      "dnaRecall": 1,
+      "dnaF1": 1,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 0)"
+      "notes": "OK"
     },
     {
       "id": "SCAM-008",
@@ -557,33 +565,36 @@
       "category": "scam",
       "dialect": "msa",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "suspicious",
-      "riskScore": 32,
+      "actualRiskCategory": "high",
+      "riskScore": 86,
       "expectedScamType": "FAKE_PRIZE",
-      "actualScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "BANK_IMPERSONATION",
       "expectedDnaFeatures": [
         "financial_lure",
         "unexpected_contact",
         "action_pressure"
       ],
       "actualDnaFeatures": [
-        "otp_request"
+        "otp_request",
+        "impersonation",
+        "financial_lure",
+        "unexpected_contact"
       ],
-      "isRiskCategoryCorrect": false,
+      "isRiskCategoryCorrect": true,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": false,
-      "dnaTruePositives": 0,
-      "dnaFalsePositives": 1,
-      "dnaFalseNegatives": 3,
-      "dnaPrecision": 0,
-      "dnaRecall": 0,
-      "dnaF1": 0,
+      "dnaTruePositives": 2,
+      "dnaFalsePositives": 2,
+      "dnaFalseNegatives": 1,
+      "dnaPrecision": 0.5,
+      "dnaRecall": 0.667,
+      "dnaF1": 0.572,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "Mismatch: expected high, got suspicious (score 32)"
+      "notes": "OK"
     },
     {
       "id": "SCAM-010",
@@ -591,10 +602,10 @@
       "category": "scam",
       "dialect": "yemeni",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "high",
-      "riskScore": 87,
+      "actualRiskCategory": "suspicious",
+      "riskScore": 65,
       "expectedScamType": "FAKE_PRIZE",
-      "actualScamType": "INVESTMENT_SCAM",
+      "actualScamType": "GOVERNMENT_IMPERSONATION",
       "expectedDnaFeatures": [
         "impersonation",
         "financial_lure",
@@ -603,25 +614,25 @@
       ],
       "actualDnaFeatures": [
         "credential_request",
-        "financial_lure",
         "suspicious_url",
+        "unexpected_contact",
         "action_pressure"
       ],
-      "isRiskCategoryCorrect": true,
+      "isRiskCategoryCorrect": false,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": false,
-      "dnaTruePositives": 3,
-      "dnaFalsePositives": 1,
-      "dnaFalseNegatives": 1,
-      "dnaPrecision": 0.75,
-      "dnaRecall": 0.75,
-      "dnaF1": 0.75,
+      "dnaTruePositives": 2,
+      "dnaFalsePositives": 2,
+      "dnaFalseNegatives": 2,
+      "dnaPrecision": 0.5,
+      "dnaRecall": 0.5,
+      "dnaF1": 0.5,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "OK"
+      "notes": "Mismatch: expected high, got suspicious (score 65)"
     },
     {
       "id": "SCAM-011",
@@ -664,7 +675,7 @@
       "actualRiskCategory": "low",
       "riskScore": 18,
       "expectedScamType": "INVESTMENT_SCAM",
-      "actualScamType": "INVESTMENT_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
       "expectedDnaFeatures": [
         "financial_lure",
         "urgency",
@@ -674,7 +685,7 @@
         "financial_lure"
       ],
       "isRiskCategoryCorrect": false,
-      "isScamTypeCorrect": true,
+      "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": true,
       "dnaTruePositives": 1,
@@ -934,10 +945,10 @@
       "category": "scam",
       "dialect": "arabizi",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "low",
-      "riskScore": 20,
+      "actualRiskCategory": "high",
+      "riskScore": 78,
       "expectedScamType": "ACCOUNT_TAKEOVER",
-      "actualScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "BANK_IMPERSONATION",
       "expectedDnaFeatures": [
         "credential_request",
         "financial_lure",
@@ -945,23 +956,25 @@
         "urgency"
       ],
       "actualDnaFeatures": [
+        "urgency",
+        "credential_request",
         "suspicious_url"
       ],
-      "isRiskCategoryCorrect": false,
+      "isRiskCategoryCorrect": true,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
-      "isFalseNegative": true,
-      "dnaTruePositives": 1,
+      "isFalseNegative": false,
+      "dnaTruePositives": 3,
       "dnaFalsePositives": 0,
-      "dnaFalseNegatives": 3,
+      "dnaFalseNegatives": 1,
       "dnaPrecision": 1,
-      "dnaRecall": 0.25,
-      "dnaF1": 0.4,
+      "dnaRecall": 0.75,
+      "dnaF1": 0.857,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 20)"
+      "notes": "OK"
     },
     {
       "id": "SCAM-021",
@@ -1039,7 +1052,7 @@
       "actualRiskCategory": "suspicious",
       "riskScore": 38,
       "expectedScamType": "SOCIAL_ENGINEERING",
-      "actualScamType": "DELIVERY_SCAM",
+      "actualScamType": "SOCIAL_ENGINEERING",
       "expectedDnaFeatures": [
         "impersonation",
         "threat_language",
@@ -1051,7 +1064,7 @@
         "suspicious_url"
       ],
       "isRiskCategoryCorrect": false,
-      "isScamTypeCorrect": false,
+      "isScamTypeCorrect": true,
       "isFalsePositive": false,
       "isFalseNegative": false,
       "dnaTruePositives": 2,
@@ -1106,19 +1119,21 @@
       "dialect": "msa",
       "expectedRiskCategory": "suspicious",
       "actualRiskCategory": "low",
-      "riskScore": 0,
+      "riskScore": 8,
       "expectedScamType": "ACCOUNT_TAKEOVER",
-      "actualScamType": "UNKNOWN",
+      "actualScamType": "SOCIAL_ENGINEERING",
       "expectedDnaFeatures": [
         "suspicious_url"
       ],
-      "actualDnaFeatures": [],
+      "actualDnaFeatures": [
+        "action_pressure"
+      ],
       "isRiskCategoryCorrect": false,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": true,
       "dnaTruePositives": 0,
-      "dnaFalsePositives": 0,
+      "dnaFalsePositives": 1,
       "dnaFalseNegatives": 1,
       "dnaPrecision": 0,
       "dnaRecall": 0,
@@ -1127,7 +1142,7 @@
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 0)"
+      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 8)"
     },
     {
       "id": "SCAM-026",
@@ -1238,22 +1253,24 @@
       "dialect": "msa",
       "expectedRiskCategory": "high",
       "actualRiskCategory": "low",
-      "riskScore": 0,
+      "riskScore": 8,
       "expectedScamType": "GOVERNMENT_IMPERSONATION",
-      "actualScamType": "UNKNOWN",
+      "actualScamType": "SOCIAL_ENGINEERING",
       "expectedDnaFeatures": [
         "impersonation",
         "threat_language",
         "urgency",
         "suspicious_url"
       ],
-      "actualDnaFeatures": [],
+      "actualDnaFeatures": [
+        "action_pressure"
+      ],
       "isRiskCategoryCorrect": false,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": true,
       "dnaTruePositives": 0,
-      "dnaFalsePositives": 0,
+      "dnaFalsePositives": 1,
       "dnaFalseNegatives": 4,
       "dnaPrecision": 0,
       "dnaRecall": 0,
@@ -1262,7 +1279,7 @@
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 0)"
+      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 8)"
     },
     {
       "id": "SCAM-030",
@@ -1271,7 +1288,7 @@
       "dialect": "arabizi",
       "expectedRiskCategory": "high",
       "actualRiskCategory": "low",
-      "riskScore": 20,
+      "riskScore": 28,
       "expectedScamType": "FAKE_PRIZE",
       "actualScamType": "SOCIAL_ENGINEERING",
       "expectedDnaFeatures": [
@@ -1281,23 +1298,24 @@
         "impersonation"
       ],
       "actualDnaFeatures": [
-        "suspicious_url"
+        "suspicious_url",
+        "action_pressure"
       ],
       "isRiskCategoryCorrect": false,
       "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": true,
       "dnaTruePositives": 1,
-      "dnaFalsePositives": 0,
+      "dnaFalsePositives": 1,
       "dnaFalseNegatives": 3,
-      "dnaPrecision": 1,
+      "dnaPrecision": 0.5,
       "dnaRecall": 0.25,
-      "dnaF1": 0.4,
+      "dnaF1": 0.333,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 20)"
+      "notes": "🚨 FALSE NEGATIVE: Scam missed as low risk (score 28)"
     },
     {
       "id": "SCAM-031",
@@ -1606,7 +1624,7 @@
       "actualRiskCategory": "suspicious",
       "riskScore": 30,
       "expectedScamType": "UNKNOWN",
-      "actualScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "ACCOUNT_TAKEOVER",
       "expectedDnaFeatures": [],
       "actualDnaFeatures": [
         "credential_request"
@@ -1717,20 +1735,18 @@
       "category": "legitimate",
       "dialect": "msa",
       "expectedRiskCategory": "low",
-      "actualRiskCategory": "suspicious",
-      "riskScore": 32,
+      "actualRiskCategory": "low",
+      "riskScore": 0,
       "expectedScamType": "UNKNOWN",
-      "actualScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "UNKNOWN",
       "expectedDnaFeatures": [],
-      "actualDnaFeatures": [
-        "otp_request"
-      ],
-      "isRiskCategoryCorrect": false,
-      "isScamTypeCorrect": false,
-      "isFalsePositive": true,
+      "actualDnaFeatures": [],
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
+      "isFalsePositive": false,
       "isFalseNegative": false,
       "dnaTruePositives": 0,
-      "dnaFalsePositives": 1,
+      "dnaFalsePositives": 0,
       "dnaFalseNegatives": 0,
       "dnaPrecision": 0,
       "dnaRecall": 0,
@@ -1739,7 +1755,7 @@
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "⚠️ FALSE POSITIVE: Legitimate flagged as suspicious (score 32)"
+      "notes": "OK"
     },
     {
       "id": "LEGIT-012",
@@ -1972,17 +1988,19 @@
       "dialect": "msa",
       "expectedRiskCategory": "low",
       "actualRiskCategory": "low",
-      "riskScore": 0,
+      "riskScore": 22,
       "expectedScamType": "UNKNOWN",
-      "actualScamType": "UNKNOWN",
+      "actualScamType": "PAYMENT_SCAM",
       "expectedDnaFeatures": [],
-      "actualDnaFeatures": [],
+      "actualDnaFeatures": [
+        "suspicious_payment_request"
+      ],
       "isRiskCategoryCorrect": true,
-      "isScamTypeCorrect": true,
+      "isScamTypeCorrect": false,
       "isFalsePositive": false,
       "isFalseNegative": false,
       "dnaTruePositives": 0,
-      "dnaFalsePositives": 0,
+      "dnaFalsePositives": 1,
       "dnaFalseNegatives": 0,
       "dnaPrecision": 0,
       "dnaRecall": 0,
@@ -2114,19 +2132,17 @@
       "dialect": "msa",
       "expectedRiskCategory": "low",
       "actualRiskCategory": "low",
-      "riskScore": 18,
+      "riskScore": 0,
       "expectedScamType": "UNKNOWN",
-      "actualScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "UNKNOWN",
       "expectedDnaFeatures": [],
-      "actualDnaFeatures": [
-        "urgency"
-      ],
+      "actualDnaFeatures": [],
       "isRiskCategoryCorrect": true,
-      "isScamTypeCorrect": false,
+      "isScamTypeCorrect": true,
       "isFalsePositive": false,
       "isFalseNegative": false,
       "dnaTruePositives": 0,
-      "dnaFalsePositives": 1,
+      "dnaFalsePositives": 0,
       "dnaFalseNegatives": 0,
       "dnaPrecision": 0,
       "dnaRecall": 0,
@@ -2230,29 +2246,32 @@
       "dialect": "msa",
       "expectedRiskCategory": "suspicious",
       "actualRiskCategory": "low",
-      "riskScore": 0,
+      "riskScore": 26,
       "expectedScamType": "JOB_SCAM",
-      "actualScamType": "UNKNOWN",
+      "actualScamType": "JOB_SCAM",
       "expectedDnaFeatures": [
         "financial_lure",
         "unexpected_contact"
       ],
-      "actualDnaFeatures": [],
+      "actualDnaFeatures": [
+        "financial_lure",
+        "action_pressure"
+      ],
       "isRiskCategoryCorrect": false,
-      "isScamTypeCorrect": false,
+      "isScamTypeCorrect": true,
       "isFalsePositive": false,
       "isFalseNegative": false,
-      "dnaTruePositives": 0,
-      "dnaFalsePositives": 0,
-      "dnaFalseNegatives": 2,
-      "dnaPrecision": 0,
-      "dnaRecall": 0,
-      "dnaF1": 0,
+      "dnaTruePositives": 1,
+      "dnaFalsePositives": 1,
+      "dnaFalseNegatives": 1,
+      "dnaPrecision": 0.5,
+      "dnaRecall": 0.5,
+      "dnaF1": 0.5,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "Mismatch: expected suspicious, got low (score 0)"
+      "notes": "Mismatch: expected suspicious, got low (score 26)"
     },
     {
       "id": "ADV-008",
@@ -2260,10 +2279,10 @@
       "category": "ambiguous",
       "dialect": "arabizi",
       "expectedRiskCategory": "high",
-      "actualRiskCategory": "low",
-      "riskScore": 20,
+      "actualRiskCategory": "high",
+      "riskScore": 100,
       "expectedScamType": "BANK_IMPERSONATION",
-      "actualScamType": "SOCIAL_ENGINEERING",
+      "actualScamType": "BANK_IMPERSONATION",
       "expectedDnaFeatures": [
         "otp_request",
         "urgency",
@@ -2271,23 +2290,26 @@
         "impersonation"
       ],
       "actualDnaFeatures": [
+        "urgency",
+        "otp_request",
+        "impersonation",
         "suspicious_url"
       ],
-      "isRiskCategoryCorrect": false,
-      "isScamTypeCorrect": false,
+      "isRiskCategoryCorrect": true,
+      "isScamTypeCorrect": true,
       "isFalsePositive": false,
       "isFalseNegative": false,
-      "dnaTruePositives": 1,
+      "dnaTruePositives": 4,
       "dnaFalsePositives": 0,
-      "dnaFalseNegatives": 3,
+      "dnaFalseNegatives": 0,
       "dnaPrecision": 1,
-      "dnaRecall": 0.25,
-      "dnaF1": 0.4,
+      "dnaRecall": 1,
+      "dnaF1": 1,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "Mismatch: expected high, got low (score 20)"
+      "notes": "OK"
     },
     {
       "id": "ADV-009",
@@ -2325,31 +2347,33 @@
       "category": "ambiguous",
       "dialect": "msa",
       "expectedRiskCategory": "suspicious",
-      "actualRiskCategory": "low",
-      "riskScore": 20,
+      "actualRiskCategory": "suspicious",
+      "riskScore": 35,
       "expectedScamType": "SOCIAL_ENGINEERING",
       "actualScamType": "SOCIAL_ENGINEERING",
       "expectedDnaFeatures": [
         "suspicious_url"
       ],
       "actualDnaFeatures": [
-        "suspicious_url"
+        "suspicious_url",
+        "unexpected_contact",
+        "action_pressure"
       ],
-      "isRiskCategoryCorrect": false,
+      "isRiskCategoryCorrect": true,
       "isScamTypeCorrect": true,
       "isFalsePositive": false,
       "isFalseNegative": false,
       "dnaTruePositives": 1,
-      "dnaFalsePositives": 0,
+      "dnaFalsePositives": 2,
       "dnaFalseNegatives": 0,
-      "dnaPrecision": 1,
+      "dnaPrecision": 0.333,
       "dnaRecall": 1,
-      "dnaF1": 1,
+      "dnaF1": 0.5,
       "aiConfidence": null,
       "extractionConfidence": null,
       "isExtractionFailure": false,
       "isIndeterminate": false,
-      "notes": "Mismatch: expected suspicious, got low (score 20)"
+      "notes": "OK"
     },
     {
       "id": "ADV-011",

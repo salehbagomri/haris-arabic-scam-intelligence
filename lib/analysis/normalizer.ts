@@ -77,15 +77,21 @@ export function deduplicateRepeatedChars(text: string): { cleaned: string; wasPr
  * Detect and resolve intentional obfuscation (e.g., spaces or dots between Arabic letters: "ح س ا ب ك" or "ح.س.ا.ب.ك")
  */
 export function resolveObfuscation(text: string): { cleaned: string; detected: boolean } {
-  // Detect single Arabic letters separated by spaces or dots/dashes (at least 3 letters in a standalone sequence)
+  // 1. Detect single Arabic letters separated by spaces or dots/dashes (at least 3 letters in a standalone sequence)
   const singleLetterSpacedRegex = /(?<=\s|^)(?:[\u0600-\u06FF][ ._\-]){2,}[\u0600-\u06FF](?=\s|$|[.,!؟])/gu;
-  const detected = singleLetterSpacedRegex.test(text);
+  let detected = singleLetterSpacedRegex.test(text);
 
   let cleaned = text;
   if (detected) {
     cleaned = cleaned.replace(singleLetterSpacedRegex, (match) => {
       return match.replace(/[ ._\-]/g, '');
     });
+  }
+
+  // 2. Detect Cyrillic/Latin homoglyphs mixed directly into Arabic words (e.g. Cyrillic \u0430 in إشعаر or إيقаف)
+  const homoglyphRegex = /[\u0600-\u06FF][\u0400-\u04FF]|[\u0400-\u04FF][\u0600-\u06FF]/u;
+  if (homoglyphRegex.test(cleaned)) {
+    detected = true;
   }
 
   return { cleaned, detected };
@@ -126,6 +132,14 @@ export function normalizeArabizi(text: string): { cleaned: string; detected: boo
       detected = true;
       // Replace leading 7 with ح, 3 with ع if prepended to Arabic
       return w.replace(/^7(?=[\u0600-\u06FF])/, 'ح').replace(/^3(?=[\u0600-\u06FF])/, 'ع');
+    }
+    // Conservative Arabizi pattern detection for latin words containing Arabizi numbers
+    if (
+      /\b(?:ya\s+5oy|7sabk|7ot|t36l|sh7ntak|eb3t|rkm|karta|rosoom|twseel|twsil|tdfe3|bsor3a|fzt|rb7t)\b/i.test(w) ||
+      /\b[23578][a-zA-Z]{2,}\b/i.test(w) ||
+      /\b[a-zA-Z]{2,}[23578][a-zA-Z]+\b/i.test(w)
+    ) {
+      detected = true;
     }
     return w;
   });
@@ -186,7 +200,7 @@ export function normalizeArabicText(input: string): NormalizedTextResult {
 
   // 2. Remove zero-width characters and invisible control formatting
   let processed = originalText
-    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ')
+    .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF\u00A0]/g, ' ')
     .replace(/\r\n/g, '\n');
 
   // 3. Strip Arabic diacritics and tatweel

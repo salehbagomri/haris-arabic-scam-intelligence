@@ -9,24 +9,25 @@ interface AnalysisLoadingProps {
 }
 
 const STAGES = [
-  { id: 1, title: 'فهم المحتوى والسياق اللغوي واللهجات...' },
-  { id: 2, title: 'استخراج المؤشرات التقنية وفحص الروابط سلبياً...' },
-  { id: 3, title: 'تحليل نمط الاحتيال واستخراج بصمة Scam DNA...' },
-  { id: 4, title: 'احتساب درجة الاشتباه وصياغة التوصيات الوقائية...' },
+  { id: 1, title: 'معالجة وتطبيع المحتوى العربي (Arabic Normalization)' },
+  { id: 2, title: 'استخراج المؤشرات والأدلة التقنية (Technical Evidence)' },
+  { id: 3, title: 'التحليل الدلالي واستدلال السياق (Semantic Analysis)' },
+  { id: 4, title: 'مطابقة بصمة الاحتيال وبناء التهديد (Scam DNA)' },
+  { id: 5, title: 'احتساب درجة الاشتباه والتقييم النهائي (Risk Assessment)' },
 ];
 
-export function AnalysisLoading({ onComplete, speedMs = 600 }: AnalysisLoadingProps) {
+export function AnalysisLoading({ onComplete, speedMs = 140 }: AnalysisLoadingProps) {
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentStageIndex((prev) => {
-        if (prev < STAGES.length - 1) {
+        if (prev < STAGES.length) {
           return prev + 1;
         } else {
           clearInterval(timer);
           if (onComplete) {
-            setTimeout(onComplete, 400);
+            onComplete();
           }
           return prev;
         }

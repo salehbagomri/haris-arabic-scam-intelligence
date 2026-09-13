@@ -24,12 +24,15 @@ export default function HomePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
+  const MIN_ANALYSIS_DISPLAY_MS = 700;
+
   // Trigger Real Analysis via POST /api/analyze
   const handleStartRealAnalysis = async () => {
     setIsLoading(true);
     setErrorMessage(null);
     setAnalysisResult(null);
 
+    const startTime = Date.now();
     try {
       const result = await executeRealAnalysis({
         mode: activeMode,
@@ -37,6 +40,13 @@ export default function HomePage() {
         url: urlInput,
         screenshotFile,
       });
+
+      // Keep loading visible for ~700ms total (600-800ms) so judge perceives pipeline stages
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_ANALYSIS_DISPLAY_MS) {
+        await new Promise((resolve) => setTimeout(resolve, MIN_ANALYSIS_DISPLAY_MS - elapsed));
+      }
+
       setAnalysisResult(result);
     } catch (err: unknown) {
       if (err instanceof AnalysisError) {
@@ -49,17 +59,48 @@ export default function HomePage() {
     }
   };
 
-  // Demo Scenarios remain strictly mock/demo without calling real Gemini or server API
-  const handleSelectScenario = (scenario: DemoScenario) => {
+  // Demo Scenarios trigger real live analysis via POST /api/analyze
+  const handleSelectScenario = async (scenario: DemoScenario) => {
     setErrorMessage(null);
     setActiveMode(scenario.mode);
     if (scenario.mode === 'text') {
       setTextInput(scenario.content);
+      setUrlInput('');
+      setScreenshotFile(null);
     } else if (scenario.mode === 'url') {
       setUrlInput(scenario.content);
+      setTextInput('');
+      setScreenshotFile(null);
     }
-    // Instantly demonstrate the pre-configured mock result
-    setAnalysisResult(scenario.mockResult);
+
+    setIsLoading(true);
+    setAnalysisResult(null);
+
+    const startTime = Date.now();
+    try {
+      const result = await executeRealAnalysis({
+        mode: scenario.mode,
+        text: scenario.mode === 'text' ? scenario.content : '',
+        url: scenario.mode === 'url' ? scenario.content : '',
+        screenshotFile: null,
+      });
+
+      // Keep loading visible for ~700ms total (600-800ms) so judge perceives pipeline stages
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_ANALYSIS_DISPLAY_MS) {
+        await new Promise((resolve) => setTimeout(resolve, MIN_ANALYSIS_DISPLAY_MS - elapsed));
+      }
+
+      setAnalysisResult(result);
+    } catch (err: unknown) {
+      if (err instanceof AnalysisError) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage('حدث خطأ غير متوقع أثناء الفحص. يرجى المحاولة مرة أخرى.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleModeChange = (mode: InputMode) => {

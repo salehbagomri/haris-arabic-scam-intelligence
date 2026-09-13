@@ -32,6 +32,7 @@ import {
 export function normalizeForContainment(str: string): string {
   return str
     .toLowerCase()
+    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ') // Replace zero-width & invisible format characters with space
     .replace(/[\u064B-\u065F\u0670]/g, '') // Remove Arabic diacritics
     .replace(/\u0640/g, '') // Remove tatweel
     .replace(/[أإآ]/g, 'ا') // Normalize alif
@@ -270,18 +271,45 @@ export function calculateRedTeamSummary(
   const failedCasesCount = caseResults.filter((c) => c.hasFailure).length;
   const overallFailureRate = totalCases > 0 ? Number((failedCasesCount / totalCases).toFixed(3)) : 0;
 
+  // Benign cases (expected risk: low)
   const benignCases = caseResults.filter((c) => c.expectedRiskCategory === 'low');
+  const totalBenignCases = benignCases.length;
+  const determinateBenign = benignCases.filter((c) => !c.isIndeterminate);
+  const determinateBenignCases = determinateBenign.length;
+  const indeterminateBenign = benignCases.filter((c) => c.isIndeterminate);
+  const indeterminateBenignCases = indeterminateBenign.length;
   const falsePositivesCount = caseResults.filter((c) => c.isFalsePositive).length;
-  const falsePositiveRate =
-    benignCases.length > 0 ? Number((falsePositivesCount / benignCases.length).toFixed(3)) : 0;
+  const determinateFalsePositiveRate =
+    determinateBenignCases > 0
+      ? Number((falsePositivesCount / determinateBenignCases).toFixed(3))
+      : 0;
+  const totalCorpusFalsePositiveRate =
+    totalBenignCases > 0 ? Number((falsePositivesCount / totalBenignCases).toFixed(3)) : 0;
+  const falsePositiveRate = determinateFalsePositiveRate;
 
+  // Malicious cases (expected risk: suspicious or high)
   const maliciousCases = caseResults.filter((c) => c.expectedRiskCategory !== 'low');
+  const totalMaliciousCases = maliciousCases.length;
+  const determinateMalicious = maliciousCases.filter((c) => !c.isIndeterminate);
+  const determinateMaliciousCases = determinateMalicious.length;
+  const indeterminateMalicious = maliciousCases.filter((c) => c.isIndeterminate);
+  const indeterminateMaliciousCases = indeterminateMalicious.length;
   const falseNegativesCount = caseResults.filter((c) => c.isFalseNegative).length;
-  const falseNegativeRate =
-    maliciousCases.length > 0 ? Number((falseNegativesCount / maliciousCases.length).toFixed(3)) : 0;
+  const determinateFalseNegativeRate =
+    determinateMaliciousCases > 0
+      ? Number((falseNegativesCount / determinateMaliciousCases).toFixed(3))
+      : 0;
+  const totalCorpusFalseNegativeRate =
+    totalMaliciousCases > 0 ? Number((falseNegativesCount / totalMaliciousCases).toFixed(3)) : 0;
+  const falseNegativeRate = determinateFalseNegativeRate;
 
+  // Indeterminate rates
   const indeterminateCount = caseResults.filter((c) => c.isIndeterminate).length;
   const indeterminateRate = totalCases > 0 ? Number((indeterminateCount / totalCases).toFixed(3)) : 0;
+  const benignIndeterminateRate =
+    totalBenignCases > 0 ? Number((indeterminateBenignCases / totalBenignCases).toFixed(3)) : 0;
+  const maliciousIndeterminateRate =
+    totalMaliciousCases > 0 ? Number((indeterminateMaliciousCases / totalMaliciousCases).toFixed(3)) : 0;
 
   // Failure category breakdown
   const failuresByCategoryType: Record<AdversarialFailureCategory, number> = {
@@ -392,7 +420,7 @@ export function calculateRedTeamSummary(
     const recall =
       casesExpectingFeature.length > 0
         ? Number((casesDetectingFeature.length / casesExpectingFeature.length).toFixed(3))
-        : 1.0;
+        : null;
 
     dnaFeatureRecall.push({
       feature,
@@ -418,12 +446,24 @@ export function calculateRedTeamSummary(
     totalCases,
     failedCasesCount,
     overallFailureRate,
+    totalBenignCases,
+    determinateBenignCases,
+    indeterminateBenignCases,
     falsePositivesCount,
+    determinateFalsePositiveRate,
+    totalCorpusFalsePositiveRate,
     falsePositiveRate,
+    totalMaliciousCases,
+    determinateMaliciousCases,
+    indeterminateMaliciousCases,
     falseNegativesCount,
+    determinateFalseNegativeRate,
+    totalCorpusFalseNegativeRate,
     falseNegativeRate,
     indeterminateCount,
     indeterminateRate,
+    benignIndeterminateRate,
+    maliciousIndeterminateRate,
     totalFailuresCount,
     failuresByCategoryType,
     failuresBySeverity,

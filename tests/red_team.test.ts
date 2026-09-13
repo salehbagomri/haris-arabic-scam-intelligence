@@ -198,6 +198,135 @@ describe('HARIS Phase 6B: Evaluator Normalization & Evidence Integrity Checks', 
   });
 });
 
+describe('HARIS Phase 6B.1: Evaluation Integrity & Metric Corrections', () => {
+  it('1. strips zero-width spaces (\u200B, \u200C, \u200D, \uFEFF) in normalizeForContainment safely', () => {
+    const raw = 'تم\u200B\u200Bحظر\u200Cحسابك\u200Dالمصرفي\uFEFF';
+    const normalized = normalizeForContainment(raw);
+    assert.strictEqual(normalized, 'تم حظر حسابك المصرفي');
+  });
+
+  it('2. RED-017 is NOT flagged as an evidence integrity violation', async () => {
+    const item017 = RED_TEAM_DATASET.find((c) => c.id === 'RED-017');
+    assert.ok(item017, 'RED-017 must exist');
+    const result017 = await evaluateRedTeamItem(item017);
+    assert.strictEqual(
+      result017.evidenceIntegrityViolations.length,
+      0,
+      'RED-017 must have 0 evidence integrity violations after zero-width normalization'
+    );
+    assert.strictEqual(
+      result017.hasFailure,
+      false,
+      'RED-017 should pass all checks when grounded evidence is recognized'
+    );
+  });
+
+  it('3. RED-006 is verified as low risk with zero evidence integrity violations', async () => {
+    const item006 = RED_TEAM_DATASET.find((c) => c.id === 'RED-006');
+    assert.ok(item006, 'RED-006 must exist');
+    const result006 = await evaluateRedTeamItem(item006);
+    assert.strictEqual(
+      result006.evidenceIntegrityViolations.length,
+      0,
+      'RED-006 must have 0 evidence integrity violations after advisory polarity hardening'
+    );
+    assert.strictEqual(result006.actualRiskCategory, 'low', 'RED-006 must be classified as low risk');
+    assert.strictEqual(result006.isFalsePositive, false, 'RED-006 must not be a false positive');
+  });
+
+  it('4. calculates 0/0 DNA feature recall as null (N/A) with denominator = 0', () => {
+    const mockCase = {
+      id: 'MOCK-1',
+      title: 'Mock',
+      taxonomyCategory: 'brand_mention_no_impersonation' as RedTeamTaxonomyCategory,
+      taxonomyCategoryName: '1. Brand Mention',
+      dialect: 'msa' as const,
+      modality: 'text' as const,
+      expectedRiskCategory: 'low' as const,
+      actualRiskCategory: 'low' as const,
+      riskScore: 0,
+      expectedScamType: 'UNKNOWN' as const,
+      actualScamType: 'UNKNOWN',
+      expectedDnaFeatures: [],
+      actualDnaFeatures: [],
+      isRiskCategoryCorrect: true,
+      isScamTypeCorrect: true,
+      isFalsePositive: false,
+      isFalseNegative: false,
+      isIndeterminate: false,
+      evidenceItemsCount: 0,
+      evidenceItems: [],
+      uncertainties: [],
+      actionableAdvice: [],
+      aiConfidence: null,
+      extractionConfidence: null,
+      failures: [],
+      evidenceIntegrityViolations: [],
+      hasFailure: false,
+    };
+
+    const summary = calculateRedTeamSummary([mockCase], {
+      datasetVersion: '1.0.0',
+      datasetSha256: 'mock',
+      runnerVersion: '1.0.0',
+      evaluationSourceCommit: 'mock',
+      nodeVersion: 'v24',
+      pipelineMode: 'test',
+      geminiConfigured: false,
+    });
+
+    const suspiciousUrlRecall = summary.dnaFeatureRecall.find((f) => f.feature === 'suspicious_url');
+    assert.ok(suspiciousUrlRecall);
+    assert.strictEqual(suspiciousUrlRecall.expectedCount, 0);
+    assert.strictEqual(suspiciousUrlRecall.recall, null, 'Recall for 0 expected count must be null (N/A)');
+
+    const secrecyRecall = summary.dnaFeatureRecall.find((f) => f.feature === 'secrecy_pressure');
+    assert.ok(secrecyRecall);
+    assert.strictEqual(secrecyRecall.expectedCount, 0);
+    assert.strictEqual(secrecyRecall.recall, null, 'Recall for 0 expected count must be null (N/A)');
+  });
+
+  it('5. computes accurate determinate FPR (0/16) and improved determinate FNR across full corpus', async () => {
+    const caseResults = [];
+    for (const item of RED_TEAM_DATASET) {
+      caseResults.push(await evaluateRedTeamItem(item));
+    }
+
+    const summary = calculateRedTeamSummary(caseResults, {
+      datasetVersion: '1.0.0',
+      datasetSha256: 'test',
+      runnerVersion: '1.0.0',
+      evaluationSourceCommit: 'test',
+      nodeVersion: 'v24',
+      pipelineMode: 'test',
+      geminiConfigured: false,
+    });
+
+    // Benign counts & FPR
+    assert.strictEqual(summary.totalBenignCases, 19);
+    assert.strictEqual(summary.determinateBenignCases, 16);
+    assert.strictEqual(summary.indeterminateBenignCases, 3);
+    assert.strictEqual(summary.falsePositivesCount, 0, 'Determinate false positive count must be 0 after RED-006 fix');
+    assert.strictEqual(summary.determinateFalsePositiveRate, 0.0, 'Determinate FPR must be 0/16 = 0.0');
+    assert.strictEqual(summary.totalCorpusFalsePositiveRate, 0.0, 'Total-corpus FPR must be 0/19 = 0.0');
+
+    // Malicious counts & FNR
+    assert.strictEqual(summary.totalMaliciousCases, 29);
+    assert.strictEqual(summary.determinateMaliciousCases, 26);
+    assert.strictEqual(summary.indeterminateMaliciousCases, 3);
+    assert.ok(summary.determinateFalseNegativeRate <= 0.077, 'Determinate FNR must be <= 7.7%');
+
+    // Indeterminate breakdown
+    assert.strictEqual(summary.indeterminateCount, 6);
+    assert.strictEqual(summary.indeterminateRate, 0.125, 'Total indeterminate rate must be 6/48 = 0.125');
+    assert.strictEqual(summary.benignIndeterminateRate, 0.158, 'Benign indeterminate rate must be 3/19 = 0.158');
+    assert.strictEqual(summary.maliciousIndeterminateRate, 0.103, 'Malicious indeterminate rate must be 3/29 = 0.103');
+
+    // Evidence violations count
+    assert.strictEqual(summary.evidenceIntegrityViolationsCount, 0, 'Evidence integrity violations must be 0');
+  });
+});
+
 describe('HARIS Phase 6B: Baseline Benchmark Isolation Guarantee', () => {
   it('1. baseline 70-case dataset remains completely unmodified', () => {
     assert.strictEqual(EVALUATION_DATASET.length, 70, 'Baseline dataset must remain exactly 70 cases');

@@ -164,7 +164,7 @@ export function ResultsView({ result, onReset }: ResultsViewProps) {
       <EvidenceList evidence={result.evidence} />
 
       {/* Actionable Advice */}
-      <ActionableAdvice advice={result.actionableAdvice} />
+      <ActionableAdvice advice={result.actionableAdvice} riskLevel={result.riskLevel} />
 
       {/* Uncertainty Notice */}
       <UncertaintyNotice uncertainties={result.uncertainties} />

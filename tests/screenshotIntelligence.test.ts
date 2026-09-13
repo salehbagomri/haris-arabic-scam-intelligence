@@ -638,7 +638,8 @@ describe('HARIS Phase 4B: Screenshot Intelligence Tests', () => {
         { client: failingClient as any }
       );
 
-      assert.ok(result.uncertainties.some((u) => u.includes('Connection refused by vision service')));
+      assert.ok(result.uncertainties.some((u) => u.includes('فشل استخراج محتوى لقطة الشاشة')));
+      assert.ok(!result.uncertainties.some((u) => u.includes('Connection refused by vision service')));
       assert.ok(result.uncertainties.some((u) => u.includes('ولا تعني بأي حال من الأحوال أن الرسالة آمنة')));
     });
 

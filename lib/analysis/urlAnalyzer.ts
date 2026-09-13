@@ -75,6 +75,7 @@ const SUSPICIOUS_TLDS = new Set([
   'fit',
   'beauty',
   'sbs',
+  'club',
 ]);
 
 /**
@@ -170,6 +171,24 @@ const TARGET_BRANDS: BrandDefinition[] = [
     canonicalNameAr: 'شركة الاتصالات (stc)',
     keywords: ['stc', 'stcpay'],
     legitimateDomains: ['stc.com.sa', 'stc.com', 'stcpay.com.sa'],
+  },
+  {
+    brandKey: 'kuraimi',
+    canonicalNameAr: 'بنك الكريمي',
+    keywords: ['kuraimi', 'alkuraimi', 'كريمي', 'الكريمي'],
+    legitimateDomains: ['kuraimibank.com', 'alkuraimi.com'],
+  },
+  {
+    brandKey: 'whatsapp',
+    canonicalNameAr: 'واتساب (WhatsApp)',
+    keywords: ['whatsapp', 'wa.me', 'واتساب'],
+    legitimateDomains: ['whatsapp.com', 'wa.me'],
+  },
+  {
+    brandKey: 'generic_bank',
+    canonicalNameAr: 'جهة مصرفية / بنك',
+    keywords: ['bank-login', 'banklogin', 'bank-secure', 'banksecure', 'online-bank', 'ebank'],
+    legitimateDomains: [],
   },
 ];
 

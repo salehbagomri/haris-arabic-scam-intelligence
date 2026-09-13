@@ -165,7 +165,7 @@ export interface DnaFeatureRecallSummary {
   feature: FeatureKey;
   expectedCount: number;
   detectedCount: number;
-  recall: number;
+  recall: number | null;
 }
 
 export interface RedTeamBenchmarkSummary {
@@ -183,12 +183,24 @@ export interface RedTeamBenchmarkSummary {
   totalCases: number;
   failedCasesCount: number;
   overallFailureRate: number;
+  totalBenignCases: number;
+  determinateBenignCases: number;
+  indeterminateBenignCases: number;
   falsePositivesCount: number;
+  determinateFalsePositiveRate: number;
+  totalCorpusFalsePositiveRate: number;
   falsePositiveRate: number;
+  totalMaliciousCases: number;
+  determinateMaliciousCases: number;
+  indeterminateMaliciousCases: number;
   falseNegativesCount: number;
+  determinateFalseNegativeRate: number;
+  totalCorpusFalseNegativeRate: number;
   falseNegativeRate: number;
   indeterminateCount: number;
   indeterminateRate: number;
+  benignIndeterminateRate: number;
+  maliciousIndeterminateRate: number;
   totalFailuresCount: number;
   failuresByCategoryType: Record<AdversarialFailureCategory, number>;
   failuresBySeverity: Record<FailureSeverity, number>;

@@ -10,6 +10,14 @@ export const VISION_CONFIG = {
   /** Maximum image payload size in bytes (10 MB) */
   maxImageSizeBytes: 10 * 1024 * 1024,
 
+  /**
+   * Maximum character length of screenshot Base64/Data URL data string in API requests (SEC-FIND-05).
+   * Accommodates up to 11 MB decoded image (15,379,138 chars Base64) with Data URL overhead,
+   * allowing domain-level 10MB decoded verification to enforce 413, while capping raw string
+   * length before reaching the 16MB raw HTTP body limit.
+   */
+  maxScreenshotDataLength: 15500000,
+
   /** Supported image MIME types for visual extraction */
   allowedMimeTypes: [
     'image/png',

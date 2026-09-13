@@ -20,6 +20,7 @@ import {
 } from '../ai';
 import { ScreenshotInput, ScreenshotExtractionData } from './schema';
 import { extractScreenshotContent } from './analyzer';
+import { sanitizeToUserSafeUncertainty, USER_SAFE_ERROR_MESSAGES } from '../security/safeErrors';
 
 export interface UnifiedAnalysisInput {
   text?: string;
@@ -67,20 +68,20 @@ export async function analyzeUnified(
 
   // 3. Early structured fallback if ONLY a screenshot was provided and extraction failed
   if (!aggregatedText && !input.url && input.screenshot && !visualData) {
-    const reason = visualFallbackReason || 'تعذر استخراج أو قراءة محتوى لقطة الشاشة المرفقة.';
     const emptyDeterministic = analyzeDeterministic({});
+    const safeReason = sanitizeToUserSafeUncertainty(visualFallbackReason);
     return fuseEvidenceAndAssess(emptyDeterministic, null, {
-      fallbackReason: reason,
+      fallbackReason: visualFallbackReason,
       visualData: null,
       isExtractionFailure: true,
-      overrideInterpretation: `تعذر استخراج أو قراءة محتوى لقطة الشاشة المرفقة (${reason}). لم يتم التحقق من سلامة المحتوى ولا يعتبر ذلك مؤشراً على أمان الرسالة.`,
+      overrideInterpretation: USER_SAFE_ERROR_MESSAGES.INTERPRETATION_EXTRACTION_FAILED,
       additionalAdvice: [
         'يرجى إعادة رفع لقطة شاشة بدقة أعلى وأكثر وضوحاً، مع التأكد من وضوح النصوص والإضاءة.',
         'يمكنك نسخ نص الرسالة أو الرابط المريب ولصقه مباشرة في حقل الفحص لإجراء فحص أمني دقيق ومباشر.',
       ],
       additionalUncertainties: [
-        `فشل استخراج محتوى لقطة الشاشة: ${reason}`,
-        'نتيجة الفحص غير محددة لتعذر قراءة الصورة ولا تعني بأي حال من الأحوال أن الرسالة آمنة.',
+        `فشل استخراج محتوى لقطة الشاشة: ${safeReason}`,
+        USER_SAFE_ERROR_MESSAGES.UNREADABLE_IMAGE_DISCLAIMER,
       ],
     });
   }
@@ -144,7 +145,7 @@ export async function analyzeUnified(
       maxAiScoreContribution: options.maxAiScoreContribution,
       maxVisualScoreContribution: options.maxVisualScoreContribution,
       additionalUncertainties: visualFallbackReason
-        ? [`فشل استخراج لقطة الشاشة (${visualFallbackReason})، واعتمد التحليل على النص/الرابط المدخل فقط.`]
+        ? [USER_SAFE_ERROR_MESSAGES.PARTIAL_EXTRACTION_WARNING]
         : undefined,
     }
   );

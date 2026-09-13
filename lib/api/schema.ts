@@ -33,7 +33,11 @@ export const screenshotPayloadSchema = z
     data: z
       .string()
       .trim()
-      .min(1, 'Screenshot data cannot be empty'),
+      .min(1, 'Screenshot data cannot be empty')
+      .max(
+        VISION_CONFIG.maxScreenshotDataLength,
+        `Screenshot data exceeds maximum permitted length of ${VISION_CONFIG.maxScreenshotDataLength} characters`
+      ),
   })
   .strict();
 

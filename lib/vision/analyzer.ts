@@ -11,6 +11,7 @@ import { ScreenshotInput, ScreenshotExtractionData } from './schema';
 import { HARIS_VISION_SYSTEM_PROMPT, HARIS_VISION_USER_PROMPT } from './prompts';
 import { parseAndValidateVisionOutput } from './parser';
 import { validateImageConstraints, VISION_CONFIG } from '../config/vision';
+import { sanitizeInternalErrorMessage } from '../security/safeErrors';
 
 export interface VisionExecutionResult {
   success: boolean;
@@ -141,7 +142,7 @@ export async function extractScreenshotContent(
       success: false,
       fallbackReason: isTimeout
         ? `Vision analysis timed out after ${timeoutMs}ms.`
-        : `Vision execution error: ${errorMessage}`,
+        : `Vision execution error: ${sanitizeInternalErrorMessage(errorMessage)}`,
     };
   }
 }

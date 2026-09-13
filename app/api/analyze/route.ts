@@ -9,6 +9,9 @@
 import { analyzeRequestSchema, AnalyzeResponse } from '../../../lib/api/schema';
 import { analyzeUnified, UnifiedPipelineOptions, ScreenshotInput } from '../../../lib/vision';
 import { VISION_CONFIG } from '../../../lib/config/vision';
+import { checkRateLimit, getClientIdentifier, resetRateLimiter, setRateLimitConfigForTesting } from '../../../lib/security/rateLimiter';
+import { readAndParseJsonWithLimit, setRawBodyLimitBytesForTesting } from '../../../lib/security/bodyLimiter';
+import { getSecurityHeadersMap } from '../../../lib/security/headers';
 
 export interface ApiResponsePayload {
   status: number;
@@ -23,6 +26,8 @@ let analyzePipelineFn = analyzeUnified;
 export function setAnalyzePipelineForTesting(fn: typeof analyzeUnified | null): void {
   analyzePipelineFn = fn || analyzeUnified;
 }
+
+export { resetRateLimiter, setRateLimitConfigForTesting, setRawBodyLimitBytesForTesting };
 
 /**
  * Core analysis handler shared by HTTP route and programmatic invocation
@@ -217,22 +222,61 @@ export async function handleAnalyze(
  */
 export async function POST(request: Request): Promise<Response> {
   try {
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch {
+    // 0. Pre-parsing Rate Limiting check (protects against memory, CPU, and quota exhaustion)
+    const clientIp = getClientIdentifier(request);
+    const rateLimit = checkRateLimit(clientIp);
+
+    const securityHeaders = getSecurityHeadersMap();
+
+    if (!rateLimit.allowed) {
       return Response.json(
-        { error: 'Invalid JSON payload in request body.' },
-        { status: 400 }
+        {
+          error: `Too many requests. Rate limit exceeded (${rateLimit.limit} requests per minute). Please try again in ${rateLimit.retryAfterSeconds} seconds.`,
+        },
+        {
+          status: 429,
+          headers: {
+            ...securityHeaders,
+            'Retry-After': String(rateLimit.retryAfterSeconds),
+            'X-RateLimit-Limit': String(rateLimit.limit),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(rateLimit.resetTime),
+          },
+        }
       );
     }
 
-    const result = await handleAnalyze(body);
-    return Response.json(result.data, { status: result.status });
+    const responseHeaders = {
+      ...securityHeaders,
+      'X-RateLimit-Limit': String(rateLimit.limit),
+      'X-RateLimit-Remaining': String(rateLimit.remaining),
+      'X-RateLimit-Reset': String(rateLimit.resetTime),
+    };
+
+    // 1. Raw Body Limit & Bounded Stream Reader (protects against large body buffer allocation)
+    const bodyResult = await readAndParseJsonWithLimit(request);
+    if (!bodyResult.ok) {
+      return Response.json(
+        { error: bodyResult.error },
+        {
+          status: bodyResult.status ?? 400,
+          headers: responseHeaders,
+        }
+      );
+    }
+
+    const result = await handleAnalyze(bodyResult.data);
+    return Response.json(result.data, {
+      status: result.status,
+      headers: responseHeaders,
+    });
   } catch {
     return Response.json(
       { error: 'An unexpected internal error occurred during analysis.' },
-      { status: 500 }
+      {
+        status: 500,
+        headers: getSecurityHeadersMap(),
+      }
     );
   }
 }

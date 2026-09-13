@@ -83,6 +83,18 @@ export function classifyScamType(
     return 'UNKNOWN';
   }
 
+  const combinedEvidence = evidenceTexts.join(' ').toLowerCase();
+
+  // 0. Specific Account / Wallet Takeover Check (takes precedence when explicit OTP or credential theft occurs under threat targeting wallet)
+  if (
+    (detectedFeatures.includes('otp_request') && detectedFeatures.includes('secrecy_pressure')) ||
+    (detectedFeatures.includes('threat_language') &&
+      (detectedFeatures.includes('credential_request') || detectedFeatures.includes('otp_request')) &&
+      combinedEvidence.includes('محفظ'))
+  ) {
+    return 'ACCOUNT_TAKEOVER';
+  }
+
   // Use URL brand spoofing signals if present from ANY analyzed URL
   for (const u of urlsList) {
     if (u.brandSpoofing.detected) {
@@ -90,7 +102,14 @@ export function classifyScamType(
       if (brand.includes('البريد') || brand.includes('أرامكس') || brand.includes('DHL')) {
         return 'DELIVERY_SCAM';
       }
-      if (brand.includes('الراجحي') || brand.includes('الأهلي') || brand.includes('الرياض') || brand.includes('الإنماء')) {
+      if (
+        brand.includes('الراجحي') ||
+        brand.includes('الأهلي') ||
+        brand.includes('الرياض') ||
+        brand.includes('الإنماء') ||
+        brand.includes('مصرف') ||
+        brand.includes('بنك')
+      ) {
         return 'BANK_IMPERSONATION';
       }
       if (brand.includes('أبشر') || brand.includes('الزكاة')) {
@@ -99,9 +118,22 @@ export function classifyScamType(
     }
   }
 
-  const combinedEvidence = evidenceTexts.join(' ').toLowerCase();
+  // 1. Government Impersonation
+  if (
+    detectedFeatures.includes('impersonation') &&
+    (combinedEvidence.includes('ابشر') ||
+      combinedEvidence.includes('زكاه') ||
+      combinedEvidence.includes('قضاء') ||
+      combinedEvidence.includes('قضائ') ||
+      combinedEvidence.includes('قبض') ||
+      combinedEvidence.includes('وزاره') ||
+      combinedEvidence.includes('هيئ') ||
+      combinedEvidence.includes('منصه'))
+  ) {
+    return 'GOVERNMENT_IMPERSONATION';
+  }
 
-  // 1. Delivery Scam Check
+  // 1b. Delivery Scam Check
   if (
     detectedFeatures.includes('suspicious_payment_request') &&
     (combinedEvidence.includes('شحن') ||
@@ -111,6 +143,19 @@ export function classifyScamType(
       combinedEvidence.includes('delivery'))
   ) {
     return 'DELIVERY_SCAM';
+  }
+
+  // 1c. Payment Scam Check
+  if (
+    detectedFeatures.includes('suspicious_payment_request') &&
+    (combinedEvidence.includes('حواله') ||
+      combinedEvidence.includes('تحويل') ||
+      combinedEvidence.includes('رسوم') ||
+      combinedEvidence.includes('سداد') ||
+      combinedEvidence.includes('دفع') ||
+      combinedEvidence.includes('غرام'))
+  ) {
+    return 'PAYMENT_SCAM';
   }
 
   // 2. Bank Impersonation Check
@@ -124,7 +169,11 @@ export function classifyScamType(
       combinedEvidence.includes('بطاق') ||
       combinedEvidence.includes('حساب') ||
       combinedEvidence.includes('الراجحي') ||
-      combinedEvidence.includes('الاهلي')
+      combinedEvidence.includes('الاهلي') ||
+      combinedEvidence.includes('bank') ||
+      combinedEvidence.includes('7sab') ||
+      combinedEvidence.includes('كريمي') ||
+      combinedEvidence.includes('مدى')
     ) {
       return 'BANK_IMPERSONATION';
     }
@@ -133,13 +182,30 @@ export function classifyScamType(
   // 3. Fake Prize / Lottery Check
   if (
     detectedFeatures.includes('financial_lure') &&
-    (detectedFeatures.includes('action_pressure') || detectedFeatures.includes('suspicious_url'))
+    (detectedFeatures.includes('action_pressure') ||
+      detectedFeatures.includes('suspicious_url') ||
+      detectedFeatures.includes('credential_request') ||
+      detectedFeatures.includes('unexpected_contact') ||
+      detectedFeatures.includes('impersonation'))
   ) {
     if (
       combinedEvidence.includes('مبروك') ||
       combinedEvidence.includes('جائز') ||
       combinedEvidence.includes('ربحت') ||
-      combinedEvidence.includes('قسيم')
+      combinedEvidence.includes('فزت') ||
+      combinedEvidence.includes('كسبت') ||
+      combinedEvidence.includes('قسيم') ||
+      combinedEvidence.includes('mbroo') ||
+      combinedEvidence.includes('mabroo') ||
+      combinedEvidence.includes('fzt') ||
+      combinedEvidence.includes('prize') ||
+      combinedEvidence.includes('باق') ||
+      combinedEvidence.includes('مجان') ||
+      combinedEvidence.includes('منح') ||
+      combinedEvidence.includes('شيك') ||
+      combinedEvidence.includes('سحب') ||
+      combinedEvidence.includes('gift') ||
+      combinedEvidence.includes('claim')
     ) {
       return 'FAKE_PRIZE';
     }
@@ -151,26 +217,50 @@ export function classifyScamType(
     (combinedEvidence.includes('استثمار') ||
       combinedEvidence.includes('تداول') ||
       combinedEvidence.includes('ارباح') ||
-      combinedEvidence.includes('دخل'))
+      combinedEvidence.includes('دخل') ||
+      combinedEvidence.includes('اضعاف') ||
+      combinedEvidence.includes('مستثمر') ||
+      combinedEvidence.includes('اسهم'))
   ) {
     return 'INVESTMENT_SCAM';
   }
 
-  // 5. Account Takeover Check
-  if (detectedFeatures.includes('otp_request') && detectedFeatures.includes('secrecy_pressure')) {
-    return 'ACCOUNT_TAKEOVER';
+  // 4b. Job Scam Check
+  if (
+    detectedFeatures.includes('financial_lure') &&
+    (combinedEvidence.includes('وظيفة') ||
+      combinedEvidence.includes('توظيف') ||
+      combinedEvidence.includes('تجنيد') ||
+      combinedEvidence.includes('تقييم') ||
+      combinedEvidence.includes('عمل بسيط') ||
+      combinedEvidence.includes('من المنزل') ||
+      combinedEvidence.includes('راتب'))
+  ) {
+    return 'JOB_SCAM';
   }
 
-  // 6. Government Impersonation
+  // 5. Account Takeover Check
   if (
-    detectedFeatures.includes('impersonation') &&
-    (combinedEvidence.includes('ابشر') ||
-      combinedEvidence.includes('زكاه') ||
-      combinedEvidence.includes('قضاء') ||
-      combinedEvidence.includes('وزاره') ||
-      combinedEvidence.includes('منصه'))
+    (detectedFeatures.includes('otp_request') && detectedFeatures.includes('secrecy_pressure')) ||
+    (detectedFeatures.includes('otp_request') &&
+      (combinedEvidence.includes('واتساب') ||
+        combinedEvidence.includes('whatsapp') ||
+        combinedEvidence.includes('تيليجرام') ||
+        combinedEvidence.includes('telegram') ||
+        combinedEvidence.includes('انستغرام') ||
+        combinedEvidence.includes('instagram') ||
+        combinedEvidence.includes('استرجع') ||
+        combinedEvidence.includes('حسابي'))) ||
+    (detectedFeatures.includes('credential_request') &&
+      (combinedEvidence.includes('بريد') ||
+        combinedEvidence.includes('حساب') ||
+        combinedEvidence.includes('دخول') ||
+        combinedEvidence.includes('صلاحية') ||
+        combinedEvidence.includes('portal') ||
+        combinedEvidence.includes('auth') ||
+        combinedEvidence.includes('مرور')))
   ) {
-    return 'GOVERNMENT_IMPERSONATION';
+    return 'ACCOUNT_TAKEOVER';
   }
 
   // 7. General scoring against metadata primaryFeatures
@@ -179,6 +269,26 @@ export function classifyScamType(
 
   for (const [typeKey, meta] of Object.entries(SCAM_TYPES_METADATA)) {
     if (typeKey === 'UNKNOWN') continue;
+    // Guard DELIVERY_SCAM: must have delivery context
+    if (typeKey === 'DELIVERY_SCAM') {
+      const hasDeliveryContext =
+        combinedEvidence.includes('شحن') ||
+        combinedEvidence.includes('طرد') ||
+        combinedEvidence.includes('توصيل') ||
+        combinedEvidence.includes('بريد') ||
+        combinedEvidence.includes('سبل') ||
+        combinedEvidence.includes('ارامكس') ||
+        combinedEvidence.includes('dhl') ||
+        combinedEvidence.includes('smsa') ||
+        combinedEvidence.includes('delivery') ||
+        combinedEvidence.includes('shipping') ||
+        combinedEvidence.includes('package');
+      if (!hasDeliveryContext) continue;
+    }
+    // Guard FAKE_PRIZE: must have financial_lure
+    if (typeKey === 'FAKE_PRIZE' && !detectedFeatures.includes('financial_lure')) {
+      continue;
+    }
     const overlap = meta.primaryFeatures.filter((f) => detectedFeatures.includes(f)).length;
     if (overlap > bestOverlapCount) {
       bestOverlapCount = overlap;
@@ -209,6 +319,14 @@ function generateActionableAdvice(
 
   if (hasSuspiciousUrl) {
     advice.push('لا تضغط على الرابط نهائياً، ولا تفتح أي صفحات يوجهك إليها.');
+  }
+
+  if (urlsList.length > 1) {
+    const hasSuspicious = urlsList.some((u) => u.signals.length > 0 || u.brandSpoofing.detected);
+    const hasBenign = urlsList.some((u) => u.signals.length === 0 && !u.brandSpoofing.detected);
+    if (hasSuspicious && hasBenign) {
+      advice.push('احذر من التمويه بالروابط: الرسالة تدمج روابط رسمية أو موثوقة مع روابط تصيد أخرى لتضليلك.');
+    }
   }
 
   if (detectedFeatures.includes('otp_request')) {
@@ -416,17 +534,29 @@ export function calculateRiskScore(
   ];
 
   // 10. URL findings
-  const urlFindings = urlsList.length > 0 ? {
-    totalUrls: urlsList.length,
-    suspiciousUrlsCount: urlsList.filter((u) => u.signals.length > 0 || u.brandSpoofing.detected).length,
-    urls: urlsList.map((u) => ({
-      url: u.rawUrl,
-      hostname: u.hostname,
-      isSuspicious: u.signals.length > 0 || u.brandSpoofing.detected,
-      anomalies: u.anomalies,
-      signals: u.signals,
-    })),
-  } : undefined;
+  let urlFindings: RiskAssessmentResult['urlFindings'] = undefined;
+  if (urlsList.length > 0) {
+    const hasBenign = urlsList.some((u) => u.signals.length === 0 && !u.brandSpoofing.detected);
+
+    urlFindings = {
+      totalUrls: urlsList.length,
+      suspiciousUrlsCount: urlsList.filter((u) => u.signals.length > 0 || u.brandSpoofing.detected).length,
+      urls: urlsList.map((u) => {
+        const isSuspicious = u.signals.length > 0 || u.brandSpoofing.detected;
+        const anomalies = [...u.anomalies];
+        if (urlsList.length > 1 && isSuspicious && hasBenign) {
+          anomalies.push('رابط مشبوه مقترن برابط رسمي/موثوق (تمويه بروابط متعددة)');
+        }
+        return {
+          url: u.rawUrl,
+          hostname: u.hostname,
+          isSuspicious,
+          anomalies,
+          signals: u.signals,
+        };
+      }),
+    };
+  }
 
   return {
     score,
