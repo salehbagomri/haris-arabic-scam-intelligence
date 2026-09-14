@@ -9,7 +9,7 @@ runConfig:
 # Environment variables and secrets
 env:
   - variable: GEMINI_MODEL
-    value: gemini-2.5-flash
+    value: gemini-3.6-flash
   - variable: ENABLE_HSTS
     value: "true"
   - variable: NODE_ENV
