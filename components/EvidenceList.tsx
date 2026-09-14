@@ -86,7 +86,7 @@ export function EvidenceList({ evidence }: EvidenceListProps) {
                   <div className="haris-evidence-verbatim-container">
                     <div className="haris-evidence-verbatim-header">
                       <Quote size={12} className="haris-evidence-quote-icon" />
-                      <span className="haris-evidence-verbatim-badge">دليل حرفي من الرسالة الأصلية (Verbatim Evidence):</span>
+                      <span className="haris-evidence-verbatim-badge">الدليل الحرفي من الرسالة الأصلية (Verbatim Evidence):</span>
                     </div>
                     <div className="haris-evidence-quote-box">
                       <span className="haris-evidence-quote-text font-mono">« {verbatimQuote} »</span>

@@ -112,6 +112,9 @@ export default function HomePage() {
     setAnalysisResult(null);
     setErrorMessage(null);
     setIsLoading(false);
+    setTextInput('');
+    setUrlInput('');
+    setScreenshotFile(null);
   };
 
   return (

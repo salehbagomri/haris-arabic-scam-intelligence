@@ -46,7 +46,7 @@ export function ActionableAdvice({ advice, riskLevel = 'suspicious' }: Actionabl
         <div className="haris-section-title" style={{ marginBottom: 0 }}>
           {config.icon}
           <h2 id="advice-heading" style={{ fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}>
-            ماذا تفعل الآن؟ (إرشادات وقائية مباشرة)
+            إجراءات مقترحة (ماذا تفعل الآن؟)
           </h2>
         </div>
         <span className={`haris-badge ${config.badgeClass}`}>

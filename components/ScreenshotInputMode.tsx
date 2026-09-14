@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { UploadCloud, Image as ImageIcon, X, ShieldAlert, AlertCircle } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, X, ShieldAlert, AlertCircle, Sparkles, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { getDemoScamScreenshotFile, getDemoLegitScreenshotFile } from '../lib/demo/screenshotFixtures';
 
 interface ScreenshotInputModeProps {
   selectedFile: File | null;
@@ -38,6 +39,26 @@ export function ScreenshotInputMode({
     onFileSelect(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+  };
+
+  const handleLoadScamFixture = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const file = getDemoScamScreenshotFile();
+      validateAndSetFile(file);
+    } catch {
+      setErrorMessage('تعذر تحميل النموذج التجريبي.');
+    }
+  };
+
+  const handleLoadLegitFixture = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const file = getDemoLegitScreenshotFile();
+      validateAndSetFile(file);
+    } catch {
+      setErrorMessage('تعذر تحميل النموذج التجريبي.');
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -96,31 +117,73 @@ export function ScreenshotInputMode({
       />
 
       {!selectedFile ? (
-        <div
-          className={`haris-dropzone ${isDragActive ? 'drag-active' : ''}`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={() => !isLoading && fileInputRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              fileInputRef.current?.click();
-            }
-          }}
-          aria-label="منطقة رفع لقطة الشاشة"
-        >
-          <div className="haris-dropzone-icon">
-            <UploadCloud size={28} />
+        <>
+          <div
+            className={`haris-dropzone ${isDragActive ? 'drag-active' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => !isLoading && fileInputRef.current?.click()}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                fileInputRef.current?.click();
+              }
+            }}
+            aria-label="منطقة رفع لقطة الشاشة"
+          >
+            <div className="haris-dropzone-icon">
+              <UploadCloud size={28} />
+            </div>
+            <div className="haris-dropzone-title">
+              اسحب لقطة الشاشة هنا أو انقر للاختيار
+            </div>
+            <div className="haris-dropzone-subtitle">
+              يدعم صور المحادثات ولقطات الـ SMS وتطبيقات المراسلة (PNG, JPG حتى 10 م.ب)
+            </div>
           </div>
-          <div className="haris-dropzone-title">
-            اسحب لقطة الشاشة هنا أو انقر للاختيار
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-2)',
+              marginTop: 'var(--space-2)',
+              padding: 'var(--space-3) var(--space-4)',
+              background: 'var(--bg-surface-subtle)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--border-subtle)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--text-secondary)', fontSize: 'var(--font-xs)', fontWeight: 600 }}>
+              <Sparkles size={14} color="var(--accent)" />
+              <span>نماذج تجريبية سريعة للعرض والتحكيم (Demo Fixtures):</span>
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="haris-secondary-btn"
+                onClick={handleLoadScamFixture}
+                disabled={isLoading}
+                style={{ fontSize: 'var(--font-xs)', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
+              >
+                <AlertTriangle size={14} color="var(--danger)" />
+                <span>تجربة: لقطة احتيال بنكي (Scam Screenshot)</span>
+              </button>
+              <button
+                type="button"
+                className="haris-secondary-btn"
+                onClick={handleLoadLegitFixture}
+                disabled={isLoading}
+                style={{ fontSize: 'var(--font-xs)', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
+              >
+                <ShieldCheck size={14} color="var(--success)" />
+                <span>تجربة: لقطة توعية مشروعة للمقارنة (Legitimate Contrast)</span>
+              </button>
+            </div>
           </div>
-          <div className="haris-dropzone-subtitle">
-            يدعم صور المحادثات ولقطات الـ SMS وتطبيقات المراسلة (PNG, JPG حتى 10 م.ب)
-          </div>
-        </div>
+        </>
       ) : (
         <div className="haris-preview-box">
           <div className="haris-preview-info">
